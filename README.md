@@ -1,2 +1,2 @@
-# sat_deployer
-A deployment and configuration ansible project. Used by rhis-builder
+# rhis-builder-satellite
+The code in this repo builds the Satellite configuration for a RHIS deployment.
