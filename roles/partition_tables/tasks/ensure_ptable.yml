@@ -1,0 +1,33 @@
+---
+# This task creates an individual partition table from specified paramters
+
+- name: Apply any ansible templating defined in the configuration template
+  ansible.builtin.template:
+    src: "{{ partition_table.path }}"
+    dest: "{{ partition_table.path }}.out"
+    owner: root
+    group: root
+    mode: "0744"
+
+# state defaults to present
+# we are always builting from templates
+
+- name: "Ensure state of partition table - {{ partition_table.name }}"
+  redhat.satellite.partition_table:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    file_name: "{{ partition_table.path }}.out"
+    locked: "{{ partition_table.locked | default(omit) }}"
+    name: "{{ partition_table.name }}"
+    updated_name: "{{ partition_table.updated_name | default(omit) }}"
+    os_family: "{{ partition_table.os_family | default('Redhat') }}"
+    state: "{{ partition_table.state | default(omit) }}"
+    organizations: "{{ partition_table.organization_list | default(satellite_organization | list) }}"
+    locations: "{{ partition_table.location_list | default(satellite_location | list) }}"
+
+- name: "Remove the temporary file"
+  ansible.builtin.file:
+    path: "{{ partition_table.path }}.out"
+    state: absent

@@ -1,0 +1,10 @@
+---
+# This playbook configures the rhisam hostgroups 
+#
+- name: Create the rhisam hostgroups
+  include_tasks: create_hostgroup.yml
+  loop: "{{ hostgroups_baremetal }}"
+  loop_control:
+    loop_var: hg
+  when: "hostgroups_baremetal is defined"
+

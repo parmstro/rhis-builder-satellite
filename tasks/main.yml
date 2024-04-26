@@ -1,0 +1,424 @@
+---
+# This is the entry point for the foreman_post role tasks
+# As this is a role for the configuration of a complex single system, this is a necessarily long and involved file.
+# Please take the time to read the documentation especially around the variables that you should set (and those you might wish to leave alone!)
+# Content Configuration
+# - configure hammer
+# - download and install a Red Hat manifest to access content.
+# - configure Red Hat repositories.
+# - configure content credentials
+# - configure any custom products e.g. MSSQL Server
+# - synchronize the content
+# - create the life cycle environments
+# - create the content views
+# - create the composite content views
+# - create the sync plans
+# - attach the sync plans to content
+# - configure Activation Keys
+# Provisioning Configuration
+# - configure OS media
+# - configure partition tables templates
+# - configure job templates
+# - configure provisioning templates
+# - configure template synchronization
+# - configure OSs
+# - download ansible roles for SCAP
+# - configure OSCAP content
+# - configure OSCAP tailoring files
+# - configure OSCAP policy
+# - configure Network Domains
+# - configure Kerberos REALMs
+# - configure Subnets
+# - configure PXE provisioning defaults for baremetal discovery
+# - configure discovery rules
+# - configure schedules
+# - configure global parameters
+# - configure anything else
+# - configure hostgroups
+# - add admin users - cloud connector, ansible
+
+- name: "Configure hammer"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_hammer.yml"
+  tags:
+    - tags_rhisam
+    - tags_basic_config
+    - tags_configure_hammer
+
+- name: "Create Satellite manifest"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/create_manifest.yml"
+  tags:
+    - tags_rhisam
+    - tags_basic_config
+    - tags_manifest
+
+- name: "Fetch Satellite manifest"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/fetch_manifest.yml"
+  tags:
+    - tags_rhisam
+    - tags_basic_config
+    - tags_manifest
+
+- name: "Upload Satellite manifest"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/upload_manifest.yml"
+  tags:
+    - tags_rhisam
+    - tags_basic_config
+    - tags_manifest
+
+- name: "Configure rhisam repositories"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_repositories.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_redhat_repos
+    - tags_repositories
+
+- name: "Configure user repositories"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_repositories.yml"
+  tags:
+    - tags_user
+    - tags_content_config
+    - tags_redhat_repos
+    - tags_repositories
+
+- name: "Configure custom products"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_custom_products.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - custom_repos
+    - tags_repositories
+
+- name: "Start repository synchronization... go grab a meal, this will take a while"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/start_synchronization.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_sync
+
+- name: "Configure lifecycle environments"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_lifecycle_environments.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_lifecycle_environments
+
+- name: "Configure rhisam sync plans"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_sync_plans.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - sync_plans
+
+- name: "Configure user sync plans"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_sync_plans.yml"
+  tags:
+    - tags_user
+    - tags_content_config
+    - tags_sync_plans
+
+- name: "Attach sync plans to products"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/attach_sync_plans.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_sync_plans
+
+- name: "Configure rhisam content views"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_cvs.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_content_views
+
+- name: "Configure user content views"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_cvs.yml"
+  tags:
+    - tags_user
+    - tags_content_config
+    - tags_content_views
+
+- name: "Configure rhisam composite content views"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_ccvs.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_composite_content_views
+
+- name: "Configure user composite content views"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_ccvs.yml"
+  tags:
+    - tags_user
+    - tags_content_config
+    - tags_composite_content_views
+
+- name: "Configure rhisam media"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_media.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_media
+
+- name: "Configure user media"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_media.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_media
+
+- name: "Configure rhisam partition tables"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_ptables.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_ptables
+
+- name: "Configure user partition tables"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_ptables.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_ptables
+
+- name: "Configure rhisam provisioning templates"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_prov_templates.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_prov_templates
+
+- name: "Configure user provisioning templates"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_prov_templates.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_prov_templates
+
+- name: "Configure rhisam operating systems"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_oss.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_os
+
+- name: "Configure user operating systems"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_oss.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_os
+
+- name: "Configure rhisam activation keys"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_aks.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_activation_keys
+
+- name: "Configure user activation keys"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_aks.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_activation_keys
+
+- name: "Configure rhisam DNS domains"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_domains.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_network
+    - tags_domains
+
+- name: "Configure user DNS domains"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_domains.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_network
+    - tags_domains
+
+- name: "Configure rhisam IdM REALMs"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_realms.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_network
+    - tags_realms
+
+- name: "Configure user IdM REALMs"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_realms.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_network
+    - tags_realms
+
+- name: "Configure rhisam subnets"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_subnets.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_network
+    - tags_subnets
+
+- name: "Configure user subnets"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_subnets.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_network
+    - tags_subnets
+
+- name: "Build PXE Linux defaults"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/build_pxe_defaults.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_discovery
+
+- name: "Configure rhisam compute resources"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_compute_resources.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_compute_resources
+
+- name: "Configure user compute resources"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_compute_resources.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_compute_resources
+
+- name: "Configure rhisam compute profiles"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_compute_profiles.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_compute_profiles
+
+- name: "Configure configure user compute profiles"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_compute_profiles.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_compute_profiles
+
+- name: "Configure virt-who configurations"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_virtwho.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_virt_who
+
+- name: "Configure configure rhisam ansible role git repos"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_git_repos.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_clone_git_repos
+
+- name: "Configure configure user ansible role git repos"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_git_repos.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_clone_git_repos
+
+- name: "Ensure import ansible roles"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/ensure_import_roles.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_ansible_import_roles
+
+- name: "Configure rhisam SCAP content"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_scap_content.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_scap_contents
+
+- name: "Configure user SCAP content"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_scap_content.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_scap_contents
+
+- name: "Configure configure rhisam SCAP tailoring files"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_scap_tailoring_files.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_scap_tailoring_files
+
+- name: "Configure user SCAP tailoring files"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_scap_tailoring_files.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_scap_tailoring_files
+
+- name: "Configure rhisam hostgroups"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_hostgroups.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_host_groups
+
+- name: "Configure user hostgroups"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_hostgroups.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_host_groups
+
+- name: "Configure rhisam SCAP policies"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_scap_policies.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_scap_policies
+
+- name: "Configure user SCAP policies"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_scap_policies.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_scap_policies
+
+- name: "Configure rhisam discovery rules"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_discovery_rules.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_discovery_rules
+
+- name: "Configure user discovery rules"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_discovery_rules.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_discovery_rules
+
+- name: "Configure rhisam global parameters"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_rhisam_global_parameters.yml"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_global_parameters
+
+- name: "Configure user global parameters"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_user_global_parameters.yml"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_global_parameters
+
+- name: "Configure general settings"
+  ansible.builtin.import_tasks: "{{ role_path }}/tasks/configure_general_settings.yml"
+  tags:
+    - tags_general_settings
+# End of Satellite Configuration

@@ -1,0 +1,16 @@
+---
+# This play creates an individual lifecycle environment.
+# state defaults to present
+
+- name: "Ensure the state of the lifecycle environment - {{ lifecycle_environment.name }}"
+  redhat.satellite.lifecycle_environment:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ lifecycle_environment.name }}"
+    label: "{{ lifecycle_environment.label }}"
+    organization: "{{ lifecycle.organization }}"
+    description: "{{ lifecycle_environment.desc }}"
+    prior: "{{ lifecycle_environment.prior }}"
+    state: "{{ lifecycle_environment.state | default(omit) }}"

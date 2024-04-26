@@ -1,0 +1,16 @@
+---
+
+# This task configures the rhisam and custom subscription manifests
+- name: "Configure the specified rhisam subscription_manifests."
+  ansible.builtin.include_tasks: "ensure_subscription_manifest.yml"
+  loop: "{{ subscription_manifests_rhisam }}"
+  loop_control:
+    loop_var: subscription_manifest
+  when: "subscription_manifests_rhisam is defined"
+
+- name: "Configure the specified user subscription_manifests."
+  ansible.builting.include_tasks: "ensure_subscription_manifest.yml"
+  loop: "{{ subscription_manifests_user }}"
+  loop_control:
+    loop_var: subscription_manifest
+  when: "subscription_manifests_user is defined"

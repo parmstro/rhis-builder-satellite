@@ -1,4 +1,7 @@
 ---
+# Tell the linter to ignore long lines
+# yamllint disable rule:line-length
+
 satellite_fqdn: "{{ groups['sat_primary'][0] }}"
 satellite_domain: "{{ ansible_domain }}"
 
@@ -9,7 +12,7 @@ satellite_admin_username: "{{ sat_inital_admin_username_vault }}"
 satellite_admin_password: "{{ sat_inital_admin_password_vault }}"
 satellite_validate_certs: true
 
-satellite_admin_email: "{{ satellite_admin_username}}@{{ satellite_domain }}"
+satellite_admin_email: "{{ satellite_admin_username }}@{{ satellite_domain }}"
 
 async_timeout: 14400
 async_delay: 15
@@ -97,8 +100,8 @@ manifest_subs:
 # locations
 
 # Red Hat Repositories
-# - mandatory: make demos work - this pattern is used throughout
-# - optional: let's *you* do stuff - this pattern is used throughout
+# - rhisam: make demos work - this pattern is used throughout
+# - user: let's *you* do stuff - this pattern is used throughout
 # the repo may or may not have a basearch or releasever - this is a total crap shoot
 #
 
@@ -111,7 +114,7 @@ skip_publish: false
 
 # Add additional content not needed for boostrap but still valuable and useful
 # Can be set to false to skip managemet of repos, CVs and CCVs
-repos_mandatory:
+repos_rhisam:
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     releasever: "8"
@@ -164,7 +167,7 @@ repos_mandatory:
     product: "JBoss Enterprise Application Platform"
 
 
-repos_optional:
+repos_user:
   - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
     product: "Red Hat Enterprise Linux Server"
     basearch: "x86_64"
@@ -335,7 +338,7 @@ lifecycle_environments:
     org: "{{ satellite_initial_organization }}"
     prior: "Production"
 
-sync_plans_mandatory:
+sync_plans_rhisam:
   - name: "nightly_os"
     desc: "Nightly OS repo sync - 00:30"
     interval: "daily"
@@ -360,7 +363,7 @@ sync_plans_mandatory:
     organization: "{{ satellite_initial_organization }}"
     location: "{{ satellite_initial_location }}"
 
-product_plan_mandatory:
+product_plan_rhisam:
   - name: "Red Hat Enterprise Linux Server for x86_64"
     plan: "nightly_os"
     organization: "{{ satellite_initial_organization }}"
@@ -381,7 +384,7 @@ product_plan_mandatory:
     plan: "nightly_infra"
     organization: "{{ satellite_initial_organization }}"
 
-product_plan_optional:
+product_plan_user:
   - name: "Red Hat Enterprise Linux Server"
     plan: "nightly_os"
     organization: "{{ satellite_initial_organization }}"
@@ -397,14 +400,14 @@ product_plan_optional:
   - name: "CentOS Streams"
     plan: "nightly_third_party"
     organization: "{{ satellite_initial_organization }}"
-  
+
   - name: "Microsoft SQL Server for Linux 2022 for RHEL 8"
     plan: "nightly_third_party"
     organization: "{{ satellite_initial_organization }}"
 
 errata_end_date: "{{ ansible_date_time.date }}"
 
-cvs_mandatory:
+cvs_rhisam:
   - name: "AAP_Files"
     desc: "Red Hat Ansible Automation Platform Install Files"
     org: "{{ satellite_initial_organization }}"
@@ -480,7 +483,7 @@ cvs_mandatory:
     - "Qualification"
     - "Production"
 
-cvs_optional:
+cvs_user:
   - name: "SOE_RHEL7"
     desc: "Our Red Hat Enterprise Linux 7 Standard Operating Environment Content"
     org: "{{ satellite_initial_organization }}"
@@ -800,7 +803,7 @@ cvs_optional:
 #    - "Library"
 #    - "Development"
 
-ccvs_mandatory:
+ccvs_rhisam:
   - name: "SOE_AAP"
     desc: "SOE for Ansible Automation Platform Servers"
     org: "{{ satellite_initial_organization }}"
@@ -827,7 +830,7 @@ ccvs_mandatory:
     - "Development"
     - "Qualification"
 
-ccvs_optional:
+ccvs_user:
   - name: "LEAPP_7_2_8"
     desc: "Migrate from RHEL 7.9 to RHEL 8.6"
     org: "{{ satellite_initial_organization }}"
@@ -879,7 +882,7 @@ ccvs_optional:
     - "Development"
     - "Qualification"
 
-global_parameters_mandatory:
+global_parameters_rhisam:
   - name: "ansible_host_config_key"
     value: "50f79524-5415-462b-b5d3-2eeebc65aaac"
     parameter_type: "string"
@@ -1003,23 +1006,23 @@ global_parameters_mandatory:
     value: false
     parameter_type: "boolean"
 
-global_parameters_optional:
+global_parameters_user:
 
-  - name: "an_example_optional_global_parameter"
+  - name: "an_example_user_global_parameter"
     value: "Delete Me"
     parameter_type: "string"
 
 # NOTE: Most media is now included in the content view
-# media_mandatory:
+# media_rhisam:
 #  - name: RHEL7Server
 #    os_family: Redhat
 #    path: "http://{{ satellite_fqdn }}/pulp/repos/{{ satellite_initial_organization | replace(' ', '_') }}/Library/content/dist/rhel/server/7/$major.$minor/$arch/kickstart/"
 #    organization: "{{ satellite_initial_organization }}"
 #    location: "{{ satellite_initial_location }}"
 
-# media_optional:
+# media_user:
 
-prov_templates_mandatory:
+prov_templates_rhisam:
 # snippets
   - name: "soe_create_users_selinux"
     type: "snippet"
@@ -1140,7 +1143,7 @@ prov_templates_mandatory:
     location: "{{ satellite_initial_location }}"
 
 
-ptables_mandatory:
+ptables_rhisam:
   - name: "RHEL_Server_CIS1"
     os_family: "Red Hat"
     path: "ptable_rhel_server_cis1.j2"
@@ -1165,11 +1168,11 @@ ptables_mandatory:
     organization: "{{ satellite_initial_organization }}"
     location: "{{ satellite_initial_location }}"
 
-# ptables_optional:
+# ptables_user:
 
 # Although the OSs are create automatically wdhen we include a kickstart
 # we still need to update some of the configurations, notably templates and partition tables
-oss_mandatory:
+oss_rhisam:
   - name: "RedHat"
     major: 8
     minor: 8
@@ -1220,7 +1223,7 @@ oss_mandatory:
       - name: "Kickstart default user data"
         template_kind: "user_data"
 
-oss_optional:
+oss_user:
   - name: "RedHat"
     major: 7
     minor: 9
@@ -1421,7 +1424,7 @@ oss_optional:
       - name: "Kickstart default user data"
         template_kind: "user_data"
 
-aks_mandatory:
+aks_rhisam:
   - name: "SOE_RHEL8"
     state: "present"
     description: "Activate a RHEL 8 system"
@@ -1434,7 +1437,7 @@ aks_mandatory:
     lifecycle_environment: "Development"
     unlimited_hosts: true
 
-aks_optional:
+aks_user:
   - name: "SOE_RHEL7"
     state: "present"
     description: "Activate a RHEL 7 system"
@@ -1483,7 +1486,7 @@ aks_optional:
     lifecycle_environment: "Development"
     unlimited_hosts: true
 
-domains_mandatory:
+domains_rhisam:
   - name: "{{ satellite_domain }}"
     description: "root domain for the installation"
     dns_capsule: "{{ satellite_fqdn }}"
@@ -1492,7 +1495,7 @@ domains_mandatory:
     locations:
       - "{{ satellite_initial_location }}"
 
-realms_mandatory:
+realms_rhisam:
   - name: "{{ satellite_domain | upper }}"
     organizations: "{{ satellite_initial_organization }}"
     locations: "{{ satellite_initial_location }}"
@@ -1500,7 +1503,7 @@ realms_mandatory:
     realm_capsule: "{{ satellite_fqdn }}"
 
 # ansible role sources
-git_repos_mandatory:
+git_repos_rhisam:
 # RHEL9
   - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-e8.git"
     dest: "/etc/ansible/roles/ansible-role-rhel9-e8"
@@ -1637,7 +1640,7 @@ git_repos_mandatory:
     clone: true
     force: true
 
-scap_content_mandatory:
+scap_content_rhisam:
   - title: "RHEL 8 SCAP content"
     scap_file: "ssg-rhel8-ds.xml"
     locations:
@@ -1645,7 +1648,7 @@ scap_content_mandatory:
     organizations:
       - "{{ satellite_initial_organization }}"
 
-scap_content_optional:
+scap_content_user:
   - title: "RHEL 7 SCAP content"
     scap_file: "ssg-rhel7-ds.xml"
     locations:
@@ -1659,7 +1662,7 @@ scap_content_optional:
     organizations:
       - "{{ satellite_initial_organization }}"
 
-scap_tailoring_files_mandatory:
+scap_tailoring_files_rhisam:
   - name: "RHEL 8 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel8-ds-tailoring.xml"
     locations:
@@ -1667,7 +1670,7 @@ scap_tailoring_files_mandatory:
     organizations:
       - "{{ satellite_initial_organization }}"
 
-scap_tailoring_files_optional:
+scap_tailoring_files_user:
   - name: "RHEL 7 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel7-ds-tailoring.xml"
     locations:

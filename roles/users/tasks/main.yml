@@ -1,0 +1,25 @@
+---
+
+- name: "Ensure the users for the rhisam configuration"
+  ansible.builtin.include_tasks: "ensure_user_group.yml"
+  loop: "{{ users_rhisam }}"
+  loop_control:
+    loop_var: user
+  when: "users_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_satellite_management_config
+    - tags_users
+    - tags_users_rhisam
+
+- name: "Ensure the users for the user configuration"
+  ansible.builtin.include_tasks: "ensure_user_group.yml"
+  loop: "{{ users_user }}"
+  loop_control:
+    loop_var: user
+  when: "users_user is defined"
+  tags:
+    - tags_user
+    - tags_satellite_management_config
+    - tags_users
+    - tags_users_user

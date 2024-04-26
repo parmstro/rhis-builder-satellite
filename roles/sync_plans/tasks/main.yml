@@ -1,0 +1,26 @@
+---
+# This playbook configures the rhisam product repo sync plans
+#
+- name: "Ensure the rhisam synchronization plans"
+  ansible.builtin.include_tasks: "ensure_sync_plan.yml"
+  loop: "{{ sync_plans_rhisam }}"
+  loop_control:
+    loop_var: sync_plan
+  when: "sync_plans_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_content_management_config
+    - tags_sync_plans
+    - tags_sync_plans_rhisam
+
+- name: "Ensure the user synchronization plans"
+  ansible.builtin.include_tasks: "ensure_sync_plan.yml"
+  loop: "{{ sync_plans_user }}"
+  loop_control:
+    loop_var: sync_plan
+  when: "sync_plans_user is defined"
+  tags:
+    - tags_rhisam
+    - tags_content_management_config
+    - tags_sync_plans
+    - tags_sync_plans_user

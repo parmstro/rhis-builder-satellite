@@ -1,13 +1,19 @@
 ---
+# Tell the yaml linter to ignore long lines
+# yamllint disable rule:line-length
+
+# These operations do not play well with the ansible conventions for changes and shell pipes
+# This has been tested extensively on RHEL8 and RHEL9 and works as expected.
+
 - name: "Clean up old keytabs"
   ansible.builtin.file:
     path: "{{ item }}"
     state: absent
   loop:
-    - /etc/foreman-proxy/freeipa.keytab
+    - "/etc/foreman-proxy/freeipa.keytab"
     - "freeipa.keytab"
 
-- name: "Setup satellite realm user"
+- name: "Setup satellite realm user"  # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; echo '{{ ipa_admin_password }}' | /usr/sbin/foreman-prepare-realm admin {{ foreman_proxy_realm_principal }}"
   register: result
 
@@ -15,20 +21,24 @@
   ansible.builtin.wait_for:
     path: "freeipa.keytab"
 
-- name: "Ensure the foreman-proxy directory exists"
+- name: "Ensure the foreman-proxy directory exists"  # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.file:
-    path: /etc/foreman-proxy
+    path: "/etc/foreman-proxy"
     state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
 
-- name: "Move the keytab to the foreman-proxy directory"
+- name: "Move the keytab to the foreman-proxy directory"  # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.copy:
     src: "freeipa.keytab"
     dest: /etc/foreman-proxy/freeipa.keytab
     owner: foreman-proxy
     group: foreman-proxy
-    remote_src: yes
+    mode: "0600"
+    remote_src: true
 
-- name: "Test the new keytab"
+- name: "Test the new keytab" # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.command: "kinit -kt /etc/foreman-proxy/freeipa.keytab {{ foreman_proxy_realm_principal }}"
   register: result
 
@@ -38,19 +48,19 @@
       - result.stdout == ""
 
 
-- name: "copy the ipa ca-certificates to the trust directory"
+- name: "Copy the ipa ca-certificates to the trust directory"
   ansible.builtin.copy:
     src: /etc/ipa/ca.crt
     dest: /etc/pki/ca-trust/source/anchors/ipa.crt
-    remote_src: yes
+    remote_src: true
     owner: root
     group: root
     mode: '0644'
 
-- name: enable the trust
+- name: "Enable the trust" # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.command: "update-ca-trust enable"
 
-- name: update the trust
+- name: "Update the trust" # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.command: "update-ca-trust"
 
 - name: "Set up IdM forward lookup zone to allow foreman proxy to update DNS"
@@ -58,11 +68,11 @@
     ipaadmin_principal: "{{ ipa_admin_principal }}"
     ipaadmin_password: "{{ ipa_admin_password }}"
     name: "{{ ipa_dns_forward_zone }}"
-    update_policy: "{{ foreman_proxy_BIND_update_policy }}"
+    update_policy: "{{ foreman_proxy_bind_update_policy }}"
 
 - name: "Set up IdM reverse lookup zone to allow foreman proxy to update DNS"
   redhat.rhel_idm.ipadnszone:
     ipaadmin_principal: "{{ ipa_admin_principal }}"
     ipaadmin_password: "{{ ipa_admin_password }}"
     name: "{{ ipa_dns_reverse_zone }}"
-    update_policy: "{{ foreman_proxy_BIND_update_policy }}"
+    update_policy: "{{ foreman_proxy_bind_update_policy }}"

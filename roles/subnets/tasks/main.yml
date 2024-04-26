@@ -1,0 +1,26 @@
+---
+# By the time you read this, you probably understand the pattern
+
+- name: "Configure the rhisam subnets"
+  ansible.builtin.include_tasks: "ensure_subnet.yml"
+  loop: "{{ subnets_rhisam }}"
+  loop_control:
+    loop_var: subnet
+  when: "subnets_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_infrastructure_config
+    - tags_subnets
+    - tags_subnets_rhisam
+
+- name: "Configure the user subnets"
+  ansible.builtin.include_tasks: "ensure_subnet.yml"
+  loop: "{{ subnets_user }}"
+  loop_control:
+    loop_var: subnet
+  when: "subnets_user is defined"
+  tags:
+    - tags_rhisam
+    - tags_infrastructure_config
+    - tags_subnets
+    - tags_subnets_rhisam

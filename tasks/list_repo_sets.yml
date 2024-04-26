@@ -3,7 +3,7 @@
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
-    organization: "{{ satellite_initial_organization }}"
+    organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
     resource: repository_sets
     search: 'name ~ "Red Hat Satellite Client 6"'

@@ -1,0 +1,34 @@
+---
+
+# Currently, the SCAP scanning contents are part of the role.
+# We can install the shipping scap-security-guide content for RHEL8 on the Satellite host
+# This installs the content for RHEL6, RHEL7 and RHEL8, but not for RHEL9
+# as a bonus it installs the Red Hat official ansible playbooks
+# We still need the RHEL9 contents. Unfortunately, on RHEL9 scap-security-guide only contains the RHEL9 contents and playbooks
+# So we are in a conundrum - install or copy. We are chosing to copy the xml files and we sync the ansible code from
+# The RedHatOfficial site and load the playbooks into Satellite
+# Last we checked, the RedHatOfficial ansible code does not play with IdM with auth-select enable-feature with-sudo (centralised sudo management)
+# So, we are also creating a repository with code to ensure that it does work with the above turned on
+# We will continue to provide this until we can be confident that the RedHatOfficial code plays nicely.
+
+- name: "Copy the scap file to target"
+  ansible.builtin.copy:
+    src: "{{ role_path }}/files/{{ scap_content.scap_file }}"
+    dest: "{{ scap_content.scap_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: scap_content.scap_file is defined
+
+- name: "Ensure the scap content is loaded"
+  redhat.satellite.scap_content:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    title: "{{ scap_content.title }}"
+    scap_file: "{{ scap_content.scap_file | default(omit) }}"
+    locations: "{{ scap_content.locations | default(omit) }}"
+    organizations: "{{ scap_content.organizations | default(omit) }}"
+    updated_title: "{{ scap_content.updated_title | default(omit) }}"
+    state: "{{ scap_content.state | default(omit) }}" # underlying collection default is present

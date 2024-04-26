@@ -1,0 +1,25 @@
+---
+
+- name: "Ensure the rhisam SCAP tailoring files are configured"
+  ansible.builtin.include_tasks: "ensure_scap_tailoring_file.yml"
+  loop: "{{ scap_tailoring_files_rhisam }}"
+  loop_control:
+    loop_var: scap_tailoring_file
+  when: scap_tailoring_files_rhisam is defined
+  tags:
+    - tags_rhisam
+    - tags_scap_config
+    - tags_scap_tailoring_files
+    - tags_scap_tailoring_files_rhisam
+
+- name: "Ensure the user SCAP tailoring files are configured"
+  ansible.builtin.include_tasks: "ensure_scap_tailoring_file.yml"
+  loop: "{{ scap_tailoring_files_rhisam }}"
+  loop_control:
+    loop_var: scap_tailoring_file
+  when: scap_tailoring_files_rhisam is defined
+  tags:
+    - tags_rhisam
+    - tags_scap_config
+    - tags_scap_tailoring_files
+    - tags_scap_tailoring_files_rhisam

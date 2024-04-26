@@ -1,0 +1,26 @@
+---
+# Configure the rhisam and user compute profiles
+
+- name: "Configure the rhisam compute profiles"
+  ansible.builtin.include_tasks: ensure_compute_profile.yml
+  loop: "{{ compute_profiles_rhisam }}"
+  loop_control:
+    loop_var: compute_profile
+  when: "compute_profiles_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_compute_profiles
+    - tags_compute_profiles_rhisam
+
+- name: "Configure the user compute profiles"
+  ansible.builtin.include_tasks: ensure_compute_profile.yml
+  loop: "{{ compute_profiles_user }}"
+  loop_control:
+    loop_var: compute_profile
+  when: "compute_profiles_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_compute_profiles
+    - tags_compute_profiles_user

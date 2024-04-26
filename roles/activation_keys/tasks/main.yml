@@ -1,0 +1,26 @@
+---
+## Configure the rhisam and user activation keys
+
+- name: "Configure the rhisam activation_keys"
+  ansible.builtin.include_tasks: "ensure_aactivation_key.yml"
+  loop: "{{ activation_keys_rhisam }}"
+  loop_control:
+    loop_var: activation_key
+  when: "activation_keys_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_activation_keys
+    - tags_activation_keys_rhisam
+
+- name: "Configure the user activation keys"
+  ansible.builtin.include_tasks: "ensure_activation_key.yml"
+  loop: "{{ activation_keys_user }}"
+  loop_control:
+    loop_var: activation_key
+  when: "activationkeys_user is defined"
+  tags:
+    - tags_user
+    - tags_content_config
+    - tags_activation_keys
+    - tags_activation_keys_user

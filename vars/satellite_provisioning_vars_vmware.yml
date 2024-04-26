@@ -1,5 +1,5 @@
 ---
-subnets_mandatory:
+subnets_rhisam:
   - name: "Public"
     description: "Front side for client apps "
     network_type: "IPv4"
@@ -24,26 +24,26 @@ subnets_mandatory:
     organizations:
       - "{{ satellite_initial_organization }}"
 
-# subnets_optional:
+# subnets_user:
 
 vcenter_service_username: "{{ vcenter_service_username_vault }}"
 vcenter_service_password: "{{ vcenter_service_password_vault }}"
 
-compute_resources_mandatory:
+compute_resources_rhisam:
   - name: "VMware_Lab"
     provider: "vmware"
     description: "Lab VCenter Server"
     locations: "{{ satellite_initial_location }}"
     organizations: "{{ satellite_initial_organization }}"
     provider_params:
-      caching_enabled: false  #setting this to true currently causes some server faults.
+      caching_enabled: false  # setting this to true currently causes some server faults.
       datacenter: "example.ca"
       url: "192.168.140.30"
       user: "{{ vcenter_service_username }}"
       password: "{{ vcenter_service_password }}"
 
 
-# compute_resources_optional:
+# compute_resources_user:
 
 # setup_virtwho
 vcenter_virtwho_username: "{{ vcenter_virtwho_username_vault }}"
@@ -51,7 +51,7 @@ vcenter_virtwho_password: "{{ vcenter_virtwho_password_vault }}"
 satellite_virtwho_username: "{{ satellite_virtwho_username_vault }}"
 satellite_virtwho_password: "{{ satellite_virtwho_password_vault }}"
 
-virtwho_configs_mandatory:
+virtwho_configs_rhisam:
   - foreman_virt_who_configure_config:
       name: "VMware"
       hypervisor_type: "esx"
@@ -65,7 +65,7 @@ virtwho_configs_mandatory:
       organization_id: 1
 
 # compute_profiles
-compute_profiles_mandatory:
+compute_profiles_rhisam:
   - name: "SOE_Small"
     compute_attributes:
       - compute_resource: "VMware_Lab"
@@ -168,7 +168,7 @@ compute_profiles_mandatory:
               type: "VirtualVmxnet3"
               network: "VM Network"
 
-hostgroups_mandatory:
+hostgroups_rhisam:
   - name: "RHEL8base"
     description: "RHEL 8 SOE base hostgroup"
     activation_keys: "SOE_RHEL8"
@@ -219,7 +219,7 @@ hostgroups_mandatory:
     ptable: "RHEL_Server_Compliance"
     organization: "{{ satellite_initial_organization }}"
 
-hostgroups_optional:
+hostgroups_user:
   - name: "RHEL9base"
     description: "RHEL 9 SOE base hostgroup"
     activation_keys: "SOE_RHEL9"
@@ -261,7 +261,7 @@ hostgroups_optional:
     ptable: "RHEL_Server_Compliance"
     organization: "{{ satellite_initial_organization }}"
 
-discovery_rules_mandatory:
+discovery_rules_rhisam:
   - name: "3nic_host"
     enabled: false
     state: present

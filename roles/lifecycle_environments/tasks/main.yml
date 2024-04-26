@@ -1,0 +1,29 @@
+# This task creates the lifecycle environments defined
+# The basic environments are Dev QA and Prod
+# keeping it simple.
+#
+
+- name: "Ensuring the specified rhisam lifecycle environments"
+  ansible.builtin.include_tasks: ensure_lifecycle_environment.yml
+  loop: "{{ lifecycle_environments_rhisam }}"
+  loop_control:
+    loop_var: lifecycle_environment
+  when: "lifecycle_environments_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_content_management_config
+    - tags_lifecycle_environments
+    - tags_lifecycle_environments_rhisam
+
+
+- name: "Ensuring the specified user lifecycle environments"
+  ansible.builtin.include_tasks: ensure_lifecycle_environment.yml
+  loop: "{{ lifecycle_environments_user }}"
+  loop_control:
+    loop_var: lifecycle_environment
+  when: "lifecycle_environments_user is defined"
+  tags:
+    - tags_user
+    - tags_content_management_config
+    - tags_lifecycle_environments
+    - tags_lifecycle_environments_user

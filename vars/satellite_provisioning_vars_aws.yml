@@ -1,11 +1,11 @@
 ---
-subnets_mandatory: []
-subnets_optional: []
+subnets_rhisam: []
+subnets_user: []
 
 aws_access_key: "{{ aws_access_key_vault }}"
 aws_secret_key: "{{ aws_secret_key_vault }}"
 
-compute_resources_mandatory:
+compute_resources_rhisam:
   - name: "EC2-{{ ec2_region }}"
     provider: "EC2"
     description: "EC2 compute for {{ ec2_name_prefix }} Region {{ ec2_region }}"
@@ -23,13 +23,13 @@ compute_resources_mandatory:
         image_username: 'ec2-user'
         uuid: "{{ imagebuilder_ami }}"
 
-# compute_resources_optional:
+# compute_resources_user:
 
 # setup_virtwho
 satellite_virtwho_username: "{{ satellite_virtwho_username_vault }}"
 satellite_virtwho_password: "{{ satellite_virtwho_password_vault }}"
 
-virtwho_configs_mandatory: []
+virtwho_configs_rhisam: []
 #  - foreman_virt_who_configure_config:
 #      name: "VMware"
 #      hypervisor_type: "esx"
@@ -43,7 +43,7 @@ virtwho_configs_mandatory: []
 #      organization_id: 1
 
 # compute_profiles
-compute_profiles_mandatory:
+compute_profiles_rhisam:
   - name: "AWS_SOE_Small"
     compute_attributes:
       - compute_resource: "EC2-{{ ec2_region }}"
@@ -101,7 +101,7 @@ compute_profiles_mandatory:
           security_group_ids:
             - "{{ hostvars['localhost']['sg_id'] }}"
 
-oss_mandatory:
+oss_rhisam:
   - name: "RedHat"
     major: 8
     minor: 8
@@ -134,7 +134,7 @@ oss_mandatory:
       - name: "Kickstart default user data"
         template_kind: "user_data"
 
-hostgroups_mandatory:
+hostgroups_rhisam:
   - name: "RHEL8base"
     description: "RHEL 8 SOE base hostgroup"
     activation_keys: "SOE_RHEL8"
@@ -155,7 +155,7 @@ hostgroups_mandatory:
     realm: "{{ satellite_domain | upper }}"
     root_pass: "{{ satellite_admin_password }}"
 
-discovery_rules_mandatory: []
+discovery_rules_rhisam: []
 #  - name: "3nic_host"
 #    enabled: false
 #    state: present

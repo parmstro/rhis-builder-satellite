@@ -1,0 +1,21 @@
+---
+
+# This task configures custom products that you have defined.
+# Custom products are stuff like Fedora, MSSQL Server, Debian,
+# or whatever that aren't covered by the Satellite Manifest.
+# If you are building a foreman based environment rather
+# than a Satellite environment, all of your content gets defined
+# in your custom_product.yml file in your hostvars directory for
+# your server
+
+- name: "Ensure the state of the specified custom products."
+  ansible.builtin.include_tasks: ensure_custom_product.yml
+  loop: "{{ custom_products }}"
+  loop_control:
+    loop_var: custom_product
+  when: "custom_products is defined"
+  tags:
+    - tags_user
+    - tags_rhisam
+    - tags_content_management
+    - tags_custom_products

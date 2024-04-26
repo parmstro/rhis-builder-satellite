@@ -1,0 +1,27 @@
+---
+# Wipe the disks, reboot and delete the host
+# This cleans up physical and virtual systems
+
+- name: "Wipe the disks for target host list"
+  ansible.builtin.include_tasks: "wipe.yml"
+  loop: "{{ target_hosts }}"
+  loop_control:
+    loop_var: target_host
+
+# Because we need to wipe the disk. Then get a response that it was successful.
+# We wait for the 70 seconds so the response cycle has been met.
+- name: "Sleep for 70 seconds while we wait for host meltdown"
+  ansible.builtin.wait_for:
+    timeout: 70
+  delegate_to: localhost
+
+- name: "Delete the target hosts in from Satellite"
+  redhat.satellite.host:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    name: "{{ target_host.name }}"
+    state: absent
+  loop: "{{ target_hosts }}"
+  loop_control:
+    loop_var: target_host

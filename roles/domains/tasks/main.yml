@@ -1,0 +1,23 @@
+---
+
+- name: "Configure the rhisam domains"
+  ansible.builtin.include_tasks: "ensure_domain.yml"
+  loop: "{{ domains_rhisam }}"
+  loop_control:
+    loop_var: domain
+  when: "domains_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_domains
+
+- name: "Configure the user domains"
+  ansible.builtin.include_tasks: "ensure_domain.yml"
+  loop: "{{ domains_user }}"
+  loop_control:
+    loop_var: domain
+  when: "domains_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_domains
