@@ -16,7 +16,7 @@
 
 # state defaults to enabled
 
-- name: "Ensure the state of the repository set - {{ repository.name }}"
+- name: "Ensure the state of the repository set - {{ repository_set.name }}"
   redhat.satellite.repository_set:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
@@ -29,15 +29,15 @@
     state: "{{ repository_set.state | default(omit) }}"
   when: repository_set.repository_list is defined
 
-- name: "Ensure the state of the repository set - {{ repository.name }}"
+- name: "Ensure the state of the repository set - {{ repository_set.name }}"
   redhat.satellite.repository_set:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    name: "{{ repository.name | default(omit) }}"
-    product: "{{ repository.product | default(omit) }}"
+    name: "{{ repository_set.name | default(omit) }}"
+    product: "{{ repository_set.product | default(omit) }}"
     all_repositories: true
-    state: "{{ repository.state | default(omit) }}"
-  when: repository.repository_list is not defined
+    state: "{{ repository_set.state | default(omit) }}"
+  when: repository_set.repository_list is not defined

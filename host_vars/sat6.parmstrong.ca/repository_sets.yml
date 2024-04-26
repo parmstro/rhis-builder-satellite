@@ -20,33 +20,40 @@ repos_rhisam:
   # RHEL 9.2 kickstart
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
 # RHEL 9.3 kickstart
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
 # RHEL9 repos
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
 
   - name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
@@ -54,33 +61,40 @@ repos_rhisam:
 # RHEL 8.8 kickstart
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.8"
+    repository_list:
+      - releasever: "8.8"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.8"
+    repository_list:
+      - releasever: "8.8"
 
 # RHEL 8.9 kickstart
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.9"
+    repository_list:
+      - releasever: "8.9"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.9"
+    repository_list:
+      - releasever: "8.9"
 
 # RHEL 8 Repos
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8"
+    repository_list:
+      - releasever: "8"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8"
+    repository_list:
+      - releasever: "8"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8"
+    repository_list:
+      - releasever: "8"
 
   - name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
@@ -111,32 +125,37 @@ repos_user:
 # RHEL 7 Repos for convert2rhel and LEAPP_7_2_8
   - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
     product: "Red Hat Enterprise Linux Server"
-    basearch: "x86_64"
-    releasever: "7Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
 
   - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
     product: "Red Hat Enterprise Linux Server"
 
   - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
     product: "Red Hat Enterprise Linux Server"
-    basearch: "x86_64"
-    releasever: "7Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
 
   - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
     product: "Red Hat Enterprise Linux Server"
-    basearch: "x86_64"
-    releasever: "7Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
 
   - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux Server"
-    basearch: "x86_64"
-    releasever: "7Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
 
 # RHEL 7 Kickstart
   - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
     product: "Red Hat Enterprise Linux Server"
-    basearch: "x86_64"
-    releasever: "7.9"
+    repository_list:
+      - releasever: "7.9"
+        basearch: "x86_64"
 
   - name: "Red Hat Satellite Client 6 (for RHEL 7 Server) (RPMs)"
     product: "Red Hat Enterprise Linux Server"
@@ -147,50 +166,61 @@ repos_user:
 # RHEL 8.8 repos for LEAPP
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.8"
+    repository_list:
+      - releasever: "8.8"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.8"
+    repository_list:
+      - releasever: "8.8"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "8.8"
+    repository_list:
+      - releasever: "8.8"
 
 # RHEL9.2 repos for LEAPP_8_2_9
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
-    releasever: "9.2"
+    repository_list:
+      - releasever: "9.2"
 
 # RHEL9_aarch64 kickstart repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
-    releasever: "9.3"
+    repository_list:
+      - releasever: "9.3"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
-    releasever: "9.3"
+    repository_list:
+      - releasever: "9.3"
 
 # RHEL9_aarch64 repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
 
   - name: "Red Hat Satellite Client 6 for RHEL 9 aarch64 (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
@@ -198,8 +228,10 @@ repos_user:
 # RHEL8 and RHEL9 HA Repos
   - name: "Red Hat Enterprise Linux 8 for x86_64 - High Availability (RPMs)"
     product: "Red Hat Enterprise Linux High Availability for x86_64"
-    releasever: "8"
+    repository_list:
+      - releasever: "8"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - High Availability (RPMs)"
     product: "Red Hat Enterprise Linux High Availability for x86_64"
-    releasever: "9"
+    repository_list:
+      - releasever: "9"
