@@ -32,7 +32,7 @@
     discovery_proxy: "{{ subnet.discovery_capsule | default(omit) }}"
     dns_proxy: "{{ subnet.dns_capsule | default(omit) }}"
     externalipam_proxy: "{{ subnet.externalipam_capsule | default(omit) }}"
-    http_bootproxy: "{{ subnet.httpboot_capsule | default(omit) }}"
+    httpboot_proxy: "{{ subnet.httpboot_capsule | default(omit) }}"
     template_proxy: "{{ subnet.template_capsule | default(omit) }}"
     tftp_proxy: "{{ subnet.tftp_capsule | default(omit) }}"
     state: "{{ subnet.state | default(omit) }}"
