@@ -1,4 +1,8 @@
 ---
+
+# Tell the YAML linter to ignore long lines
+# yamllint disable rule:line-length
+
 # prerequisites
 repository_ids:
   - rhel-8-for-x86_64-baseos-rpms
@@ -32,6 +36,7 @@ ipasssd_enable_dns_updates: true
 ipa_dns_reverse_zone: "168.192.in-addr.arpa"
 ipa_dns_forward_zone: "example.ca"
 ipa_default_bind_policy: "grant {{ ipa_server_realm }} krb5-self * A; grant {{ ipa_server_realm }} krb5-self * AAAA; grant {{ ipa_server_realm }} krb5-self * SSHFP;"
+
 
 # ipaclient role vars: these do not follow standards
 ipaadmin_password: "{{ ipa_admin_password_vault }}"

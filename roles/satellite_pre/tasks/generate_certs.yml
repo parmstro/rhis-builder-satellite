@@ -42,14 +42,17 @@
 
     - name: "Stop tracking cert with certmonger" # noqa: no-changed-when risky-shell-pipe ignore-errors
       ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ sat_ssl_key_path }} -f {{ sat_ssl_crt_path }} -i {{ ansible_fqdn }}" # noqa: yaml[line-length]
+      no_log: true
       ignore_errors: true
 
     - name: "Remove the old cert from the service" # noqa: no-changed-when risky-shell-pipe ignore-errors
       ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa service-remove-cert {{ target_service }} --certificate='{{ cert.stdout }}'" # noqa: yaml[line-length]
+      no_log: true
       ignore_errors: true
 
     - name: "Revoke the old cert with reason 6 - certificateHold - an admin can completely revoke it later" # noqa: no-changed-when risky-shell-pipe ignore-errors yaml[line-length]
       ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa cert-revoke {{ serial_num.stdout_lines.1 }} --revocation-reason=6" # noqa: yaml[line-length]
+      no_log: true
       ignore_errors: true
 
     - name: "Cert exists, rename old cert .revoked"
@@ -83,9 +86,11 @@
 
     - name: "Generate the certificate for the service"
       ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ sat_ssl_csr_path }} --certificate-out={{ sat_ssl_crt_path }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      no_log: true
 
     - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"
       ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ sat_ssl_key_path }} -f {{ sat_ssl_crt_path }} -I {{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      no_log: true
 
 - name: Cleanup
   ansible.builtin.file:

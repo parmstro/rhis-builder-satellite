@@ -1,6 +1,7 @@
 ---
+
 - name: "Test Task"
-  hosts: satellite
+  hosts: sat_primary
   become: true
   gather_facts: true
   vars_files:
