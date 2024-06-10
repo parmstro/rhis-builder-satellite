@@ -1,0 +1,22 @@
+---
+# Set the basic manifest state - present or absent
+- name: "Set the manifest state"
+  redhat.satellite.redhat_manifest:
+    portal: "{{ redhat_manifest.portal_url }}"
+    username: "{{ redhat_manifest.cdn_username }}"
+    password: "{{ redhat_manifest.cdn_password }}"
+    name: "{{ redhat_manifest.name }}"
+    state: "{{ redhat_manifest.state }}"
+    content_access_mode: "{{ redhat_manifest.content_access_mode | default(omit) }}"
+    validate_certs: "{{ redhat_manifest.validate_certs }}"
+  register: result
+
+- name: "Display the result"
+  ansible.builtin.debug:
+    var: result
+
+# TODO: add the uuid by appending to the list??
+# - name: "Set manifest UUID when present"
+#   ansible.builtin.set_fact:
+#     redhat_manifest.uuid: "{{ result.uuid }}"  # noqa var-naming[pattern]
+#   when: "redhat_manifest.state == 'present'"

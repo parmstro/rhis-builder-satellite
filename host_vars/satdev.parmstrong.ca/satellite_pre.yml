@@ -51,6 +51,8 @@ ipa_generate_certs: true
 # this is the name of the user being passed to prepare realm
 foreman_proxy_realm_principal: "realm-capsule"
 foreman_proxy_bind_update_policy: "{{ ipa_default_bind_policy }} grant {{ foreman_proxy_realm_principal }}\\@{{ ipa_server_realm }} wildcard * ANY;"
+keytab_retrieval_password: "{{ ipa_admin_password_vault }}"
+keytab_retrieval_dn: "{{ ipa_keytab_dn }}"
 
 sat_ssl_rsa_key_pass: "{{ sat_ssl_rsa_key_pass_vault }}"
 sat_ssl_certs_dir: "/etc/ipa/private/{{ ansible_fqdn }}/"

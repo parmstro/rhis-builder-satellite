@@ -1,0 +1,16 @@
+---
+# Download the specified manifest from the portal
+#
+- name: "Remove existing manifest files from path"
+  ansible.builtin.file:
+    path: "{{ redhat_manifest.path }}"
+    state: absent
+
+- name: "Download the specified manifest"
+  redhat.satellite.redhat_manifest:
+    portal: "{{ redhat_manifest.portal_url }}"
+    username: "{{ redhat_manifest.cdn_username }}"
+    password: "{{ redhat_manifest.cdn_password }}"
+    validate_certs: "{{ redhat_manifest.validate_certs }}"
+    name: "{{ redhat_manifest.name }}"
+    path: "{{ redhat_manifest.path }}"

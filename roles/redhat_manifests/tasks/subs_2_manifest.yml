@@ -1,0 +1,16 @@
+---
+# This play adds subs to the specified Satellite manifest
+# call with a list variable "sub"
+
+- name: Add specified subscriptions to manifest
+  redhat.satellite.redhat_manifest:
+    content_access_mode: "{{ redhat_manifest.content_access_mode | default(org_environment) }}" # default to SCA
+    name: "{{ redhat_manifest.name }}"
+    username: "{{ redhat_manifest.cdn_username }}"
+    password: "{{ redhat_manifest.cdn_password }}"
+    portal: "{{ redhat_manifest.portal_url }}"
+    pool_id: "{{ sub.pool_id }}"
+    pool_state: "{{ sub.pool_state | default(omit) }}" # present
+    quantity: "{{ sub.qty | default(omit) }}"          # Defaults to 1
+    state: "{{ redhat_manifest.state | default(omit) }}"      # present
+    validate_certs: "{{ redhat_manifest.validate_certs | default(omit) }}"

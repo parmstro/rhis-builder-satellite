@@ -56,6 +56,8 @@ ipa_generate_certs: true
 foreman_proxy_realm_principal: "realm-capsule"
 foreman_proxy_bind_update_policy: "{{ ipa_default_bind_policy }} grant {{ foreman_proxy_realm_principal }}\\@{{ ipa_server_realm }} wildcard * ANY;"
 
+skip_prepare_realm: true
+
 sat_ssl_rsa_key_pass: "{{ sat_ssl_rsa_key_pass_vault }}"
 sat_ssl_certs_dir: "/etc/ipa/private/{{ ansible_fqdn }}/"
 sat_ssl_crt_path: "{{ sat_ssl_certs_dir }}{{ ansible_fqdn }}.crt"
