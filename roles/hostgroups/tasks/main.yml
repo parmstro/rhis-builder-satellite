@@ -3,7 +3,7 @@
 # Configure the rhisam and user hostgroup specs
 #
 - name: "Ensure the state of the rhisam hostgroups"
-  ansible.builtin.include_tasks: ensure_hostgroup.yml
+  ansible.builtin.include_tasks: "ensure_hostgroup.yml"
   loop: "{{ hostgroups_rhisam }}"
   loop_control:
     loop_var: hostgroup
@@ -14,8 +14,8 @@
     - tags_hostgroups
     - tags_hostgroups_rhisam
 
-- name: "Create the user hostgroups"
-  ansible.builtin.include_tasks: ensure_hostgroup.yml
+- name: "Ensure the state of the user hostgroups"
+  ansible.builtin.include_tasks: "ensure_hostgroup.yml"
   loop: "{{ hostgroups_user }}"
   loop_control:
     loop_var: hostgroup

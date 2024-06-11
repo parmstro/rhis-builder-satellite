@@ -144,9 +144,9 @@ settings_general:
     settings_type: "boolean"
     default: true
     updated_at: null
-    id: "append_domain_name_for_hosts"
-    name: "append_domain_name_for_hosts"
-    full_name: "Append domain names to the host"
+    id: "display_fqdn_for_hosts"
+    name: "display_fqdn_for_hosts"
+    full_name: "Display FQDN for hosts"
     value: true
     category: "general"
     category_name: "General"

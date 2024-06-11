@@ -3,7 +3,7 @@
 # Optional parameters can be added for your usecases
 
 - name: "Configuring the rhisam global parameters"
-  ansible.builtin.include_tasks: ensure_global_parameter.yml
+  ansible.builtin.include_tasks: "ensure_global_parameter.yml"
   loop: "{{ global_parameters_rhisam }}"
   loop_control:
     loop_var: global_parameter
@@ -15,7 +15,7 @@
     - tags_global_parameters_rhisam
 
 - name: "Configuring the user global parameters"
-  ansible.builtin.include_tasks: ensure_global_parameter.yml
+  ansible.builtin.include_tasks: "ensure_global_parameter.yml"
   loop: "{{ global_parameters_user }}"
   loop_control:
     loop_var: global_parameter

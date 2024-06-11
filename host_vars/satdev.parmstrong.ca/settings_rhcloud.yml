@@ -1,7 +1,7 @@
 ---
 # settings for rh_cloud capabilities
 
-settings_rh_cloud:
+settings_rhcloud:
   - description: "Enable automatic upload of your host inventory to the Red Hat cloud"
     settings_type: "boolean"
     default: true

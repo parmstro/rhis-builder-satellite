@@ -2,7 +2,7 @@
 # This task configures the rhisam discovery rules
 #
 - name: "Create the rhisam discovery rules"
-  ansible.builtin.include_tasks: ensure_discovery_rule.yml
+  ansible.builtin.include_tasks: "ensure_discovery_rule.yml"
   loop: "{{ discovery_rules_rhisam }}"
   loop_control:
     loop_var: discovery_rule
@@ -13,7 +13,7 @@
     - tags_discovery_rules
 
 - name: "Create the user discovery rules"
-  ansible.builtin.include_tasks: ensure_discovery_rule.yml
+  ansible.builtin.include_tasks: "ensure_discovery_rule.yml"
   loop: "{{ discovery_rules_user }}"
   loop_control:
     loop_var: discovery_rule
