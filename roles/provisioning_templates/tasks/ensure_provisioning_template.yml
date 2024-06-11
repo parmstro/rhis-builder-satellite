@@ -10,7 +10,7 @@
     mode: "0744"
 
 # state defaults to present
-# we are always builting from templates
+# we are always builtin from templates
 
 - name: "Ensure state of provisioning template - {{ provisioning_template.name }}"
   redhat.satellite.provisioning_template:
@@ -24,10 +24,10 @@
     locked: "{{ provisioning_template.locked | default(omit) }}"
     name: "{{ provisioning_template.name }}"
     updated_name: "{{ provisioning_template.updated_name | default(omit) }}"
-    operatingsystems: "{{ provisioning_template.os_title_list | default(omit) }}"
+    operatingsystems: "{{ provisioning_template.os_titles | default(omit) }}"
     state: "{{ provisioning_template.state | default(omit) }}"
-    organizations: "{{ provisioning_template.organization_list | default(satellite_organization | list) }}"
-    locations: "{{ provisioning_template.location_list | default(satellite_location | list) }}"
+    organizations: "{{ provisioning_template.organizations }}"
+    locations: "{{ provisioning_template.locations }}"
 
 - name: "Remove the temporary file"
   ansible.builtin.file:

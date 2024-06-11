@@ -7,7 +7,7 @@
 # these occurences should be rare.
 
 - name: "Configure the rhisam provisioning templates"
-  ansible.builtin.include_tasks: ensure_provisioning_template.yml
+  ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
   loop: "{{ provisioning_templates_rhisam }}"
   loop_control:
     loop_var: provisioning_template
@@ -19,7 +19,7 @@
     - tags_partition_tables_rhisam
 
 - name: "Configure the user provisioning templates"
-  ansible.builtin.include_tasks: ensure_provisioning_template.yml
+  ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
   loop: "{{ provisioning_templates_user }}"
   loop_control:
     loop_var: provisioning_template

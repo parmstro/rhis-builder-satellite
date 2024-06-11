@@ -3,7 +3,7 @@
 # Add your template files to the files directory of the Role
 # OR add them in this hostvars folder and adjust the path
 
-prov_templates_rhisam:
+provisioning_templates_rhisam:
 # snippets
   - name: "soe_create_users_selinux"
     type: "snippet"
@@ -11,8 +11,10 @@ prov_templates_rhisam:
     description: "Create default users based on satellite owner"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_create_users_selinux.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_disable_non_sat_repos"
     type: "snippet"
@@ -20,8 +22,10 @@ prov_templates_rhisam:
     description: "Disable configured host repositories not provided by Satellite"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_disable_non_sat_repos.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_ensure_python"
     type: "snippet"
@@ -29,8 +33,10 @@ prov_templates_rhisam:
     description: "Ensure that the proper OS python version is installed (RHEL8)"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_ensure_python.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_ifcfg_generic_interface"
     type: "snippet"
@@ -38,8 +44,10 @@ prov_templates_rhisam:
     description: "Modified to support defined network zone"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_kickstart_ifcfg_generic_interface.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_install_cockpit"
     type: "snippet"
@@ -47,8 +55,10 @@ prov_templates_rhisam:
     description: "Ensure that the cockpit web UI is installed and enabled"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_install_cockpit.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "SOE Kickstart Default custom packages"
     type: "snippet"
@@ -56,8 +66,10 @@ prov_templates_rhisam:
     description: "Adding a list of standard SOE packages to be installed on every SOE image"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_kickstart_default_custom_packages.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_kickstart_ifcfg_bond_interface"
     type: "snippet"
@@ -65,8 +77,10 @@ prov_templates_rhisam:
     description: "Modified to support defined network zone"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_kickstart_ifcfg_bond_interface.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_kickstart_ifcfg_bonded_interface"
     type: "snippet"
@@ -74,8 +88,10 @@ prov_templates_rhisam:
     description: "Modified to support defined network zone"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_kickstart_ifcfg_bonded_interface.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_kickstart_networking_setup"
     type: "snippet"
@@ -83,8 +99,10 @@ prov_templates_rhisam:
     description: "Modified to support defined network zone"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_kickstart_networking_setup.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "soe_use_NBDE"
     type: "snippet"
@@ -92,8 +110,10 @@ prov_templates_rhisam:
     description: "Enables Network Bound Disk Encryption for host. REQUIRES encrypted type ptable. REQUIRES active tang servers."
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_snippet_soe_use_NBDE.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
 # provisioning
   - name: "SOE Kickstart Default Finish"
@@ -102,8 +122,10 @@ prov_templates_rhisam:
     description: "The default finish kickstart for image based provisioning of SOE systems"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_soe_kickstart_default_finish.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "SOE Kickstart Default PXELinux"
     type: "provision"
@@ -111,8 +133,10 @@ prov_templates_rhisam:
     description: "The default kickstart for PXE provisioning SOE systems"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_soe_kickstart_default_pxe_linux.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
   - name: "SOE Kickstart Default"
     type: "provision"
@@ -120,8 +144,10 @@ prov_templates_rhisam:
     description: "The default kickstart for network based provisioning SOE systems"
     audit_comment: "created by rhis-builder-satellite"
     path: "prov_template_soe_kickstart_default.j2"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
 
-# prov_templates_user:
-# There are none
+# Uncomment below to create your user templates
+# provisioning_templates_user:
