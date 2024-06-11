@@ -3,25 +3,25 @@
 # Add the files to the scap role directory, or update the scap_file path to support
 # your configuration
 
-scap_content_rhisam:
+scap_contents_rhisam:
   - title: "RHEL 8 SCAP content"
     scap_file: "ssg-rhel8-ds.xml"
     locations:
-      - "{{ satellite_locationn }}"
+      - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
 
-scap_content_user:
+scap_contents_user:
   - title: "RHEL 7 SCAP content"
     scap_file: "ssg-rhel7-ds.xml"
     locations:
-      - "{{ satellite_locationn }}"
+      - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
   - title: "RHEL 9 SCAP content"
     scap_file: "ssg-rhel9-ds.xml"
     locations:
-      - "{{ satellite_locationn }}"
+      - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
 
@@ -29,7 +29,7 @@ scap_tailoring_files_rhisam:
   - name: "RHEL 8 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel8-ds-tailoring.xml"
     locations:
-      - "{{ satellite_locationn }}"
+      - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
 
@@ -37,12 +37,12 @@ scap_tailoring_files_user:
   - name: "RHEL 7 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel7-ds-tailoring.xml"
     locations:
-      - "{{ satellite_locationn }}"
+      - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
   - name: "RHEL 9 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel9-ds-tailoring.xml"
     locations:
-      - "{{ satellite_locationn }}"
+      - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"

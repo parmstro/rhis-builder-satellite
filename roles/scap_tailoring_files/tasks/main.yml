@@ -5,7 +5,7 @@
   loop: "{{ scap_tailoring_files_rhisam }}"
   loop_control:
     loop_var: scap_tailoring_file
-  when: scap_tailoring_files_rhisam is defined
+  when: "scap_tailoring_files_rhisam is defined"
   tags:
     - tags_rhisam
     - tags_scap_config
@@ -14,12 +14,12 @@
 
 - name: "Ensure the user SCAP tailoring files are configured"
   ansible.builtin.include_tasks: "ensure_scap_tailoring_file.yml"
-  loop: "{{ scap_tailoring_files_rhisam }}"
+  loop: "{{ scap_tailoring_files_user }}"
   loop_control:
     loop_var: scap_tailoring_file
-  when: scap_tailoring_files_rhisam is defined
+  when: "scap_tailoring_files_user is defined"
   tags:
-    - tags_rhisam
+    - tags_user
     - tags_scap_config
     - tags_scap_tailoring_files
     - tags_scap_tailoring_files_rhisam

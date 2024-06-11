@@ -2,12 +2,11 @@
 
 - name: "Copy the scap tailoring file to target"
   ansible.builtin.copy:
-    src: "{{ role_path }}/files/{{ scap_tailoring_file.scap_file }}"
+    src: "{{ scap_tailoring_file.scap_file }}"
     dest: "{{ scap_tailoring_file.scap_file }}"
     owner: root
     group: root
     mode: "0644"
-  when: scap_tailoring_file.scap_file is defined
 
 - name: "Ensure the scap tailoring file is loaded"
   redhat.satellite.scap_tailoring_file:

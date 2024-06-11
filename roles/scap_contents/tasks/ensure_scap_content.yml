@@ -13,12 +13,12 @@
 
 - name: "Copy the scap file to target"
   ansible.builtin.copy:
-    src: "{{ role_path }}/files/{{ scap_content.scap_file }}"
+    src: "{{ scap_content.scap_file }}"
     dest: "{{ scap_content.scap_file }}"
     owner: root
     group: root
     mode: "0644"
-  when: scap_content.scap_file is defined
+  when: "scap_content.scap_file is defined"
 
 - name: "Ensure the scap content is loaded"
   redhat.satellite.scap_content:

@@ -4,8 +4,8 @@
   ansible.builtin.include_tasks: "ensure_scap_content.yml"
   loop: "{{ scap_contents_rhisam }}"
   loop_control:
-    loop_var: scap
-  when: scap_contents_rhisam is defined
+    loop_var: scap_content
+  when: "scap_contents_rhisam is defined"
   tags:
     - tags_rhisam
     - tags_scap_config
@@ -14,12 +14,12 @@
 
 - name: "Ensure the user SCAP content is configured"
   ansible.builtin.include_tasks: "ensure_scap_content.yml"
-  loop: "{{ scap_contents_rhisam }}"
+  loop: "{{ scap_contents_user }}"
   loop_control:
     loop_var: scap_content
-  when: scap_contents_rhisam is defined
+  when: "scap_contents_user is defined"
   tags:
-    - tags_rhisam
+    - tags_user
     - tags_scap_config
     - tags_scap_contents
-    - tags_scap_contents_rhisam
+    - tags_scap_contents_user
