@@ -2,7 +2,7 @@
 # Configure the rhisam and user identity management or AD realms
 
 - name: "Configure the rhisam realms"
-  ansible.builting.include_tasks: "ensure_realm.yml"
+  ansible.builtin.include_tasks: "ensure_realm.yml"
   loop: "{{ realms_rhisam }}"
   loop_control:
     loop_var: realm
@@ -14,7 +14,7 @@
     - tags_realms_rhisam
 
 - name: "Configure the user realms"
-  ansible.builting.include_tasks: "ensure_realm.yml"
+  ansible.builtin.include_tasks: "ensure_realm.yml"
   loop: "{{ realms_user }}"
   loop_control:
     loop_var: realm
