@@ -1,0 +1,66 @@
+---
+# define the compute resources for all organizations and locations
+
+# Compute resource types:
+# vmware
+# libvirt
+# ovirt
+# proxmox
+# EC2
+# AzureRm
+# GCE
+# Openstack
+
+vcenter_service_username: "{{ vcenter_service_username_vault }}"
+vcenter_service_password: "{{ vcenter_service_password_vault }}"
+
+azure1_tenant_id: "{{ azure1_tenant_id_vault }}"
+azure1_subscription_id: "{{ azure1_subscription_id_vault }}"
+azure1_client_id: "{{ azure1_client_id_vault }}"
+azure1_client_secret_id: "{{ azure1_client_secret_id_vault }}"
+azure1_client_secret: "{{ azure1_client_secret_vault }}"
+azure1_cloud: "azure"
+azure1_region: "Canada Central"
+azure1_resourcegroup1: "az_canada_central_rg"
+
+aws1_access_key: "{{ aws1_access_key_vault }}"
+aws1_secret_key: "{{ aws1_secret_key_vault }}"
+aws1_gov_cloud: false
+aws1_region: "ca-central-1"
+
+compute_resources_rhisam:
+  - name: "VMware_Lab"
+    provider: "vmware"
+    description: "Lab VCenter Server"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    provider_params:
+      caching_enabled: false  # setting this to true currently causes some server faults.
+      datacenter: "example.ca"
+      url: "192.168.140.30"
+      user: "{{ vcenter_service_username }}"
+      password: "{{ vcenter_service_password }}"
+
+compute_resources_user:
+  - name: "Azure_Lab"
+    provider: "AzureRM"
+    description: "Azure Central Canada RG"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    provider_params:
+      app_ident: "{{ azure1_client_id }}"
+      cloud: "{{ azure1_cloud }}"
+      password: "{{ azure1_client_secret }}"
+      region: "{{ azure1_region }}"
+      sub_id: "{{ azure1_subscription_id }}"
+      tenant: "{{ azure1_tenant_id }}"
+
+  - name: "AWS_Lab"
+    provider: "EC2"
+    description: "AWS EC2 Lab"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    provider_params:
+      user: "{{ aws1_access_key }}"
+      password: "{{ aws1_secret_key }}"
+      region: "{{ aws1_region }}"
