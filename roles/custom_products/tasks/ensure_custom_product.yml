@@ -15,7 +15,7 @@
 
 
 - name: "Ensure the state the repositories required for the custom product."
-  ansible.builtin.include_tasks: ensure_custom_product_repo.yml
+  ansible.builtin.include_tasks: "ensure_custom_product_repo.yml"
   loop: "{{ custom_product.repositories }}"
   loop_control:
     loop_var: custom_product_repository

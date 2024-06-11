@@ -9,7 +9,7 @@
 # your server
 
 - name: "Ensure the state of the specified custom products."
-  ansible.builtin.include_tasks: ensure_custom_product.yml
+  ansible.builtin.include_tasks: "ensure_custom_product.yml"
   loop: "{{ custom_products }}"
   loop_control:
     loop_var: custom_product
