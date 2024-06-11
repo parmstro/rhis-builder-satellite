@@ -20,7 +20,7 @@
     loop_var: subnet
   when: "subnets_user is defined"
   tags:
-    - tags_rhisam
+    - tags_user
     - tags_infrastructure_config
     - tags_subnets
-    - tags_subnets_rhisam
+    - tags_subnets_user
