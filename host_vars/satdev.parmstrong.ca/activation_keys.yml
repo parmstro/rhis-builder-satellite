@@ -61,6 +61,10 @@ activation_keys_user:
     content_overrides:
       - label: "rhel-7-server-extras-rpms"
         override: "enabled"
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+      - label: "rhel-7-server-satellite-client-6-rpms"
+        override: "enabled"
     content_view: "LEAPP_7_2_8"
     lifecycle_environment: "Development"
     unlimited_hosts: true
@@ -73,6 +77,10 @@ activation_keys_user:
     content_overrides:
       - label: "rhel-8-for-x86_64-supplementary-rpms"
         override: "disabled"
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
     content_view: "LEAPP_8_2_9"
     lifecycle_environment: "Development"
     unlimited_hosts: true
