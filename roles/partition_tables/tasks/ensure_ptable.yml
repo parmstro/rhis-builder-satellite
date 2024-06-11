@@ -10,7 +10,7 @@
     mode: "0744"
 
 # state defaults to present
-# we are always builting from templates
+# we are always builtin from templates
 
 - name: "Ensure state of partition table - {{ partition_table.name }}"
   redhat.satellite.partition_table:
@@ -24,8 +24,8 @@
     updated_name: "{{ partition_table.updated_name | default(omit) }}"
     os_family: "{{ partition_table.os_family | default('Redhat') }}"
     state: "{{ partition_table.state | default(omit) }}"
-    organizations: "{{ partition_table.organization_list | default(satellite_organization | list) }}"
-    locations: "{{ partition_table.location_list | default(satellite_location | list) }}"
+    organizations: "{{ partition_table.organizations }}"
+    locations: "{{ partition_table.locations }}"
 
 - name: "Remove the temporary file"
   ansible.builtin.file:

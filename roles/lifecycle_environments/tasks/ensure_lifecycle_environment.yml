@@ -10,7 +10,7 @@
     validate_certs: "{{ satellite_validate_certs }}"
     name: "{{ lifecycle_environment.name }}"
     label: "{{ lifecycle_environment.label }}"
-    organization: "{{ lifecycle.organization }}"
+    organization: "{{ lifecycle_environment.organization }}"
     description: "{{ lifecycle_environment.desc }}"
     prior: "{{ lifecycle_environment.prior }}"
     state: "{{ lifecycle_environment.state | default(omit) }}"

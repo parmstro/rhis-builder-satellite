@@ -8,7 +8,7 @@
 # for RH-ISAM we do not use this for day0 operations
 
 - name: "Ensure the state of the specified repositories."
-  ansible.builtin.include_tasks: ensure_custom_product.yml
+  ansible.builtin.include_tasks: ensure_repositories.yml
   loop: "{{ repositories }}"
   loop_control:
     loop_var: repository

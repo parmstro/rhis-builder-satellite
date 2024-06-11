@@ -1,7 +1,7 @@
 ---
 # This play creates an individual composite content view from specified cvs
 
-- name: "Create the composite content view"
+- name: "Configure the composite content view - {{ ccv.name }}"
   redhat.satellite.content_view:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"

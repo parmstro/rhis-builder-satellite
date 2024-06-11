@@ -1,0 +1,68 @@
+---
+
+# This determines if we should publish a content view version
+# based on whether
+#    skip_publish has been set to true
+#    the content view has been published within cv.publication_limit_hours
+#    the content view has been set to force_publish
+# It expects to be called in a loop with a loop variable cv
+
+- name: "Ensure content meets publication requirements"
+  ansible.builtin.set_fact:
+    publish_content: true                 # default to true - we want to publish
+    hours_since_publication: 8766         # unless satellite tells us assume the last publication was long ago.. one year - 365.25 days
+    inside_publication_limit: false       # assume that we have published within any reasonable limit
+
+- name: "Get content view info: {{ cv.name }}"
+  redhat.satellite.content_view_info:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ cv.name }}"
+  register: cv_info
+  changed_when: false
+
+- name: "Determine hours since last publication time"
+  when: cv_info.content_view.last_published
+  ansible.builtin.set_fact:
+    hours_since_publication: "{{ (now() - (cv_info.content_view.last_published[:-4] | to_datetime)).seconds / 3600 | float }}"
+
+- name: "Print hours since last publication"
+  ansible.builtin.debug:
+    var: hours_since_publication
+
+- name: "Determine if we are inside publication limit hours"
+  when:
+    - cv.publication_limit_hours is defined
+    - (hours_since_publication|float) <= (cv.publication_limit_hours|float)
+  ansible.builtin.set_fact:
+    inside_publication_limit: true
+
+- name: "Do not publish if we are asked to skip or if we are inside the publication limit hours"
+  when: (inside_publication_limit) or
+        (skip_publish)
+  ansible.builtin.set_fact:
+    publish_content: false
+
+- name: "Have we been asked to force publish this content view?"
+  when: (cv.force_publish is defined and cv.force_publish)
+  ansible.builtin.set_fact:
+    publish_content: true
+
+- name: "Publish content if necessary - {{ cv.name }}"
+  when: publish_content
+  redhat.satellite.content_view_version:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    content_view: "{{ cv.name }}"
+    description: "{{ cv.description | default(omit) }}"
+    version: "{{ cv.version | default(omit) }}" # default is a new version
+    lifecycle_environments: "{{ cv.environments | default(omit) }}" # underlying default is publish new version to the library
+    state: "{{ cv.state | default(omit) }}" # underlying default is present
+  async: "{{ cv_publish_timeout | default(14400) }}"
+  poll: "{{ cv_publish_retry_interval | default(15) }}"

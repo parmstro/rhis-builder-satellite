@@ -2,7 +2,7 @@
 # This play creates the Content View Filters for a Content View
 #
 
-- name: "Create the content view filter - {{ cvf.name }}"
+- name: "Configure the content view filter - {{ cvf.name }}"
   redhat.satellite.content_view_filter:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
@@ -20,9 +20,8 @@
 
 
 - name: "Configure Content View Filter Rules"
-  include_tasks: create_cvf_rules.yml
+  ansible.builtin.include_tasks: "create_cvf_rules.yml"
   loop: "{{ cvf.rules }}"
   loop_control:
     loop_var: cvfr
   when: "cvf.rules is defined"
-

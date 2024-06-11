@@ -1,6 +1,6 @@
 ---
 # This play creates an individual content view from specified paramters
-- name: "Create the content view - {{ cv.name }}"
+- name: "Ensure the state of content view - {{ cv.name }}"
   redhat.satellite.content_view:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
@@ -13,8 +13,8 @@
     state: "{{ cv.state | default(omit) }}"
 
 # Add the filters
-- name: "Add the filters to the Content View - {{ cv.name }}"
-  include_tasks: create_cv_filter.yml
+- name: "Configure the filters for the Content View - {{ cv.name }}"
+  ansible.builtin.include_tasks: "create_cv_filter.yml"
   loop: "{{ cv.filters }}"
   loop_control:
     loop_var: cvf

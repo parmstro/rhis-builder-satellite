@@ -1,16 +1,21 @@
 ---
+# synchronization of repositories
+
 - name: "Sync unless skip_sync == true"
-  when: skip_sync == false
+  when: "not skip_sync"
+  tags:
+    - tags_start_sync
   block:
     - name: "Set or increment retry count"
       ansible.builtin.set_fact:
-        sync_retry_count: "{{ 0 if sync_retry_count is undefined else sync_retry_count|int + 1 }}"
+        sync_retry_count: "{{ 0 if sync_retry_count is undefined else sync_retry_count | int + 1 }}"
 
     - name: "Get the unique list of rhisam products"
-      set_fact:
-        products_to_sync: "{{ repos_rhisam | map(attribute='product') | list | unique }}"
+      ansible.builtin.set_fact:
+        products_to_sync: "{{ repository_sets_rhisam | map(attribute='product') | list | unique }}"
 
-    - debug:
+    - name: "List the products to be synchronized"
+      ansible.builtin.debug:
         var: products_to_sync
 
     - name: "Sync the rhisam products with the CDN"
@@ -27,8 +32,8 @@
       register: async_update
 
     - name: "Get the unique list of user products"
-      set_fact:
-        products_to_sync: "{{ repos_user | map(attribute='product') | list | unique }}"
+      ansible.builtin.set_fact:
+        products_to_sync: "{{ repository_sets_user | map(attribute='product') | list | unique }}"
 
     - name: "Sync the user products"
       redhat.satellite.repository_sync:
@@ -44,7 +49,7 @@
       register: async_update
 
     - name: "Get the unique list of custom products"
-      set_fact:
+      ansible.builtin.set_fact:
         products_to_sync: "{{ custom_products | map(attribute='name') | list | unique }}"
 
     - name: "Sync the custom products"
@@ -72,6 +77,3 @@
 
     - name: "Retry"
       ansible.builtin.include_tasks: start_synchronization.yml
-
-  tags:
-  - tags_start_sync

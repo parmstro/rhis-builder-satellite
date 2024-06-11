@@ -14,7 +14,7 @@
     - tags_partition_tables_rhisam
 
 - name: "Configure the specified user partition tables."
-  ansible.builting.include_tasks: "ensure_ptable.yml"
+  ansible.builtin.include_tasks: "ensure_ptable.yml"
   loop: "{{ partition_tables_user }}"
   loop_control:
     loop_var: partition_table

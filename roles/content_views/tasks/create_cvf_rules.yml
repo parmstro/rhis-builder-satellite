@@ -2,7 +2,7 @@
 # This play adds the filter rules to a content view filter
 # There are a lot of ways to create rules. Please consult the latest documentation
 
-- name: "Create the content view filter {{ cvfr.name }}"
+- name: "Configure the content view filter - {{ cvfr.name }}"
   redhat.satellite.content_view_filter_rule:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
@@ -27,4 +27,4 @@
     module_name: "{{ cvfr.module_name | default(omit) }}"  # name alias
     package_name: "{{ cvfr.package_name | default(omit) }}"  # name alias
     package_group: "{{ cvfr.package_group | default(omit) }}"  # name alias
-    arch:  "{{ cvfr.arch | default(omit) }}" # architecture alias
+    arch: "{{ cvfr.arch | default(omit) }}" # architecture alias
