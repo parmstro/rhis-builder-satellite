@@ -6,7 +6,7 @@
 domains_rhisam:
 # The domain of the Satellite Server
   - name: "{{ satellite_domain }}"
-    description: "root domain for the installation"
+    description: "{{ satellite_domain }} - root domain for the installation"
     dns_capsule: "{{ satellite_fqdn }}"
     organizations:
       - "{{ satellite_organization }}"
@@ -14,4 +14,4 @@ domains_rhisam:
       - "{{ satellite_location }}"
 
 # domains_user:
-# uncomment and add your domains here if you need more
+# uncomment and add your user domains here
