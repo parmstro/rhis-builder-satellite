@@ -13,6 +13,7 @@
     provider: "{{ compute_resource.provider }}"
     provider_params: "{{ compute_resource.provider_params }}"
     state: "{{ compute_resource.state | default(omit) }}"
+  no_log: true
 
 - name: "Ensure the state of the compute resource images - {{ image.name }}"
   redhat.satellite.image:
@@ -32,3 +33,4 @@
   loop: "{{ compute_resource.images | default([]) }}"
   loop_control:
     loop_var: image
+  no_log: true
