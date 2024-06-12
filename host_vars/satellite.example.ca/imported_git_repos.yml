@@ -1,0 +1,144 @@
+---
+# Import any git repos into the base OS of the Satellite Server
+# This is used primarily to sync and ingest Ansible Roles for:
+# ansible role from compliance as code project / RedHatOfficial
+
+# This really allows you to import any git repos that may contain content
+# that you otherwise want to reference in your build
+
+git_repos_rhisam:
+# RHEL9
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-e8.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-e8"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-ism.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-ism"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-cui.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-cui"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-pci-dss.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-pci-dss"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-ospp.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-ospp"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-hipaa.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-hipaa"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-cis.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-cis"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-anssi_bp28_minimal.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-anssi_bp28_minimal"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-anssi_bp28_intermediary.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-anssi_bp28_intermediary"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-anssi_bp28_high.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-anssi_bp28_high"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-stig.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel9-stig"
+    clone: true
+    force: true
+# RHEL8
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-cui.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-cui"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-rht-ccp.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-rht-ccp"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-pci-dss.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-pci-dss"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-ospp.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-ospp"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-hipaa.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-hipaa"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-cjis.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-cjis"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-cis.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-cis"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-anssi_bp28_minimal.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_bp28_minimal"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-anssi_bp28_intermediary.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_bp28_intermediary"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-anssi_bp28_high.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-anssi_bp28_high"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-anssi_bp28_enhanced.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_bp28_enhanced"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel8-stig.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel8-stig"
+    clone: true
+    force: true
+# RHEL7
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-cui.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel7-cui"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-pci-dss.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel7-pci-dss"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-ospp.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel7-ospp"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-cjis.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel7-cjis"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-cis.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel7-cis"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-stig.git"
+    dest: "/etc/ansible/roles/ansible-role-rhel7-stig"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-anssi_nt28_minimal.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_nt28_minimal"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-anssi_nt28_intermediary.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_nt28_intermediary"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-anssi_nt28_high.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_nt28_high"
+    clone: true
+    force: true
+  - repository: "https://github.com/RedHatOfficial/ansible-role-rhel7-anssi_nt28_enhanced.git"
+    dest: "/etc/ansible/roles/ansible-role-anssi_nt28_enhanced"
+    clone: true
+    force: true

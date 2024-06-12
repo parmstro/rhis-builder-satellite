@@ -1,0 +1,19 @@
+---
+# The IdM and AD realms managed by Satellite.
+# The REALM name is always upper
+# Realm type is Active Directory or Red Hat Identity Management
+# Only one capsule can manage one realm
+#
+# NOTE: We install the identity management client on the satellite server
+#       and prepare the realm in the satellite_pre role
+
+realms_rhisam:
+  - name: "{{ satellite_domain | upper }}"
+    organizations: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    realm_type: "Red Hat Identity Management"
+    realm_capsule: "{{ satellite_fqdn }}"
+
+# realms_user:
+# Add your additional realms here. Realm capsule MUST be different
+# this will be important for when IdM supports IdM-IdM trusts

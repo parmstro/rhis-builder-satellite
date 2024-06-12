@@ -1,0 +1,25 @@
+---
+
+- name: "Configure the rhisam git repos"
+  ansible.builtin.include_tasks: "ensure_clone_git_repos.yml"
+  loop: "{{ git_repos_rhisam }}"
+  loop_control:
+    loop_var: gitrepo
+  when: "git_repos_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_import_git_repos
+    - tags_import_git_repos_rhisam
+
+- name: "Configure the user git repos"
+  ansible.builtin.include_tasks: "ensure_clone_git_repos.yml"
+  loop: "{{ git_repos_user }}"
+  loop_control:
+    loop_var: gitrepo
+  when: "git_repos_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_import_git_repos
+    - tags_import_git_repos_user

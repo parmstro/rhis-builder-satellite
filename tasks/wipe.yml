@@ -1,0 +1,12 @@
+---
+# Call the Satellite job to wipe the disks
+
+- name: "Wiping disks for {{ target_host.name }}"
+  redhat.satellite.job_invocation:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    search_query: "name ^ ({{ target_host.name }})"
+    job_template: "Provisioning Action - Re-init Baremetal Linux Host"
+    inputs:
+      action: "wipe"

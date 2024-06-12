@@ -1,0 +1,13 @@
+---
+# state defaults to present
+
+- name: "Ensure the compute profile state - {{ compute_profile.name }}"
+  redhat.satellite.compute_profile:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ compute_profile.name }}"
+    updated_name: "{{ compute_profile.updated_name | default(omit) }}"
+    state: "{{ compute_profile.state | default(omit) }}"
+    compute_attributes: "{{ compute_profile.compute_attributes | default(omit) }}"

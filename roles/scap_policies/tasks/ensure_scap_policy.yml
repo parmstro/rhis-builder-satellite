@@ -1,0 +1,15 @@
+---
+# This doesn't exist yet.
+# I have to write this
+
+- name: "Ensure the scap policy is mapped"
+  redhat.satellite.scap_policy:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ scap_policies.name }}"
+    scap_file: "{{ scap_policies.scap_file | defautl(omit) }}"
+    locations: "{{ scap_policies.locations | default(omit) }}"
+    organizations: "{{ scap_policies.organizations | default(omit) }}"
+    updated_name: "{{ scap_policies.updated_name | default(omit) }}"

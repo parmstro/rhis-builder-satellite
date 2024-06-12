@@ -1,0 +1,28 @@
+---
+
+# Ensure the state of the defined rhisam and user operating systems.
+
+- name: "Configure the specified rhisam operating systems."
+  ansible.builtin.include_tasks: "ensure_operating_system.yml"
+  loop: "{{ operating_systems_rhisam }}"
+  loop_control:
+    loop_var: "operating_system"
+  when: "operating_systems_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_operating_systems
+    - tags_operating_systems_rhisam
+
+
+- name: "Configure the specified user operating systems."
+  ansible.builtin.include_tasks: "ensure_operating_system.yml"
+  loop: "{{ operating_systems_user }}"
+  loop_control:
+    loop_var: "operating_system"
+  when: "operating_systems_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_operating_systems
+    - tags_operating_systems_user

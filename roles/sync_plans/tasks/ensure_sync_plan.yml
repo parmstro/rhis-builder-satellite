@@ -1,0 +1,15 @@
+---
+# This play will create the defined sync plans
+
+- name: "Ensure the state of the sync plan - {{ sync_plan.name }}"
+  redhat.satellite.sync_plan:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    name: "{{ sync_plan.name }}"
+    interval: "{{ sync_plan.interval }}"
+    enabled: "{{ sync_plan.enabled }}"
+    sync_date: "{{ sync_plan.sync_date }}"
+    state: "{{ sync_plan.state | default(omit) }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"

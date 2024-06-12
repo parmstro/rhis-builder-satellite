@@ -1,0 +1,25 @@
+---
+# state defaults to present
+
+- name: "Ensure state of activation key - {{ activation_key.name }}"
+  redhat.satellite.activation_key:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ activation_key.organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    state: "{{ activation_key.state | default(omit) }}"
+    name: "{{ activation_key.name }}"
+    description: "{{ activation_key.description | default(omit) }}"
+    lifecycle_environment: "{{ activation_key.lifecycle_environment }}"
+    content_view: "{{ activation_key.content_view }}"
+    content_overrides: "{{ activation_key.content_overrides | default(omit) }}"
+    auto_attach: "{{ activation_key.auto_attach | default(omit) }}"
+    subscriptions: "{{ activation_key.subscriptions | default(omit) }}"
+    max_hosts: "{{ activation_key.max_hosts | default(omit) }}"
+    unlimited_hosts: "{{ activation_key.unlimited_hosts | default(omit) }}"
+    purpose_role: "{{ activation_key.purpose_role | default(omit) }}"
+    purpose_usage: "{{ activation_key.purpose_usage | default(omit) }}"
+    release_version: "{{ activation_key.release_version | default(omit) }}"
+    service_level: "{{ activation_key.service_level | default(omit) }}"
+    host_collections: "{{ activation_key.host_collections | default(omit) }}"

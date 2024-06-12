@@ -4,7 +4,7 @@
     name: firewalld
     state: present
 
-- name: "Ensure that iptables is not running or configured"
+- name: "Ensure that iptables is not running or configured" # noqa: ignore-errors
   ansible.builtin.systemd:
     name: iptables
     state: stopped
@@ -23,11 +23,11 @@
   ansible.builtin.include_role:
     name: "redhat.rhel_system_roles.firewall"
   vars:
-    firewall:
+    firewall:                                                                     # noqa: var-naming[no-role-prefix]
       - { set_default_zone: "{{ sat_firewalld_zone }}", state: enabled }
       - { interface: eth0, zone: "{{ sat_firewalld_zone }}", state: enabled }
       - { service: "RH-Satellite-6",
-          port: ["5646/tcp","8888/tcp","8889/tcp","5671/tcp","5671/udp"],
+          port: ["5646/tcp", "8888/tcp", "8889/tcp", "5671/tcp", "5671/udp"],
           permanent: true,
           state: present }
       - { service: "{{ sat_firewalld_services }}",

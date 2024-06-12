@@ -1,0 +1,15 @@
+---
+
+#  There are really two aspects to manifests.
+#  1. Creating, modifying, and deleting a manifest on the portal. And fetching the manifest..
+#  2. Uploading, refreshing and replacing manifests on the Satellite
+
+# This module only deals with item 2.
+# The RHISAM doesn't provide a manifest.
+# All manifests are user manifests.
+
+- name: "Ensure the manifests state"
+  ansible.builtin.include_tasks: "ensure_subscription_manifest.yml"
+  loop: "{{ redhat_manifests }}"
+  loop_control:
+    loop_var: subscription_manifest

@@ -1,11 +1,13 @@
 ---
-- name: "Reset the idm module state"
+
+# unfortunately, this is necessary on RHEL8
+- name: "Reset the idm module state"  # noqa: no-changed-when
   ansible.builtin.command: "dnf -y module reset idm"
 
-- name: "Enable the idm module"
+- name: "Enable the idm module"  # noqa: no-changed-when
   ansible.builtin.command: "dnf -y module enable idm:DL1"
 
-- name: "Ensure the client module is installed"
+- name: "Ensure the client module is installed"  # noqa: no-changed-when command-instead-of-shell
   ansible.builtin.shell: "dnf -y module install idm:DL1/client"
 
 - name: "Ensure the client configuration"

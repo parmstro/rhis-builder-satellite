@@ -1,0 +1,35 @@
+---
+# This task creates an individual provisioning template from specified paramters
+# Call this task with loop_var: provisioning_template
+- name: "Apply any ansible templating defined in the configuration template"
+  ansible.builtin.template:
+    src: "{{ provisioning_template.path }}"
+    dest: "{{ provisioning_template.path }}.out"
+    owner: root
+    group: root
+    mode: "0744"
+
+# state defaults to present
+# we are always builtin from templates
+
+- name: "Ensure state of provisioning template - {{ provisioning_template.name }}"
+  redhat.satellite.provisioning_template:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    audit_comment: "{{ provisioning_template.audit_comment | default(omit) }}"
+    file_name: "{{ provisioning_template.path }}.out"
+    kind: "{{ provisioning_template.kind | default(omit) }}"
+    locked: "{{ provisioning_template.locked | default(omit) }}"
+    name: "{{ provisioning_template.name }}"
+    updated_name: "{{ provisioning_template.updated_name | default(omit) }}"
+    operatingsystems: "{{ provisioning_template.os_titles | default(omit) }}"
+    state: "{{ provisioning_template.state | default(omit) }}"
+    organizations: "{{ provisioning_template.organizations }}"
+    locations: "{{ provisioning_template.locations }}"
+
+- name: "Remove the temporary file"
+  ansible.builtin.file:
+    path: "{{ provisioning_template.path }}.out"
+    state: absent

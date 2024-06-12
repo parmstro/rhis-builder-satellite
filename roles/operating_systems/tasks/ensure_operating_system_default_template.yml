@@ -1,0 +1,14 @@
+---
+# This task associates a default template with an OS for a given template type
+# state defaults to present
+
+- name: "Assigning {{ default_template.template_kind }} Template {{ default_template.name }} to {{ operating_system.description | default('unknown') }}" # noqa: name[template] yaml[line-length]
+  redhat.satellite.os_default_template:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    operatingsystem: "{{ operating_system.description }}"
+    template_kind: "{{ default_template.template_kind }}"
+    provisioning_template: "{{ default_template.name }}"
+    state: "{{ default_tempate.state | default(omit) }}"

@@ -1,0 +1,10 @@
+---
+
+subscription_manifests_rhisam:
+  - organization: "Default Organization"
+    state: "refreshed"
+  - organization: "Test Organization"
+    manifest_path: "~/test_org_sub_manifest.zip"
+
+# Add your organization manifests here
+# subscription_manifests_user:

@@ -1,0 +1,31 @@
+---
+# This playbook configures the rhisam provisioning templates
+# NOTE: If you are providing templates that will be used with
+# ansible downstream, ensure the downstream ansible is properly
+# encapsulated. This also applies to any foreman templating
+# that may be incompatible with anisble template parsing,
+# these occurences should be rare.
+
+- name: "Configure the rhisam provisioning templates"
+  ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
+  loop: "{{ provisioning_templates_rhisam }}"
+  loop_control:
+    loop_var: provisioning_template
+  when: "provisioning_templates_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_partition_tables
+    - tags_partition_tables_rhisam
+
+- name: "Configure the user provisioning templates"
+  ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
+  loop: "{{ provisioning_templates_user }}"
+  loop_control:
+    loop_var: provisioning_template
+  when: "provisioning_templates_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_partition_tables
+    - tags_partition_tables_user

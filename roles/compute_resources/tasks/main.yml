@@ -1,0 +1,26 @@
+---
+# Configure the rhisam and user compute resources
+
+- name: "Configure the rhisam compute resources."
+  ansible.builtin.include_tasks: "ensure_compute_resource.yml"
+  loop: "{{ compute_resources_rhisam }}"
+  loop_control:
+    loop_var: compute_resource
+  when: "compute_resources_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_compute_resources
+    - tags_compute_resources_rhisam
+
+- name: "Configure the user compute resources."
+  ansible.builtin.include_tasks: "ensure_compute_resource.yml"
+  loop: "{{ compute_resources_user }}"
+  loop_control:
+    loop_var: compute_resource
+  when: "compute_resources_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_compute_resources
+    - tags_compute_resources_user

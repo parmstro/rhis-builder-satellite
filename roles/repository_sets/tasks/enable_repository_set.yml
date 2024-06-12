@@ -1,0 +1,43 @@
+---
+# The model for products, repository sets, and repositories is something like this
+# - product
+#      |- repository_set
+#              |-- repository (releasever=n, basearch=x86_64)
+#              |-- repository (releasever=n.1, basearch=x86_64)
+#              |-- repository (releasever=n.2, basearch=x86_64)
+#
+# If you suppy a list of repositories to enable as part of the definition, we will enable them
+# repository_list
+#      |- releasever
+#      |  basearch
+#      |- releasever
+#      |  basearch
+# if you omit repositories, we will fall through and enable all repos for the repository set
+
+# state defaults to enabled
+
+- name: "Ensure the state of the repository set - {{ repository_set.name }}"
+  redhat.satellite.repository_set:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ repository_set.name | default(omit) }}"
+    product: "{{ repository_set.product | default(omit) }}"
+    repositories: "{{ repository_set.repository_list }}"
+    state: "{{ repository_set.state | default(omit) }}"
+  when: repository_set.repository_list is defined
+
+- name: "Ensure the state of the repository set - {{ repository_set.name }}"
+  redhat.satellite.repository_set:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ repository_set.name | default(omit) }}"
+    product: "{{ repository_set.product | default(omit) }}"
+    all_repositories: true
+    state: "{{ repository_set.state | default(omit) }}"
+  when: repository_set.repository_list is not defined

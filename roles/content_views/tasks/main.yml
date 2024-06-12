@@ -1,0 +1,98 @@
+---
+
+# Configure the content views and composite content views
+- name: "Ensure configuration of rhisam content views"
+  ansible.builtin.include_tasks: "create_cv.yml"
+  loop: "{{ cvs_rhisam }}"
+  loop_control:
+    loop_var: cv
+  when: "cvs_rhisam is defined"
+  tags:
+    - tags_content_management
+    - tags_content_views_configure
+    - tags_rhisam
+    - tags_rhisam_content_views
+
+- name: "Publish the rhisam content views"
+  ansible.builtin.include_tasks: "publish_cv_version.yml"
+  loop: "{{ cvs_rhisam }}"
+  loop_control:
+    loop_var: cv
+  when: "cvs_rhisam is defined"
+  tags:
+    - tags_content_management
+    - tags_content_views_publish
+    - tags_rhisam
+    - tags_rhisam_content_views
+
+- name: "Ensure configuration of the user content views"
+  ansible.builtin.include_tasks: "create_cv.yml"
+  loop: "{{ cvs_user }}"
+  loop_control:
+    loop_var: cv
+  when: "cvs_user is defined"
+  tags:
+    - tags_content_management
+    - tags_content_views_configure
+    - tags_user
+    - tags_user_content_views
+
+- name: "Publish the user content views"
+  ansible.builtin.include_tasks: "publish_cv_version.yml"
+  loop: "{{ cvs_user }}"
+  loop_control:
+    loop_var: cv
+  when: "cvs_user is defined"
+  tags:
+    - tags_content_management
+    - tags_content_views_publish
+    - tags_user
+    - tags_user_content_views
+
+- name: "Ensure configuration of the rhisam composite content views"
+  ansible.builtin.include_tasks: "create_ccv.yml"
+  loop: "{{ ccvs_rhisam }}"
+  loop_control:
+    loop_var: ccv
+  when: "ccvs_rhisam is defined"
+  tags:
+    - tags_content_management
+    - tags_composite_content_views_configure
+    - tags_rhisam
+    - tags_rhisam_composite_content_views
+
+- name: "Publish the rhisam composite content views"
+  ansible.builtin.include_tasks: "publish_cv_version.yml"
+  loop: "{{ ccvs_rhisam }}"
+  loop_control:
+    loop_var: cv
+  when: "ccvs_rhisam is defined"
+  tags:
+    - tags_content_management
+    - tags_composite_content_views_publish
+    - tags_rhisam
+    - tags_rhisam_composite_content_views
+
+- name: Creating the specified content views
+  ansible.builtin.include_tasks: "create_ccv.yml"
+  loop: "{{ ccvs_user }}"
+  loop_control:
+    loop_var: ccv
+  when: "ccvs_user is defined"
+  tags:
+    - tags_content_management
+    - tags_composite_content_views_configure
+    - tags_user
+    - tags_user_composite_content_views
+
+- name: Publish the specified content views
+  ansible.builtin.include_tasks: "publish_cv_version.yml"
+  loop: "{{ ccvs_user }}"
+  loop_control:
+    loop_var: cv
+  when: "ccvs_user is defined"
+  tags:
+    - tags_content_management
+    - tags_composite_content_views_publish
+    - tags_user
+    - tags_user_composite_content_views

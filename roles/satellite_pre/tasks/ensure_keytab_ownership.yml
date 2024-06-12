@@ -1,0 +1,9 @@
+---
+
+- name: "Ensure foreman-proxy owns the /etc/foreman-proxy/freeipa.keytab"
+  ansible.builtin.file:
+    path: "/etc/foreman-proxy/freeipa.keytab"
+    owner: foreman-proxy
+    group: foreman-proxy
+    mode: "0644"
+    state: file

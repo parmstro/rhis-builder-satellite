@@ -1,0 +1,95 @@
+---
+# Satellite Hostgroup configurations
+
+hostgroups_rhisam:
+  - name: "RHEL8base"
+    description: "RHEL 8 SOE base hostgroup"
+    activation_keys: "SOE_RHEL8"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    architecture: "x86_64"
+    compute_profile: "SOE_Medium"
+    compute_resource: "VMware_Lab"
+    content_source: "{{ satellite_fqdn }}"
+    content_view: "SOE_RHEL8"
+    domain: "{{ satellite_domain }}"
+    lifecycle_environment: "Development"
+    kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.8"
+    locations: "{{ satellite_location }}"
+    organization: "{{ satellite_organization }}"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    operatingsystem: "RHEL 8.8"
+    ptable: "RHEL_Server_CIS1"
+    pxe_loader: "PXELinux BIOS"
+    realm: "{{ satellite_domain | upper }}"
+    subnet: "devlabsubnet"
+    root_pass: "{{ satellite_admin_password }}"
+
+  - name: "RHEL8_JBoss"
+    parent: "RHEL8base"
+    description: "RHEL 8 SOE for JBoss"
+    content_view: "SOE_JBoss"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    ptable: "RHEL_Server_Compliance"
+    organization: "{{ satellite_organization }}"
+
+  - name: "RHEL8_LAMP"
+    parent: "RHEL8base"
+    description: "RHEL 8 SOE for LAMP stack"
+    content_view: "SOE_RHEL8"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    ptable: "RHEL_Server_Compliance"
+    organization: "{{ satellite_organization }}"
+
+  - name: "RHEL8_WordPress"
+    parent: "RHEL8base"
+    description: "RHEL 8 SOE for WordPress"
+    content_view: "SOE_RHEL8EPEL"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    ptable: "RHEL_Server_Compliance"
+    organization: "{{ satellite_organization }}"
+
+hostgroups_user:
+  - name: "RHEL9base"
+    description: "RHEL 9 SOE base hostgroup"
+    activation_keys: "SOE_RHEL9"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    architecture: "x86_64"
+    compute_profile: "SOE_Medium"
+    compute_resource: "VMware_Lab"
+    content_source: "{{ satellite_fqdn }}"
+    content_view: "SOE_RHEL9"
+    domain: "{{ satellite_domain }}"
+    lifecycle_environment: "Development"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.2"
+    locations: "{{ satellite_location }}"
+    organization: "{{ satellite_organization }}"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    operatingsystem: "RHEL 9.2"
+    ptable: "RHEL_Server_CIS1"
+    pxe_loader: "PXELinux BIOS"
+    realm: "{{ satellite_domain | upper }}"
+    subnet: "devlabsubnet"
+    root_pass: "{{ satellite_admin_password }}"
+
+  - name: "RHEL8_CIS2"
+    parent: "RHEL8base"
+    description: "RHEL 8 SOE for CIS Server 2 compliance template"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+      - ansible-role-rhel8-cis
+    ptable: "RHEL_Server_Compliance"
+    organization: "{{ satellite_organization }}"
+
+  - name: "RHEL9_CIS2"
+    parent: "RHEL9base"
+    description: "RHEL 9 SOE for CIS Server 2 compliance template"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+      - ansible-role-rhel9-cis
+    ptable: "RHEL_Server_Compliance"
+    organization: "{{ satellite_organization }}"

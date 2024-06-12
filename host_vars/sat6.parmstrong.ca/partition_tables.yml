@@ -1,0 +1,31 @@
+---
+# The partition tables.
+# Add your template files to the files directory of the Role
+# OR add them in this hostvars folder and adjust the path
+
+ptables_rhisam:
+  - name: "RHEL_Server_CIS1"
+    os_family: "Red Hat"
+    path: "ptable_rhel_server_cis1.j2"
+    description: "Partition table supporting Center for Internet Security (CIS) Server Level 1"
+    audit_comment: "created by rhis-builder-satellite"
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+  - name: "RHEL_Server_Compliance"
+    os_family: "Red Hat"
+    path: "ptable_rhel_server_compliance.j2"
+    description: "This partition scheme meets most major Compliance Profiles (OSPP, PCI-DSS, CIS Server 2, etc..).  Minimum 100GB disk required."
+    audit_comment: "created by rhis-builder-satellite"
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+  - name: "RHEL_Server_Compliance_Encrypted"
+    os_family: "Red Hat"
+    path: "ptable_rhel_server_compliance_encrypted.j2"
+    description: "Designed to meet most high security compliance requirements. luks2 encryption and NBDE. Requires a tang server to be up."
+    audit_comment: "created by rhis-builder-satellite"
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+# ptables_user:

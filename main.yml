@@ -1,20 +1,13 @@
 ---
+
 - name: "Build the satellite primary"
   hosts: sat_primary
   become: true
   gather_facts: true
   vars_files:
-    - "vars/satellite_pre_vars.yml"
-    - "vars/satellite_vars.yml"
     - "~/rhisbuilder_vault.yml"
 
   tasks:
-    - name: "Dynamically include variables"
-      ansible.builtin.include_vars:
-        file: "{{ item }}"
-      loop:
-        - "vars/satellite_provisioning_vars_{{ rhisbuilder_bootstrap_target }}.yml"
-        - "~/rhisbuilder_vault.yml"
 
     - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
@@ -30,9 +23,220 @@
         - tags_phase_3
         - tags_satellite_install
 
-    - name: "Apply satellite_post role to target"
-      ansible.builtin.include_role:
-        name: satellite_post
+    - name: "Ensure hammer configuration"
+      ansible.builtin.import_tasks: "tasks/configure_hammer.yml"
       tags:
-        - tags_phase_3
-        - tags_satellite_post
+        - tags_rhisam
+        - tags_basic_config
+        - tags_configure_hammer
+
+    - name: "Ensure Satellite manifest configuration"
+      ansible.builtin.import_role:
+        name: redhat_manifests
+      tags:
+        - tags_rhisam
+        - tags_basic_config
+        - tags_manifest
+
+    - name: "Ensure Satellite manifest configuration"
+      ansible.builtin.import_role:
+        name: subscription_manifests
+      tags:
+        - tags_rhisam
+        - tags_basic_config
+        - tags_manifest
+
+    - name: "Ensure repository sets configuration"
+      ansible.builtin.import_role:
+        name: repository_sets
+      tags:
+        - tags_content_config
+        - tags_redhat_repos
+        - tags_repository_sets
+
+    - name: "Ensure custom products configuration"
+      ansible.builtin.import_role:
+        name: custom_products
+      tags:
+        - tags_content_config
+        - custom_repos
+        - tags_repositories
+
+    # This task should occur synchronously - we want all the repos populated before we start creating content views
+    - name: "Ensure repository synchronization... go grab a meal, this will take a while"
+      ansible.builtin.import_tasks: "tasks/start_synchronization.yml"
+      tags:
+        - tags_content_config
+        - tags_sync
+
+    - name: "Ensure lifecycle environments are configured"
+      ansible.builtin.import_role:
+        name: lifecycle_environments
+      tags:
+        - tags_content_config
+        - tags_lifecycle_environments
+
+    - name: "Ensure sync plans are attached and configured"
+      ansible.builtin.import_role:
+        name: sync_plans
+      tags:
+        - tags_content_config
+        - sync_plans
+
+    - name: "Ensure content view configurations"
+      ansible.builtin.import_role:
+        name: content_views
+      tags:
+        - tags_content_config
+        - tags_content_views
+
+#    We are currently ensuring sync'd content for media
+#    Satellite automatically creates the media when kickstart trees are added.
+#    - name: "Configure OS media"
+#      ansible.builtin.import_role: "media"
+#      tags:
+#        - tags_provisioning_config
+#        - tags_media
+
+    - name: "Configure partition tables"
+      ansible.builtin.import_role:
+        name: partition_tables
+      tags:
+        - tags_provisioning_config
+        - tags_ptables
+
+    - name: "Configure provisioning templates"
+      ansible.builtin.import_role:
+        name: provisioning_templates
+      tags:
+        - tags_provisioning_config
+        - tags_provisioning_templates
+
+    - name: "Configure operating systems"
+      ansible.builtin.import_role:
+        name: operating_systems
+      tags:
+        - tags_provisioning_config
+        - tags_operating_systems
+
+    - name: "Configure activation keys"
+      ansible.builtin.import_role:
+        name: activation_keys
+      tags:
+        - tags_provisioning_config
+        - tags_activation_keys
+
+    - name: "Configure domains"
+      ansible.builtin.import_role:
+        name: domains
+      tags:
+        - tags_provisioning_config
+        - tags_network
+        - tags_domains
+
+    - name: "Configure AD or IdM REALMs"
+      ansible.builtin.import_role:
+        name: realms
+      tags:
+        - tags_provisioning_config
+        - tags_network
+        - tags_realms
+
+    - name: "Configure network subnets"
+      ansible.builtin.import_role:
+        name: subnets
+      tags:
+        - tags_provisioning_config
+        - tags_network
+        - tags_subnets
+
+    - name: "Build PXE Linux defaults"
+      ansible.builtin.import_tasks: "tasks/build_pxe_linux_defaults.yml"
+      tags:
+        - tags_provisioning_config
+        - tags_pxe_defaults
+
+    - name: "Configure compute resources"
+      ansible.builtin.import_role:
+        name: compute_resources
+      tags:
+        - tags_provisioning_config
+        - tags_compute_resources
+
+    - name: "Configure compute profiles"
+      ansible.builtin.import_role:
+        name: compute_profiles
+      tags:
+        - tags_rhisam
+        - tags_provisioning_config
+        - tags_compute_profiles
+
+    - name: "Configure virt-who configurations"
+      ansible.builtin.import_role:
+        name: virtwho_configs
+      tags:
+        - tags_provisioning_config
+        - tags_virt_who
+
+    - name: "Configure ansible role git repos"
+      ansible.builtin.import_role:
+        name: imported_git_repos
+      tags:
+        - tags_provisioning_config
+        - tags_clone_git_repos
+
+    - name: "Ensure import ansible roles"
+      ansible.builtin.import_tasks: "tasks/ensure_import_roles.yml"
+      tags:
+        - tags_provisioning_config
+        - tags_ansible_import_roles
+
+    - name: "Configure SCAP content files"
+      ansible.builtin.import_role:
+        name: scap_contents
+      tags:
+        - tags_provisioning_config
+        - tags_scap_contents
+
+    - name: "Configure SCAP tailoring files"
+      ansible.builtin.import_role:
+        name: scap_tailoring_files
+      tags:
+        - tags_provisioning_config
+        - tags_scap_tailoring_files
+
+    - name: "Configure rhisam hostgroups"
+      ansible.builtin.import_role:
+        name: hostgroups
+      tags:
+        - tags_provisioning_config
+        - tags_host_groups
+
+    - name: "Configure SCAP policies"
+      ansible.builtin.import_role:
+        name: scap_policies
+      tags:
+        - tags_provisioning_config
+        - tags_scap_policies
+
+    - name: "Configure rhisam discovery rules"
+      ansible.builtin.import_role:
+        name: discovery_rules
+      tags:
+        - tags_provisioning_config
+        - tags_discovery_rules
+
+    - name: "Configure global parameters"
+      ansible.builtin.import_role:
+        name: global_parameters
+      tags:
+        - tags_provisioning_config
+        - tags_global_parameters
+
+    - name: "Configure general settings"
+      ansible.builtin.import_role:
+        name: settings
+      tags:
+        - tags_general_settings
+
+# End of Satellite Configuration

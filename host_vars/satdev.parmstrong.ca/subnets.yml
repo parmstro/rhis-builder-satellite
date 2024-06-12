@@ -1,0 +1,34 @@
+---
+subnets_rhisam:
+  - name: "devlabsubnet"
+    description: "bogus development network"
+    network_type: "IPv4"
+    network: 192.168.240.0
+    prefix: 22
+    mask: 255.255.252.0
+    gateway: 192.168.240.1
+    dns_primary: 192.168.25.5
+    dns_secondary: 192.168.252.6
+    ipam: "Internal DB"
+    from_ip: 192.168.240.100
+    to_ip: 192.168.240.199
+    boot_mode: "Static"
+    discovery_capsule: "{{ satellite_fqdn }}"
+    tftp_capsule: "{{ satellite_fqdn }}"
+    dns_capsule: "{{ satellite_fqdn }}"
+    template_capsule: "{{ satellite_fqdn }}"
+    parameters:
+      - name: "Parameter1"
+        parameter_type: string
+        value: "theParameter"
+    remote_execution_capsules:
+      - "{{ satellite_fqdn }}"
+    domains:
+      - "{{ satellite_domain }}"
+    locations:
+      - "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+
+# add your user subnets here
+# subnets_user:

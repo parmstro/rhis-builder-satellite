@@ -1,0 +1,22 @@
+---
+# This task will create the custom products
+# then iterate over a list of required repositories
+# state defaults to present
+
+- name: "Ensure custom product - {{ custom_product.name }}"
+  redhat.satellite.product:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ custom_product.name }}"
+    state: "{{ custom_product.state | default(omit) }}"
+
+
+- name: "Ensure the state the repositories required for the custom product."
+  ansible.builtin.include_tasks: "ensure_custom_product_repo.yml"
+  loop: "{{ custom_product.repositories }}"
+  loop_control:
+    loop_var: custom_product_repository
+  when: "custom_product.repositories is defined"

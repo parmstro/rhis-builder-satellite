@@ -1,0 +1,19 @@
+---
+#  Add the repository to the custom product
+#  state defaults to present
+
+- name: "Ensure the state of repository - {{ custom_product_repository.name }}"
+  redhat.satellite.repository:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ custom_product_repository.name }}"
+    description: "{{ custom_product_repository.description | default(omit) }}"
+    content_type: "{{ custom_product_repository.content_type }}"
+    product: "{{ custom_product.name }}"
+    url: "{{ custom_product_repository.url }}"
+    mirror_on_sync: "{{ custom_product_repository.mirror_on_sync | default(omit) }}"
+    download_policy: "{{ custom_product_repository.download_policy | default(omit) }}"
+    state: "{{ custom_product_repository.state | default(omit) }}"

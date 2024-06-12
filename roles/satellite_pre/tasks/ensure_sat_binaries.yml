@@ -1,5 +1,7 @@
 ---
-- name: "Update the system"
+
+# we are patching the system so ya, latest is required
+- name: "Update the system"  # noqa: package-latest
   ansible.builtin.dnf:
     name: '*'
     state: latest
@@ -8,21 +10,37 @@
   register: async_update
 
 - name: "Check on system update"
-  async_status:
+  ansible.builtin.async_status:
     jid: "{{ async_update.ansible_job_id }}"
   register: job_result
   until: job_result.finished
-  retries: "{{ ( async_timeout / async_delay ) | int }}"
+  retries: "{{ (async_timeout / async_delay) | int }}"
   delay: "{{ async_delay }}"
 
-- name: "Reset the Satellite module"
+- name: "Reset the Ruby module" # noqa: no-changed-when
+  ansible.builtin.command: "dnf -y module reset ruby"
+
+- name: "Reset the PostgreSQL module" # noqa: no-changed-when
+  ansible.builtin.command: "dnf -y module reset postgresql"
+
+- name: "Reset the Satellite module" # noqa: no-changed-when
   ansible.builtin.command: "dnf -y module reset satellite:el8"
 
-- name: "Enable the Satellite module"
+- name: "Enable the Satellite module" # noqa: no-changed-when
   ansible.builtin.command: "dnf -y module enable satellite:el8"
 
 - name: "Install the Satellite RPM packages"
   ansible.builtin.dnf:
     name: satellite
     state: present
+  async: "{{ async_timeout }}"
+  poll: 0
+  register: async_update
 
+- name: "Check on system update"
+  ansible.builtin.async_status:
+    jid: "{{ async_update.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: "{{ (async_timeout / async_delay) | int }}"
+  delay: "{{ async_delay }}"

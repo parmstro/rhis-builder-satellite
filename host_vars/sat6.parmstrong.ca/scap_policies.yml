@@ -1,0 +1,24 @@
+---
+# SCAP policy definitions
+
+# Draft definition
+scap_policies_rhisam:
+  - name: "RHEL9_CIS2"
+    description: "CIS Server Level 2 for RHEL9 scan"
+    deploy_by: "ansible"
+    scap_content: "name"
+    scap_profile: "name"
+    period: "weekly"
+    weekday: "Monday"
+    day_of_month:
+    cron_line:
+    hostgroups:
+      - "RHEL9_CIS2"
+    tailoring_file: "name"
+    tailoring_file_profile: "name"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
+
+# scap_policies_user

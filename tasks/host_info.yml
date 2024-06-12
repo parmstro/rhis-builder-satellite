@@ -1,0 +1,14 @@
+---
+# Get host info
+- name: "Show a host"
+  redhat.satellite.host_info:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    name: "{{ host.fqdn }}"
+  register: host_info
+
+- name: "Display data"
+  when: display_debug
+  ansible.builtin.debug:
+    var: host_info

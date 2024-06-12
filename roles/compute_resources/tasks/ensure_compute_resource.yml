@@ -1,0 +1,36 @@
+---
+# state defaults to present
+
+- name: "Ensure the state of the compute resource - {{ compute_resource.name }}"
+  redhat.satellite.compute_resource:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ compute_resource.name }}"
+    locations: "{{ compute_resource.locations }}"
+    organizations: "{{ compute_resource.organizations }}"
+    provider: "{{ compute_resource.provider }}"
+    provider_params: "{{ compute_resource.provider_params }}"
+    state: "{{ compute_resource.state | default(omit) }}"
+  no_log: true
+
+- name: "Ensure the state of the compute resource images - {{ image.name }}"
+  redhat.satellite.image:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ image.name }}"
+    architecture: "{{ image.architecture | default('x86_64') }}"
+    compute_resource: "{{ compute_resource.name }}"
+    image_password: "{{ image.image_password | default(omit) }}"
+    image_username: "{{ image.image_username | default(omit) }}"
+    operatingsystem: "{{ image.operatingsystem | default(omit) }}"
+    user_data: "{{ image.user_data | default(omit) }}"
+    uuid: "{{ image.uuid | default(omit) }}"
+    state: "{{ image.state | default(omit) }}"
+  loop: "{{ compute_resource.images | default([]) }}"
+  loop_control:
+    loop_var: image
+  no_log: true

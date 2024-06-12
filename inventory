@@ -7,7 +7,8 @@ idm.example.ca
 [idm_replicas]
 
 [sat_primary]
-sat.example.ca
+# satdev.parmstrong.ca
+# sat.example.ca
 
 [sat_capsule]
 

@@ -1,0 +1,19 @@
+---
+
+- name: "Running SCAP based on query {{ scan.search_query }}"
+  redhat.satellite.job_invocation:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    search_query: "{{ scan.search_query }}"
+    job_template: "Run OpenSCAP scans - Ansible Default"
+    concurrency_control: "{{ scan.concurrency_control | default(omit) }}"
+    description_format: "{{ scan.description_format | default(omit) }}"
+    execution_timeout_interval: "{{ scan.execution_timeout_interval | default(omit) }}"
+    # inputs: a scap scan has no inputs
+    randomized_ordering: "{{ scan.randomized_ordering | default(omit) }}"
+    recurrence: "{{ scan.recurrence | default(omit) }}"
+    ssh: "{{ scan.ssh | default(omit) }}"
+    scheduling: "{{ scan.scheduling | default(omit) }}"
+    targeting_type: "{{ scan.targeting_type | default(omit) }}"

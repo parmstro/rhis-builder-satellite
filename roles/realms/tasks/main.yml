@@ -1,0 +1,26 @@
+---
+# Configure the rhisam and user identity management or AD realms
+
+- name: "Configure the rhisam realms"
+  ansible.builtin.include_tasks: "ensure_realm.yml"
+  loop: "{{ realms_rhisam }}"
+  loop_control:
+    loop_var: realm
+  when: "realms_rhisam is defined"
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_realms
+    - tags_realms_rhisam
+
+- name: "Configure the user realms"
+  ansible.builtin.include_tasks: "ensure_realm.yml"
+  loop: "{{ realms_user }}"
+  loop_control:
+    loop_var: realm
+  when: "realms_user is defined"
+  tags:
+    - tags_user
+    - tags_provisioning_config
+    - tags_realms
+    - tags_realms_user

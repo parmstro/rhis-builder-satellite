@@ -9,6 +9,9 @@
   ansible.builtin.template:
     src: "chrony.j2"
     dest: "/etc/chrony.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
 
 - name: "Start the chronyd service with default settings"
   ansible.builtin.service:
@@ -17,7 +20,7 @@
     enabled: true
 
 - name: "Ensure the time is synchronized"
-  ansible.builtin.command: "chronyc makestep"
+  ansible.builtin.command: "chronyc makestep" # noqa: no-changed-when
 
 - name: "Install the SOS Report package"
   ansible.builtin.dnf:

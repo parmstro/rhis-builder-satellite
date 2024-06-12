@@ -2,7 +2,7 @@
 # This is the private vault file for your rhisbuilder secrets
 # This file is required to be in the root of the home directory of the executing user
 # i.e. ~/rhisbuilder_vault.yml
-# 
+#
 # Use this file to define all secrets in the project
 # Use rhisbuilder_local.yml to define non-secret location dependent variables
 # see: SAMPLE_rhisbuilder_local.yml
@@ -10,6 +10,10 @@
 
 # whether we are building AAP servers from images or with Satellite once Satellite is provisioned.
 # false means Satellite will build the AAP - best for metal and vmware deploys
+
+# Tell the linter to ignore long lines
+# yamllint disable rule:line-length
+
 build_aap_from_image: false
 
 # What platform we are going to bootstrap from i.e. where we build the initial IdM Server and Satellite Server
@@ -68,7 +72,7 @@ offline_token_vault: "eyJhbGciOiJIUz... big long string"                        
 
 # Red Hat Hybrid Cloud Console Organization and Activation Key
 # These are used for registering your boostrap systems
-# 
+#
 default_org_number_vault: 4242424242             # a number without quotes listed on the Activation Key page      # notsecret
 default_activation_key_vault: "build_rhis"       # a string - the name of the activation key                      # notsecret
 
@@ -76,15 +80,20 @@ default_activation_key_vault: "build_rhis"       # a string - the name of the ac
 org_number_vault: "{{ default_org_number_vault }}"                                               # notsecret
 activation_key_vault: "{{ default_activation_key_vault }}"                                       # notsecret
 
-#Default password for cloud-init when deploying
+# Default password for cloud-init when deploying
 baseimage_password_vault: "eyJhbGciOiJIUz"                                                       # notsecret
 
 
 # Setting up defaults to be used everywhere in our process
 # These defaults are fine for development or testing
-# For productiond deployments, set each password below individually
+
+####################################################################
+# FOR PRODUCTION DEPLOYMENTS, set each password below individually #
+####################################################################
+
 default_environment_username_vault: "{{ rhisbuilder_default_user }}"                             # notsecret
 default_environment_password_vault: "eyJhbGciOiJIUz"                                             # notsecret
+satellite_server_url_vault: "https://sat.example.ca"
 
 # Satellite administrator
 satellite_username_vault: "{{ default_admin_username }}"                                         # notsecret
@@ -102,24 +111,37 @@ sat_activationkey_vault: "{{ default_activation_key_vault }}"                   
 idm_rhsm_org_vault: "{{ default_org_number_vault }}"                                             # notsecret
 sat_rhsm_org_vault: "{{ default_org_number_vault }}"                                             # notsecret
 
-
 # Secrets used for bootstrapping on VMware
 vcenter_username_vault: "Administrator@VSPHERE.LOCAL"                                            # notsecret
 vcenter_password_vault: "{{ default_environment_password_vault }}"                               # notsecret
 
-# Secrets used for bootstrapping on Azure (currently unsupported)
-azure_tenant_id_vault: ""                                                                        # notsecret
-azure_subscription_id_vault: ""                                                                  # notsecret
+# Secrets used for Azure (bootstrapping and ComputeResource)
+azure1_cloud_vault: "azure"
+azure1_tenant_id_vault: "your_guid_here"
+azure1_subscription_id_vault: "your_guid_here"
+azure1_client_id_vault: "your_guid_here"
+azure1_client_secret_desc_vault: "SomeName"
+azure1_client_secret_id_vault: "your_guid_here"
+azure1_client_secret_vault: "a_long_generated_random_string"
+azure1_region_vault: "canadacentral"
+azure1_resource_group_vault: "az_canada_central_rg"
+azure1_user_ssh_key: "a_public_ssh_key_for_the_login_user"
 
+# Secrets used for AWS (bootstrapping and ComputeResource)
+aws1_account_id_vault: "an_account_id"
+aws1_access_key_vault: "an_access_key"
+aws1_secret_key_vault: "a_generated_secret"
+aws1_gov_cloud_vault: false
+aws1_region_vault: "ca-central-1"
 
 #####################################
-# Phase 2 - IdM Intaller Role Secrets 
+# Phase 2 - IdM Intaller Role Secrets
 #####################################
 # variable names required by the role
 # (the Satellite Pre role uses these to install the IdM client)
 ipa_admin_principal_vault: "{{ default_admin_username }}"                                         # notsecret
 ipa_admin_password_vault: "{{ default_environment_password_vault }}"                              # notsecret
-ipa_dm_password_vault: "{{ default_environment_password_vault }}"                                 # notsecret           
+ipa_dm_password_vault: "{{ default_environment_password_vault }}"                                 # notsecret
 
 
 #####################################
@@ -129,14 +151,31 @@ sat_ssl_rsa_key_pass_vault: "{{ default_environment_password_vault }}"          
 sat_inital_admin_username_vault: "{{ default_admin_username }}"                                   # notsecret
 sat_inital_admin_password_vault: "{{ default_environment_password_vault }}"                       # notsecret
 
+# This is used to pull the keytab instead of recreating it
+# Only the DM by default can pull an existing user keytab
+ipa_keytab_dn: "cn=Directory Manager"
 
 # Satellite Manifest creation secrets
 # These are required to create/pull the manifests for both Satellite and AAP Controller
 # These are extremely sensitive. DO NOT PUBLISH
+
+# I am updating FAM/redhat.satellite to support searching by contract and SKU
+
 cdn_username_vault: "user@example.ca"                                                             # notsecret
 cdn_password_vault: "eyJhbGciOiJIUz"                                                              # notsecret
-cdn_account_number_vault: "{{ default_org_number_vault }}"                                        # notsecret
-satellite_manifest_zip_vault: "~/satellite_manifest.zip"                                          # notsecret
+cdn_account_number_vault: "5258694"
+cdn_organization_id_vault: "an_organization_number_from_the_CDN"
+cdn_sat_activation_key_vault: "an_activation_key_name"
+manifest_subs_vault:
+  - name: "Base"
+    pool_id: "some_pool_id"                                                   # notsecret
+    qty: 1000
+  - name: "SatCapsule"
+    pool_id: "some_other_pool_id"                                                   # notsecret
+    qty: 1
+  - name: "NonRHEL"
+    pool_id: "the_last_pool_id"                                                   # notsecret
+    qty: 100
 
 # Satellite Remote Execution ssh user and keys
 # allows you to predefine the ssh keys for Satellite remote execution

@@ -1,0 +1,34 @@
+---
+# This task sets up hammer on the satellite server so we can execute
+# additional setup commands
+# Updated for Satellite 6.6.z health check label is now 'server-ping'
+
+- name: "Create a directory for the hammer config for the root user"
+  ansible.builtin.file:
+    dest: "/root/.hammer/cli.modules.d/"
+    owner: root
+    group: root
+    mode: "0600"
+    state: "directory"
+
+- name: "Create the configuration file"
+  ansible.builtin.template:
+    src: "foreman.yml.j2"
+    owner: root
+    group: root
+    mode: "0600"
+    dest: "/root/.hammer/cli.modules.d/foreman.yml"
+
+- name: "Check hammer"
+  ansible.builtin.command: "hammer ping" # noqa: no-changed-when
+  register: output
+
+- ansible.builtin.fail: # noqa: name[missing]
+  when: "'Status:          ok' not in output.stdout"
+
+- name: "Check health" # noqa: no-changed-when
+  ansible.builtin.command: "satellite-maintain health check --label server-ping"
+  register: output
+
+- ansible.builtin.fail: # noqa: name[missing]
+  when: "'[OK]' not in output.stdout"
