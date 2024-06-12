@@ -2,6 +2,6 @@
 
 - name: "Ensure satellite system registered to CDN"
   community.general.redhat_subscription:
-    activationkey: "{{ cdn_sat_registration_key }}"
+    activationkey: "{{ cdn_sat_activation_key }}"
     org_id: "{{ cdn_organization_id }}"
     state: present

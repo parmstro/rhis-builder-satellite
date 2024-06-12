@@ -1,6 +1,9 @@
 ---
 
 # prerequisites
+cdn_organization_id: "{{ cdn_organization_id_vault }}"
+cdn_sat_activation_key: "{{ cdn_sat_activation_key_vault }}"
+
 repository_ids:
   - rhel-8-for-x86_64-baseos-rpms
   - rhel-8-for-x86_64-appstream-rpms
