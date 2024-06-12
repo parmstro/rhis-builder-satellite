@@ -151,7 +151,7 @@
         - tags_subnets
 
     - name: "Build PXE Linux defaults"
-      ansible.builtin.import_tasks: "tasks/build_pxe_defaults.yml"
+      ansible.builtin.import_tasks: "tasks/build_pxe_linux_defaults.yml"
       tags:
         - tags_provisioning_config
         - tags_pxe_defaults
