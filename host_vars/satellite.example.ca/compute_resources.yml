@@ -21,7 +21,7 @@ azure1_client_secret_id: "{{ azure1_client_secret_id_vault }}"
 azure1_client_secret: "{{ azure1_client_secret_vault }}"
 azure1_cloud: "azure"
 azure1_region: "Canada Central"
-azure1_resourcegroup1: "az_canada_central_rg"
+azure1_resourcegroup1: "rg_example_ca"
 
 aws1_access_key: "{{ aws1_access_key_vault }}"
 aws1_secret_key: "{{ aws1_secret_key_vault }}"
@@ -36,7 +36,7 @@ compute_resources_rhisam:
     organizations: "{{ satellite_organization }}"
     provider_params:
       caching_enabled: false  # setting this to true currently causes some server faults.
-      datacenter: "parmstrong.ca"
+      datacenter: "example.ca"
       url: "192.168.252.30"
       user: "{{ vcenter_service_username }}"
       password: "{{ vcenter_service_password }}"
@@ -44,7 +44,7 @@ compute_resources_rhisam:
 compute_resources_user:
   - name: "Azure_Lab"
     provider: "AzureRm"
-    description: "Azure Central Canada RG"
+    description: "Example.ca Resource Group"
     locations: "{{ satellite_location }}"
     organizations: "{{ satellite_organization }}"
     images:

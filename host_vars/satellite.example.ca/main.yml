@@ -1,12 +1,12 @@
 ---
 # This file holds the main satellite level variables.
 
-satellite_fqdn: sat6.parmstrong.ca
+satellite_fqdn: satellite.example.ca
 satellite_admin_username: "{{ satellite_admin_username_vault }}"
 satellite_admin_password: "{{ satellite_admin_password_vault }}"
 satellite_initial_location: "Default Location"
 satellite_initial_organization: "Default organization"
-satellite_domain: parmstrong.ca
+satellite_domain: example.ca
 satellite_url: "https://{{ satellite_fqdn }}/"
 satellite_virtwho_username: "{{ satellite_virtwho_username_vault }}"
 satellite_virtwho_password: "{{ satellite_virtwho_password_vault }}"

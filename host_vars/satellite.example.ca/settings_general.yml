@@ -7,12 +7,12 @@
 settings_general:
   - description: "The default administrator email address"
     settings_type: "string"
-    default: "root@parmstrong.ca"
+    default: "root@example.ca"
     updated_at: null
     id: "administrator"
     name: "administrator"
     full_name: "Administrator email address"
-    value: "root@parmstrong.ca"
+    value: "root@example.ca"
     category: "general"
     category_name: "General"
     readonly: false
@@ -22,12 +22,12 @@ settings_general:
 
   - description: "URL where your Foreman instance is reachable (see also Provisioning unattended_url)"
     settings_type: "string"
-    default: "https://sat6.parmstrong.ca"
+    default: "https://sat6.example.ca"
     updated_at: null
     id: "foreman_url"
     name: "foreman_url"
     full_name: "Foreman URL"
-    value: "https://sat6.parmstrong.ca"
+    value: "https://sat6.example.ca"
     category: "general"
     category_name: "General"
     readonly: false

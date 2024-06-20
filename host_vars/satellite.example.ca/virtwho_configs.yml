@@ -11,7 +11,7 @@ virtwho_configs_rhisam:
   - foreman_virt_who_configure_config:
       name: "VMware"
       hypervisor_type: "esx"
-      hypervisor_server: "vcenter.parmstrong.ca"
+      hypervisor_server: "vcenter.example.ca"
       hypervisor_username: "{{ vcenter_virtwho_username }}"
       hypervisor_password: "{{ vcenter_virtwho_password }}"
       hypervisor_id: "hostname"
