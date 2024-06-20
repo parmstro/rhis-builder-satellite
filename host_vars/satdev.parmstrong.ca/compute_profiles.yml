@@ -4,6 +4,8 @@
 
 vmware_cluster1_name: "NUCLab"
 vmware_cluster1_path: "/Datacenters/parmstrong.ca/vm"
+vmware_cluster1_datastore: "NAS1_VMS"
+vmware_cluster1_network: "VM Network"
 
 compute_profiles_rhisam:
   - name: "SOE_Small"
@@ -33,12 +35,12 @@ compute_profiles_rhisam:
               name: "Hard disk"
               mode: "persistent"
               controller_key: 1000
-              datastore: "NASAEX_VMS"
+              datastore: "{{ vmware_cluster1_datastore }}"
               size_gb: 65
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
-              network: "VM Network"
+              network: "{{ vmware_cluster1_network }}"
       - compute_resource: "Azure_Lab"
         vm_attrs:
           resource_group: "az_canada_central_rg"
@@ -91,12 +93,12 @@ compute_profiles_rhisam:
               name: "Hard disk"
               mode: "persistent"
               controller_key: 1000
-              datastore: "NASAEX_VMS"
+              datastore: "{{ vmware_cluster1_datastore }}"
               size_gb: 100
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
-              network: "VM Network"
+              network: "{{ vmware_cluster1_network }}"
       - compute_resource: "Azure_Lab"
         vm_attrs:
           resource_group: "az_canada_central_rg"
@@ -149,12 +151,12 @@ compute_profiles_rhisam:
               name: "Hard disk"
               mode: "persistent"
               controller_key: 1000
-              datastore: "NASAEX_VMS"
+              datastore: "{{ vmware_cluster1_datastore }}"
               size_gb: 100
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
-              network: "VM Network"
+              network: "{{ vmware_cluster1_network }}"
       - compute_resource: "Azure_Lab"
         vm_attrs:
           resource_group: "az_canada_central_rg"
