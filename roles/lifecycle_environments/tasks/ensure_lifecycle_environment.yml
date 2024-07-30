@@ -11,6 +11,6 @@
     name: "{{ lifecycle_environment.name }}"
     label: "{{ lifecycle_environment.label }}"
     organization: "{{ lifecycle_environment.organization }}"
-    description: "{{ lifecycle_environment.desc }}"
+    description: "{{ lifecycle_environment.description }}"
     prior: "{{ lifecycle_environment.prior }}"
     state: "{{ lifecycle_environment.state | default(omit) }}"
