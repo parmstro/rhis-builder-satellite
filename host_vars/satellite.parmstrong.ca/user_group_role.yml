@@ -1,0 +1,153 @@
+---
+# This file describes the users groups and roles an environment.
+# As with all the files there are users, groups and roles for the RH-ISAM and users, groups and roles for your custom deployment
+
+# Users required for the RH-ISAM deployment
+users_rhisam:
+  - name: "bobsurunkle"
+    firstname: "Bob"
+    lastname: "Surunkle"
+    email: "bobsurunkle@example.ca"
+    description: "Uncle Bob"
+    admin: "false"
+    user_password: "random_password"  # not_a_secret
+    default_location: "Default Location"
+    default_organization: "Default Organization"
+    auth_source: "INTERNAL"  # or "EXTERNAL"
+    timezone: "Toronto"
+    locale: "en-CA"
+    roles: "Operator" # pass a list object
+    locations:
+      - "Default Location"
+    organizations:
+      - "Default Organization"
+    state: "present"  # not Ontario
+
+# Uncomment below - Add your custom users here - use the above as a pattern
+# users_user:
+
+# satgroup-administrator will map to the Satellite admins group and administrator (all privileges) role
+# satgroup-compliance-auditor will need to view OSCAP Policy and Reports maps to Compliance Viewer
+# satgroup-compliance-manager will need to view, edit and upload OSCAP Policy and view Reports - maps to Compliance Viewer
+# satgroup-content-manager will need to manage subscriptions, repositories, products, content views, life cycles, errata, and containers
+# satgroup-org-administrator maps to Manager role
+# satgroup-site-administrator maps to Site Manager role
+# satgroup-sub-manager needs to see Red Hat Subscriptions and Manifests
+#
+# satgroup-operator - combines a number of roles - BootStrap_User, Remote Execution User, Task Manager, Edit Hosts, Discovery Manager, Viewer
+# For the POC we only need to create the Operator Role
+
+# User groups required for the RH-ISAM deployment
+user_groups_rhisam:
+  - name: "Operators"
+    admin: "false"
+    roles:
+      - "Operator"
+    users:
+      - "bobsurunkle"
+#    usergroups:
+#      - "None"
+#    updated_name: "New_Operators"
+    state: "present"
+
+# Uncomment below - Add your custom groups here - use the above as a pattern
+# user_groups_user:
+
+# Roles required for the RH-ISAM deployment
+roles_rhisam:
+  - name: "Operator"
+    state: present
+    description: "A default operator"
+    locations:
+      - "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"
+    filters:
+      - permissions:
+          - "view_hosts"
+          - "view_statistics"
+          - "view_tasks"
+          - "view_search"
+          - "view_cases"
+          - "view_log_viewer"
+          - "view_architectures"
+          - "view_audit_logs"
+          - "view_compute_profiles"
+          - "view_compute_resources"
+          - "view_compute_resources_vms"
+          - "edit_compute_resources_vms"
+          - "power_compute_resources_vms"
+          - "console_compute_resources_vms"
+          - "view_config_groups"
+          - "edit_config_groups"
+          - "view_domains"
+          - "view_environments"
+          - "view_facts"
+          - "view_globals"
+          - "view_hostgroups"
+          - "view_hosts"
+          - "create_hosts"
+          - "edit_hosts"
+          - "destroy_hosts"
+          - "build_hosts"
+          - "power_hosts"
+          - "puppetrun_hosts"
+          - "view_discovered_hosts"
+          - "submit_discovered_hosts"
+          - "auto_provision_discovered_hosts"
+          - "provision_discovered_hosts"
+          - "edit_discovered_hosts"
+          - "destroy_discovered_hosts"
+          - "view_images"
+          - "view_locations"
+          - "view_media"
+          - "view_models"
+          - "view_operatingsystems"
+          - "view_external_variables"
+          - "view_organizations"
+          - "view_ptables"
+          - "view_puppetclasses"
+          - "edit_puppetclasses"
+          - "view_realms"
+          - "view_reports"
+          - "view_subnets"
+          - "view_trends"
+          - "view_containers"
+          - "commit_containers"
+          - "create_containers"
+          - "destroy_containers"
+          - "view_registries"
+          - "view_discovery_rules"
+          - "view_foreman_tasks"
+          - "edit_foreman_tasks"
+          - "view_activation_keys"
+          - "view_content_hosts"
+          - "create_content_hosts"
+          - "edit_content_hosts"
+          - "destroy_content_hosts"
+          - "view_content_views"
+          - "view_gpg_keys"
+          - "view_host_collections"
+          - "create_host_collections"
+          - "edit_host_collections"
+          - "destroy_host_collections"
+          - "view_lifecycle_environments"
+          - "view_products"
+          - "view_provisioning_templates"
+          - "edit_provisioning_templates"
+          - "deploy_provisioning_templates"
+          - "view_recurring_logics"
+          - "view_capsule_content"
+          - "view_config_reports"
+          - "view_job_templates"
+          - "create_job_templates"
+          - "edit_job_templates"
+          - "destroy_job_templates"
+          - "lock_job_templates"
+          - "view_job_invocations"
+          - "create_job_invocations"
+          - "view_external_parameters"
+          - "view_subscriptions"
+          - "attach_subscriptions"
+          - "unattach_subscriptions"
+          - "view_arf_reports"
