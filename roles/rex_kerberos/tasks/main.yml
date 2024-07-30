@@ -1,0 +1,34 @@
+---
+# Configure the system for kerberos rex
+# Determine the id of the rex executor - this is always foreman-proxy (until it isn't) - this sets the path
+# The principal is set in the keytab - foreman-proxy sshs in as the principal
+# Set the path for the integration
+# copy the keytab for realm-capsule to the proper directory for rex with proper permissions
+# test the keytab
+
+- name: "Get the id of foreman-proxy user"
+  ansible.builtin.command:
+    cmd: "id -u {{ rex_executor }}"
+  register: result
+  changed_when: true  # this must always execute
+  failed_when: "'no such user' in result.stdout"
+
+# the keytab file *must* always be named client.keytab
+# and be located in the path below related to the impersonating users uid, in our case foreman-proxy
+- name: "Set the path for the deploying the keytab"
+  ansible.builtin.set_fact:
+    rex_keytab_path: "/var/kerberos/krb5/user/{{ result.stdout }}/client.keytab"
+
+- name: "Fetch existing keytab to server" # noqa: no-changed-when
+  ansible.builtin.command:
+    cmd: "ipa-getkeytab -p {{ rex_realm_principal }} -s {{ ipaserver_fqdn }} -r -k /root/rex.keytab -D '{{ keytab_retrieval_dn }}' -w {{ keytab_retrieval_password }}" # noqa: yaml[line-length]
+  no_log: true
+
+- name: "Move keytab to foreman-proxy directory"
+  ansible.builtin.copy:
+    src: "/root/rex.keytab"
+    dest: "{{ rex_keytab_path }}"
+    remote_src: true
+    owner: "{{ rex_executor }}"
+    group: "{{ rex_executor }}"
+    mode: "0644"
