@@ -1,4 +1,5 @@
 ---
+
 - name: "Test Task"
   hosts: sat_primary
   become: true
@@ -9,4 +10,4 @@
   tasks:
 
     - name: "Test the specified task"
-      ansible.builtin.include_tasks: tasks/{{ test_task_name }}.yml
+      ansible.builtin.include_tasks: roles/{{ role_name }}/tasks/{{ task_name }}.yml

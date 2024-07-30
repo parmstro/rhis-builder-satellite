@@ -1,0 +1,14 @@
+---
+- name: "Test Role"
+  hosts: sat_primary
+  become: true
+  gather_facts: true
+
+  vars_files:
+    - "~/rhisbuilder_vault.yml"
+
+  tasks:
+
+    - name: "Run a role test"
+      ansible.builtin.include_role:
+        name: "{{ role_name }}"
