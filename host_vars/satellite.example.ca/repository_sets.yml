@@ -12,6 +12,7 @@
 # these are valuable in testing or in maintainance runs
 # Content promotion is embedded in the publish operation for this project
 skip_sync: false
+skip_publish: false
 
 # Add additional content not needed for boostrap but still valuable and useful
 # Can be set to false to skip managemet of repos, CVs and CCVs
@@ -22,12 +23,14 @@ repository_sets_rhisam:
     repository_list:
       - releasever: "9.2"
       - releasever: "9.3"
+      - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
       - releasever: "9.2"
       - releasever: "9.3"
+      - releasever: "9.4"
 
 # RHEL9 repos
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
@@ -170,27 +173,32 @@ repository_sets_user:
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
       - releasever: "9.2"
+      - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
       - releasever: "9.2"
+      - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
       - releasever: "9.2"
+      - releasever: "9.4"
 
 # RHEL9_aarch64 kickstart repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
       - releasever: "9.3"
+      - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
       - releasever: "9.3"
+      - releasever: "9.4"
 
 # RHEL9_aarch64 repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (RPMs)"
