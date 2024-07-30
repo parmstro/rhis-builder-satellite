@@ -6,7 +6,7 @@
   loop: "{{ scap_policies_rhisam }}"
   loop_control:
     loop_var: scap_policies
-  when: scap_policies_rhisam is defined
+  when: "scap_policies_rhisam is defined"
   tags:
     - tags_rhisam
     - tags_scap_config
@@ -18,7 +18,7 @@
   loop: "{{ scap_policies_user }}"
   loop_control:
     loop_var: scap_policies
-  when: scap_policies_user is defined
+  when: "scap_policies_user is defined"
   tags:
     - tags_user
     - tags_scap_config
