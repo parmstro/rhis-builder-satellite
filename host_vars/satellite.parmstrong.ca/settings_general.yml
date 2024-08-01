@@ -7,12 +7,12 @@
 settings_general:
   - description: "The default administrator email address"
     settings_type: "string"
-    default: "root@example.ca"
+    default: "root@parmstrong.ca"
     updated_at: null
     id: "administrator"
     name: "administrator"
     full_name: "Administrator email address"
-    value: "root@example.ca"
+    value: "root@parmstrong.ca"
     category: "general"
     category_name: "General"
     readonly: false
@@ -22,12 +22,12 @@ settings_general:
 
   - description: "URL where your Foreman instance is reachable (see also Provisioning unattended_url)"
     settings_type: "string"
-    default: "https://sat6.example.ca"
+    default: "https://sat6.parmstrong.ca"
     updated_at: null
     id: "foreman_url"
     name: "foreman_url"
     full_name: "Foreman URL"
-    value: "https://sat6.example.ca"
+    value: "https://sat6.parmstrong.ca"
     category: "general"
     category_name: "General"
     readonly: false
@@ -140,13 +140,13 @@ settings_general:
     encrypted: false
     select_values: null
 
-  - description: "Foreman will append domain names when new hosts are provisioned"
+  - description: "Display names of hosts as FQDNs. If disabled, only display names of hosts as hostnames."
     settings_type: "boolean"
     default: true
     updated_at: null
     id: "display_fqdn_for_hosts"
     name: "display_fqdn_for_hosts"
-    full_name: "Display FQDN for hosts"
+    full_name: "Display names of hosts as FQDNs"
     value: true
     category: "general"
     category_name: "General"

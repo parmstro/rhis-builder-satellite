@@ -2,8 +2,10 @@
 # compute_profiles
 # yamllint disable rule:line-length
 
-vmware_cluster1_name: "NUCLab"
-vmware_cluster1_path: "/Datacenters/parmstrong.ca/vm"
+vmware_cluster1_name: "ExampleLab"
+vmware_cluster1_path: "/Datacenters/example.ca/vm"
+vmware_cluster1_datastore: "example_datastore"
+vmware_cluster1_network: "VM Network"
 
 compute_profiles_rhisam:
   - name: "SOE_Small"
@@ -33,15 +35,15 @@ compute_profiles_rhisam:
               name: "Hard disk"
               mode: "persistent"
               controller_key: 1000
-              datastore: "NASAEX_VMS"
+              datastore: "{{ vmware_cluster1_datastore }}"
               size_gb: 65
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
-              network: "VM Network"
+              network: "{{ vmware_cluster1_network }}"
       - compute_resource: "Azure_Lab"
         vm_attrs:
-          resource_group: "az_canada_central_rg"
+          resource_group: "rg_example_ca"
           vm_size: "Standard_B2ms"
           platform: "Linux"
           username: "realm-capsule"
@@ -56,7 +58,7 @@ compute_profiles_rhisam:
           nvidia_gpu_extension: "false"
           interfaces_attributes:
             0:
-              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/az_canada_central_rg/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
+              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
               public_ip: "None"
               private_ip: "true"
           volumes_attributes:
@@ -91,15 +93,15 @@ compute_profiles_rhisam:
               name: "Hard disk"
               mode: "persistent"
               controller_key: 1000
-              datastore: "NASAEX_VMS"
+              datastore: "{{ vmware_cluster1_datastore }}"
               size_gb: 100
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
-              network: "VM Network"
+              network: "{{ vmware_cluster1_network }}"
       - compute_resource: "Azure_Lab"
         vm_attrs:
-          resource_group: "az_canada_central_rg"
+          resource_group: "rg_example_ca"
           vm_size: "Standard_B4ms"
           platform: "Linux"
           username: "realm-capsule"
@@ -114,7 +116,7 @@ compute_profiles_rhisam:
           nvidia_gpu_extension: "false"
           interfaces_attributes:
             0:
-              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/az_canada_central_rg/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
+              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
               public_ip: "None"
               private_ip: "true"
           volumes_attributes:
@@ -149,15 +151,15 @@ compute_profiles_rhisam:
               name: "Hard disk"
               mode: "persistent"
               controller_key: 1000
-              datastore: "NASAEX_VMS"
+              datastore: "{{ vmware_cluster1_datastore }}"
               size_gb: 100
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
-              network: "VM Network"
+              network: "{{ vmware_cluster1_network }}"
       - compute_resource: "Azure_Lab"
         vm_attrs:
-          resource_group: "az_canada_central_rg"
+          resource_group: "rg_example_ca"
           vm_size: "Standard_B8ms"
           platform: "Linux"
           username: "realm-capsule"
@@ -172,7 +174,7 @@ compute_profiles_rhisam:
           nvidia_gpu_extension: "false"
           interfaces_attributes:
             0:
-              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/az_canada_central_rg/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
+              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
               public_ip: "None"
               private_ip: "true"
           volumes_attributes:

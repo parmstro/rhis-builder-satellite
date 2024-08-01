@@ -46,6 +46,17 @@
         - tags_basic_config
         - tags_manifest
 
+    - name: "Ensure Satellite manifest configuration"
+      ansible.builtin.import_role:
+        name: subscription_manifests
+      when:
+        - satellite_pre_use_idm
+        - rex_kerberos_enabled
+      tags:
+        - tags_rhisam
+        - tags_basic_config
+        - tags_rex_kerberos
+
     - name: "Ensure repository sets configuration"
       ansible.builtin.import_role:
         name: repository_sets

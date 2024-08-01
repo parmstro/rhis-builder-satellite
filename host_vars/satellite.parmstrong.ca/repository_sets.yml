@@ -11,7 +11,7 @@
 # set to true to overide default to sync all content, publish all CVs and CCVs, and promote
 # these are valuable in testing or in maintainance runs
 # Content promotion is embedded in the publish operation for this project
-skip_sync: false
+skip_sync: true
 skip_publish: false
 
 # Add additional content not needed for boostrap but still valuable and useful
@@ -191,13 +191,13 @@ repository_sets_user:
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
-      - releasever: "9.3"
+      - releasever: "9.2"
       - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
-      - releasever: "9.3"
+      - releasever: "9.2"
       - releasever: "9.4"
 
 # RHEL9_aarch64 repos

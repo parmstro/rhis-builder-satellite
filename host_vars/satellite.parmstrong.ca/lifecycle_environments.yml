@@ -1,0 +1,27 @@
+---
+# Default Lifecycle environments
+
+lifecycle_environments_rhisam:
+  - name: "Development"
+    label: "Development"
+    description: "Content Development - proposed for SOEs"
+    organization: "{{ satellite_organization }}"
+    prior: "Library"
+
+  - name: "Qualification"
+    label: "Qualification"
+    description: "Content Qualification of SOEs"
+    organization: "{{ satellite_organization }}"
+    prior: "Development"
+
+  - name: "Production"
+    label: "Production"
+    description: "Production Server Approved Content"
+    organization: "{{ satellite_organization }}"
+    prior: "Qualification"
+
+  - name: "Retired"
+    label: "Retired"
+    description: "Retired Content - No longer used with Active Servers"
+    organization: "{{ satellite_organization }}"
+    prior: "Production"

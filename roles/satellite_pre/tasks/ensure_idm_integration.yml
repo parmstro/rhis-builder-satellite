@@ -1,0 +1,47 @@
+---
+
+# Integrate Satellite with IdM and prepare the Realm
+- name: "Ensure satellite is registered to Identity Management"
+  ansible.builtin.import_tasks: ensure_idm_registered.yml
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_idmclient
+
+- name: "Ensure satellite certificates are generated"
+  ansible.builtin.import_tasks: generate_certs.yml
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_gen_certs
+
+- name: "Ensure satellite certificates are validated"
+  ansible.builtin.import_tasks: check_certs.yml
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_check_certs
+
+- name: "Ensure identity management realm is prepared for use with Satellite"
+  ansible.builtin.import_tasks: foreman_prepare_realm.yml
+  when: "not skip_prepare_realm"
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_prepare_realm
+
+- name: "Get existing keytab for foreman-proxy use with Realm"
+  ansible.builtin.import_tasks: get_existing_keytab.yml
+  when: "skip_prepare_realm"
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_prepare_realm
+
+- name: "Ensure keytab ownership is foreman-proxy"
+  ansible.builtin.import_tasks: ensure_keytab_ownership.yml
+  when: "skip_prepare_realm"
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_prepare_realm

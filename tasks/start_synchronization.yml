@@ -1,5 +1,10 @@
 ---
 # synchronization of repositories
+# TODO: Configure similar logic to publication
+#       If repo has never been syncd then always sync
+#       If we are being asked to force_sync then always sync
+#       If repo has NOT been syncd within max_sync_interval then always sync
+#       If no option specified, skip sync
 
 - name: "Sync unless skip_sync == true"
   when: "not skip_sync"
