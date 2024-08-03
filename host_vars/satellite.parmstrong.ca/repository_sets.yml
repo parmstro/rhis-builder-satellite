@@ -10,9 +10,16 @@
 # Sync / Publish / Promote main control vars
 # set to true to overide default to sync all content, publish all CVs and CCVs, and promote
 # these are valuable in testing or in maintainance runs
-# Content promotion is embedded in the publish operation for this project
-skip_sync: true
-skip_publish: false
+
+# if you skip synchronization and
+# you added kickstart repos to your product and content views
+# satellite doesnt register the kickstart repos as synchronized content (obviously)
+# new definitions like hostgroups then fail with bad content definitions
+# avoid setting skip_sync or skip_publish in your variable file where possible
+# call it with an extravar instead
+
+skip_sync_all: false
+last_sync_threshold_hours: 12
 
 # Add additional content not needed for boostrap but still valuable and useful
 # Can be set to false to skip managemet of repos, CVs and CCVs

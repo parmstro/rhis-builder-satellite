@@ -3,15 +3,15 @@
 # This determines if we should publish a content view version
 # based on whether
 #    skip_publish has been set to true
-#    the content view has been published within cv.publication_limit_hours
+#    the content view has been published within cv.publication_threshold_hours
 #    the content view has been set to force_publish
 # It expects to be called in a loop with a loop variable cv
 
 - name: "Ensure content meets publication requirements"
   ansible.builtin.set_fact:
-    publish_content: true                 # default to true - we want to publish
-    hours_since_publication: 8766         # unless satellite tells us assume the last publication was long ago.. one year - 365.25 days
-    inside_publication_limit: false       # assume that we have published within any reasonable limit
+    publish_content: false                       # default to false - only publish when necessary
+    hours_since_publication: 8766                # assume the last publication was long ago.. one year - 365.25 days
+    exceeded_publication_threshold_hours: false  # assume we haven't exceeded the threshold
 
 - name: "Get content view info: {{ cv.name }}"
   redhat.satellite.content_view_info:
@@ -34,25 +34,32 @@
   ansible.builtin.debug:
     var: hours_since_publication
 
-- name: "Determine if we are inside publication limit hours"
+- name: "Determine if we have exceeded publication threshold hours"
   when:
-    - cv.publication_limit_hours is defined
-    - (hours_since_publication|float) <= (cv.publication_limit_hours|float)
+    - cv.publication_threshold_hours is defined
+    - (hours_since_publication|float) > (cv.publication_threshold_hours|float)
   ansible.builtin.set_fact:
-    inside_publication_limit: true
+    exceeded_publication_threshold_hours: true
 
-- name: "Do not publish if we are asked to skip or if we are inside the publication limit hours"
-  when: (inside_publication_limit) or
-        (skip_publish)
+- name: "If we have exceeded the threshold and skip_publish_all is false, Publish"
+  when:
+    - exceeded_publication_threshold_hours
+    - not skip_publish
   ansible.builtin.set_fact:
-    publish_content: false
+    publish_content: true
 
-- name: "Have we been asked to force publish this content view?"
+- name: "If we been asked to force publish *this* content view, Publish"
   when: (cv.force_publish is defined and cv.force_publish)
   ansible.builtin.set_fact:
     publish_content: true
 
-- name: "Publish content if necessary - {{ cv.name }}"
+- name: "Assert publication status"
+  ansible.builtin.assert:
+    that: publish_content
+    fail_msg: "We will NOT publish content view - {{ cv.name }}"
+    success_msg: "We will PUBLISH content view - {{ cv.name }}"
+
+- name: "Publishing content view - {{ cv.name }}"
   when: publish_content
   redhat.satellite.content_view_version:
     username: "{{ satellite_admin_username }}"

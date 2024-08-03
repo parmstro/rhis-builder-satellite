@@ -1,4 +1,12 @@
 ---
+
+# Use skip_publish_all when debugging configuration that occurs
+# after content view creation and publication to help speed up the run
+# if you turn it on here remember that things like new kickstarts won't
+# published which may break things like hostgroups that reference new kickstarts...
+
+skip_publish_all: false
+
 # This contains all the definitions for Content Views and Composite Content Views
 # It defines the filters and filter rules for the content views as well
 
@@ -15,6 +23,8 @@ cvs_rhisam:
   - name: "AAP_Files"
     desc: "Red Hat Ansible Automation Platform Install Files"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 8 x86_64 Files"
         product: "Red Hat Ansible Automation Platform"
@@ -25,6 +35,8 @@ cvs_rhisam:
   - name: "EPEL8"
     desc: "Extra Packages for Enterprise Linux 8"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "EPEL8"
         product: "EPEL8"
@@ -35,6 +47,8 @@ cvs_rhisam:
   - name: "SOE_RHEL8"
     desc: "Red Hat Enterprise Linux 8 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -93,10 +107,23 @@ cvs_rhisam:
       - "Qualification"
       - "Production"
 
+  - name: "EPEL9"
+    desc: "Extra Packages for Enterprise Linux 9"
+    org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
+    repositories:
+      - name: "EPEL9"
+        product: "EPEL9"
+    environments:
+      - "Library"
+
 # SOE_RHEL9_x86_64 - the new RHEL 8 :-)
   - name: "SOE_RHEL9"
     desc: "Red Hat Enterprise Linux 9 x86_64 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -161,6 +188,8 @@ cvs_user:
   - name: "SOE_RHEL9_aarch64"
     desc: "Red Hat Enterprise Linux 9 aarch64 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream RPMs 9"
         product: "Red Hat Enterprise Linux for ARM 64"
@@ -222,6 +251,8 @@ cvs_user:
   - name: "SOE_RHEL7"
     desc: "Our Red Hat Enterprise Linux 7 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server x86_64"
         product: "Red Hat Ansible Engine"
@@ -275,6 +306,8 @@ cvs_user:
   - name: "LEAPP_2_RHEL8"
     desc: "Red Hat Enterprise Linux 8 for LEAPP migrations"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.10"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -326,6 +359,8 @@ cvs_user:
   - name: "LEAPP_2_RHEL9"
     desc: "Red Hat Enterprise Linux 9.2 for LEAPP migrations"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9.4"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -377,6 +412,8 @@ cvs_user:
   - name: "MSSQLServer"
     desc: "Microsoft SQL Server for Linux 2022 content"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "packages-microsoft-com-mssql-server-2022-rhel-8"
         product: "Microsoft SQL Server for Linux 2022 for RHEL 8"
@@ -445,6 +482,8 @@ cvs_user:
   - name: "CentOS"
     desc: "CentOS Content"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     repositories:
       - name: "centos-8-appstream"
         product: "CentOS Streams"
@@ -487,6 +526,8 @@ ccvs_rhisam:
   - name: "SOE_AAP"
     desc: "SOE for Ansible Automation Platform Servers"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -500,6 +541,8 @@ ccvs_rhisam:
   - name: "SOE_RHEL8EPEL"
     desc: "SOE for RHEL8 with EPEL"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -514,6 +557,8 @@ ccvs_user:
   - name: "LEAPP_7_2_8"
     desc: "Migrate from RHEL 7.9 to RHEL 8.6"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL7"
         latest: true
@@ -527,6 +572,8 @@ ccvs_user:
   - name: "LEAPP_8_2_9"
     desc: "Migrate from RHEL 8 to RHEL 9"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -540,6 +587,8 @@ ccvs_user:
   - name: "SOE_JBoss"
     desc: "Production JBoss Applications"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -553,6 +602,8 @@ ccvs_user:
   - name: "SOE_MSSQL"
     desc: "SQL Server SOE"
     org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
