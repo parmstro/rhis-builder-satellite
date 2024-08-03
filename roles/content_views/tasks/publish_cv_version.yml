@@ -24,10 +24,11 @@
   register: cv_info
   changed_when: false
 
+# Satellite returns the time for these values in UTC
 - name: "Determine hours since last publication time"
   when: cv_info.content_view.last_published
   ansible.builtin.set_fact:
-    hours_since_publication: "{{ (now() - (cv_info.content_view.last_published[:-4] | to_datetime)).seconds / 3600 | float }}"
+    hours_since_publication: "{{ (now(utc=true) - (cv_info.content_view.last_published[:-4] | to_datetime)).seconds / 3600 | float }}"
 
 - name: "Print hours since last publication"
   ansible.builtin.debug:
