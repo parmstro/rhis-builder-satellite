@@ -2,7 +2,7 @@
 
 # This determines if we should publish a content view version
 # based on whether
-#    skip_publish has been set to true
+#    skip_publish_all has been set to true
 #    the content view has been published within cv.publication_threshold_hours
 #    the content view has been set to force_publish
 # It expects to be called in a loop with a loop variable cv
@@ -44,7 +44,7 @@
 - name: "If we have exceeded the threshold and skip_publish_all is false, Publish"
   when:
     - exceeded_publication_threshold_hours
-    - not skip_publish
+    - not skip_publish_all
   ansible.builtin.set_fact:
     publish_content: true
 
@@ -52,12 +52,6 @@
   when: (cv.force_publish is defined and cv.force_publish)
   ansible.builtin.set_fact:
     publish_content: true
-
-- name: "Assert publication status"
-  ansible.builtin.assert:
-    that: publish_content
-    fail_msg: "We will NOT publish content view - {{ cv.name }}"
-    success_msg: "We will PUBLISH content view - {{ cv.name }}"
 
 - name: "Publishing content view - {{ cv.name }}"
   when: publish_content

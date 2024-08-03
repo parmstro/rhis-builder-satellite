@@ -12,7 +12,7 @@
 # these are valuable in testing or in maintainance runs
 # Content promotion is embedded in the publish operation for this project
 skip_sync: false
-skip_publish: false
+skip_publish_all: false
 
 # Add additional content not needed for boostrap but still valuable and useful
 # Can be set to false to skip managemet of repos, CVs and CCVs

@@ -15,7 +15,7 @@
 # you added kickstart repos to your product and content views
 # satellite doesnt register the kickstart repos as synchronized content (obviously)
 # new definitions like hostgroups then fail with bad content definitions
-# avoid setting skip_sync or skip_publish in your variable file where possible
+# avoid setting skip_sync_all or skip_publish_all in your variable file where possible
 # call it with an extravar instead
 
 skip_sync_all: false
