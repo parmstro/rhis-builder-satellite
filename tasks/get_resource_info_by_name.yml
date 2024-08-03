@@ -9,7 +9,7 @@
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
     resource: "{{ resource_type }}"
-    search: "{{ resource_search }}"
+    search: 'name = "{{ resource_name }}"'
   register: resource_info
 
 - name: "Debug Print"
