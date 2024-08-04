@@ -1,0 +1,68 @@
+---
+
+- name: "Ensure content meets synchronization requirements"
+  ansible.builtin.set_fact:
+    sync_content: false                              # default to false - only sync when necessary
+    hours_since_sync: 8766                           # assume the last sync was long ago.. one year - 365.25 days
+    last_sync_datetime: 0                            # reset the last_sync_datetime
+
+- name: "Get the product info"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    resource: products
+    search: 'name = "{{ product_to_sync }}"'
+  register: product_info
+
+# last_sync is null for a product that was never sync'd
+- name: "Determine last sync datetime"
+  when: product_info.resources[0] is defined
+  ansible.builtin.set_fact:
+    last_sync_datetime: "{{ product_info.resources[0].last_sync }}"
+
+# sync_status is null for a product that is not synced
+- name: "Determine if the product is in sync"
+  when:
+    - product_info.resources[0].sync_state is defined
+    - (product_info.resources[0].sync_state | type_debug) == "NoneType"
+  ansible.builtin.set_fact:
+    must_sync_product: true
+
+- name: "Determine hours since last synchronization time"
+  when: last_sync_datetime
+  ansible.builtin.set_fact:
+    hours_since_sync: "{{ (now(utc=true) - (last_sync_datetime[:-4] | to_datetime)).seconds / 3600 | float }}"
+
+- name: "Display the last_sync_datetime"
+  ansible.builtin.debug:
+    msg: "The last sync was on {{ last_sync_datetime }}, {{ hours_since_sync }} hours ago."
+
+- name: "Determine if we need to sync based on time"
+  when:
+    - (hours_since_sync|float) > (last_sync_threshold_hours|float)
+    - not skip_sync_all
+  ansible.builtin.set_fact:
+    must_sync_product: true
+
+- name: "Display Sync message"
+  when:
+    - must_sync_product
+  ansible.builtin.debug:
+    msg: "We must sync the product"
+
+- name: "Sync product"
+  when:
+    - must_sync_product
+  redhat.satellite.repository_sync:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    product: "{{ product_to_sync }}"
+  async: "{{ async_timeout }}"
+  poll: "{{ async_delay }}"
+  register: async_update

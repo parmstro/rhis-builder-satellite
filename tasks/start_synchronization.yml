@@ -1,84 +1,51 @@
 ---
 # synchronization of repositories
-# TODO: Configure similar logic to publication
-#       If repo has never been syncd then always sync
-#       If we are being asked to force_sync then always sync
-#       If repo has NOT been syncd within max_sync_interval then always sync
-#       If no option specified, skip sync
 
-- name: "Sync unless skip_sync == true"
-  when: "not skip_sync"
-  tags:
-    - tags_start_sync
-  block:
-    - name: "Set or increment retry count"
-      ansible.builtin.set_fact:
-        sync_retry_count: "{{ 0 if sync_retry_count is undefined else sync_retry_count | int + 1 }}"
+# if you skip synchronization and
+# you added kickstart repos to your product and content views
+# satellite doesnt register the kickstart repos as synchronized content (obviously)
+# new definitions like hostgroups then fail with bad content definitions
+# avoid setting skip_sync_all or skip_publish_all in your variable file
+# call it with an extravar instead
 
-    - name: "Get the unique list of rhisam products"
-      ansible.builtin.set_fact:
-        products_to_sync: "{{ repository_sets_rhisam | map(attribute='product') | list | unique }}"
+- name: "Get the unique list of rhisam products"
+  ansible.builtin.set_fact:
+    products_to_sync: "{{ repository_sets_rhisam | map(attribute='product') | list | unique }}"
 
-    - name: "List the products to be synchronized"
-      ansible.builtin.debug:
-        var: products_to_sync
+- name: "List the products to be synchronized"
+  ansible.builtin.debug:
+    var: products_to_sync
 
-    - name: "Sync the rhisam products with the CDN"
-      redhat.satellite.repository_sync:
-        username: "{{ satellite_admin_username }}"
-        password: "{{ satellite_admin_password }}"
-        server_url: "{{ satellite_url }}"
-        organization: "{{ satellite_organization }}"
-        validate_certs: "{{ satellite_validate_certs }}"
-        product: "{{ item }}"
-      loop: "{{ products_to_sync }}"
-      async: "{{ async_timeout }}"
-      poll: "{{ async_delay }}"
-      register: async_update
+- name: "Sync the rhisam products with the CDN"
+  ansible.builtin.include_tasks: "sync_product.yml"
+  loop: "{{ products_to_sync }}"
+  loop_control:
+    loop_var: product_to_sync
 
-    - name: "Get the unique list of user products"
-      ansible.builtin.set_fact:
-        products_to_sync: "{{ repository_sets_user | map(attribute='product') | list | unique }}"
+- name: "Get the unique list of user products"
+  ansible.builtin.set_fact:
+    products_to_sync: "{{ repository_sets_user | map(attribute='product') | list | unique }}"
 
-    - name: "Sync the user products"
-      redhat.satellite.repository_sync:
-        username: "{{ satellite_admin_username }}"
-        password: "{{ satellite_admin_password }}"
-        server_url: "{{ satellite_url }}"
-        organization: "{{ satellite_organization }}"
-        validate_certs: "{{ satellite_validate_certs }}"
-        product: "{{ item }}"
-      loop: "{{ products_to_sync }}"
-      async: "{{ async_timeout }}"
-      poll: "{{ async_delay }}"
-      register: async_update
+- name: "List the products to be synchronized"
+  ansible.builtin.debug:
+    var: products_to_sync
 
-    - name: "Get the unique list of custom products"
-      ansible.builtin.set_fact:
-        products_to_sync: "{{ custom_products | map(attribute='name') | list | unique }}"
+- name: "Sync the user products"
+  ansible.builtin.include_tasks: "sync_product.yml"
+  loop: "{{ products_to_sync }}"
+  loop_control:
+    loop_var: product_to_sync
 
-    - name: "Sync the custom products"
-      redhat.satellite.repository_sync:
-        username: "{{ satellite_admin_username }}"
-        password: "{{ satellite_admin_password }}"
-        server_url: "{{ satellite_url }}"
-        organization: "{{ satellite_organization }}"
-        validate_certs: "{{ satellite_validate_certs }}"
-        product: "{{ item }}"
-      loop: "{{ products_to_sync }}"
-      async: "{{ async_timeout }}"
-      poll: "{{ async_delay }}"
-      register: async_update
+- name: "Get the unique list of custom products"
+  ansible.builtin.set_fact:
+    products_to_sync: "{{ custom_products | map(attribute='name') | list | unique }}"
 
-  rescue:
-    - name: "Retry count exceeded, failing"
-      ansible.builtin.fail:
-        msg: "Maximum retry count exceeded, have tried {{ sync_retry_count }} times"
-      when: sync_retry_count|int == 4
+- name: "List the products to be synchronized"
+  ansible.builtin.debug:
+    var: products_to_sync
 
-    - name: "Retrying"
-      ansible.builtin.debug:
-        msg: "Retrying, retry count {{ sync_retry_count }} of 4..."
-
-    - name: "Retry"
-      ansible.builtin.include_tasks: start_synchronization.yml
+- name: "Sync the custom products"
+  ansible.builtin.include_tasks: "sync_product.yml"
+  loop: "{{ products_to_sync }}"
+  loop_control:
+    loop_var: product_to_sync

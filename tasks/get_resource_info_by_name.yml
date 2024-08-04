@@ -1,0 +1,17 @@
+---
+# get information about a resource in satellite
+
+- name: "Get the product info"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    resource: "{{ resource_type }}"
+    search: 'name = "{{ resource_name }}"'
+  register: resource_info
+
+- name: "Debug Print"
+  ansible.builtin.debug:
+    var: resource_info

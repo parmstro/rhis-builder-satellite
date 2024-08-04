@@ -1,0 +1,58 @@
+---
+# This is a custom script for my environment.
+# It helps me prepare a bare metal system for idm or satellite installation
+# using rhis-builder-idm or rhis-builder-satellite
+
+- name: "Baremetal Prep"
+  gather_facts: true
+  become: true
+  hosts: sat_primary
+
+  vars_files:
+    - "~/rhisbuilder_vault.yml"
+
+  tasks:
+    - name: "Ensure we are installing on RHEL8"
+      ansible.builtin.assert:
+        that: ansible_distribution_major_version == '8'
+        fail_msg: "You must install Satellite 6.12 or greater on RHEL8"
+
+    - name: "Unregister the host from content source"
+      community.general.redhat_subscription:
+        state: "absent"
+
+    - name: "Ensure that we are using the CDN for our registration target"
+      ansible.builtin.copy:
+        src: "rhsm.conf"              # original cdn definition in our files directory
+        dest: "/etc/rhsm/rhsm.conf"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: "Restart rhsmcertd"
+      ansible.builtin.systemd_service:
+        name: "rhsmcertd"
+        state: restarted
+
+    - name: "Register the host with the supplied org and activation key"
+      community.general.redhat_subscription:
+        org_id: "{{ cdn_organization_id_vault }}"
+        activationkey: "{{ cdn_sat_activation_key_vault }}"
+
+    # our latest baremetal servers have nvme boot drives and 1TB ssd for sda
+    # add the ssd drive to the vg and extend lv_var logical volume and /var
+    - name: "Add additional drive to volume group"
+      community.general.lvg:
+        vg: "vg_root"
+        pvs:
+          - "/dev/nvme0n1p2"
+          - "/dev/sda"
+        pvresize: true
+
+    - name: "Add additional drive to volume group"
+      community.general.lvol:
+        vg: "vg_root"
+        lv: "lv_var"
+        pvs: "/dev/sda"
+        size: "832G"
+        resizefs: true

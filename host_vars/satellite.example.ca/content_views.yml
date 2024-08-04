@@ -3,7 +3,7 @@
 # It defines the filters and filter rules for the content views as well
 
 errata_end_date: "{{ ansible_date_time.date }}"
-skip_publish: false
+skip_publish_all: false
 
 # These content views are needed to build the environment or run a workflow.
 # Do not remove them. You will want them anyway.
@@ -17,7 +17,7 @@ cvs_rhisam:
     desc: "Red Hat Ansible Automation Platform Install Files"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 8 x86_64 Files"
         product: "Red Hat Ansible Automation Platform"
@@ -29,7 +29,7 @@ cvs_rhisam:
     desc: "Extra Packages for Enterprise Linux 8"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "EPEL8"
         product: "EPEL8"
@@ -41,7 +41,7 @@ cvs_rhisam:
     desc: "Red Hat Enterprise Linux 8 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -105,7 +105,7 @@ cvs_rhisam:
     desc: "Red Hat Enterprise Linux 9 x86_64 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -171,7 +171,7 @@ cvs_user:
     desc: "Red Hat Enterprise Linux 9 aarch64 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream RPMs 9"
         product: "Red Hat Enterprise Linux for ARM 64"
@@ -230,7 +230,7 @@ cvs_user:
     desc: "RHEL 7 Standard Operating Environment Content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server x86_64"
         product: "Red Hat Ansible Engine"
@@ -285,7 +285,7 @@ cvs_user:
     desc: "Red Hat Enterprise Linux 8 for LEAPP migrations"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream RPMs 8.8"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -338,7 +338,7 @@ cvs_user:
     desc: "Red Hat Enterprise Linux 9 for LEAPP migrations"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9.2"
         product: "Red Hat Enterprise Linux for x86_64"
@@ -391,7 +391,7 @@ cvs_user:
     desc: "Microsoft SQL Server for Linux 2022 content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "packages-microsoft-com-mssql-server-2022-rhel-8"
         product: "Microsoft SQL Server for Linux 2022 for RHEL 8"
@@ -425,7 +425,7 @@ cvs_user:
     desc: "Red Hat JBoss EAP 7.4 Content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "JBoss Enterprise Application Platform 7.4 RHEL 8 RPMs"
         product: "JBoss Enterprise Application Platform"
@@ -463,7 +463,7 @@ cvs_user:
     desc: "CentOS Stream 9 Content"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     repositories:
       - name: "centos-9-appstream"
         product: "CentOS Stream 9"
@@ -507,7 +507,7 @@ ccvs_rhisam:
     desc: "SOE for Ansible Automation Platform Servers"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -536,7 +536,7 @@ ccvs_user:
     desc: "Migrate from RHEL 7.9 to RHEL 8"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL7"
         latest: true
@@ -551,7 +551,7 @@ ccvs_user:
     desc: "Migrate from RHEL 8 to RHEL 9"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -566,7 +566,7 @@ ccvs_user:
     desc: "Production JBoss Applications"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
@@ -581,7 +581,7 @@ ccvs_user:
     desc: "SQL Server SOE"
     org: "{{ satellite_organization }}"
     force_publish: false
-    publication_limit_hours: 24
+    publication_threshold_hours: 24
     components:
       - content_view: "SOE_RHEL8"
         latest: true
