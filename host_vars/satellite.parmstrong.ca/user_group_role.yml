@@ -4,6 +4,21 @@
 
 # User groups required for the RH-ISAM deployment
 # Roles required for the RH-ISAM deployment
+
+# NOTE: In our role schema below we include the resource_type of the permission
+# as a convenience for developers and administrators. It helps us keep the permissions
+# readable and understandable. The redhat.satellite.role module does not accept it as
+# a valid key in the filters dictionary, so we filter it out in ensure_user_roles.yml
+# you can pass it or not pass it, we think it helps though
+
+# at the bottom of this file you will find all the resource types and associated permissions
+# as of Satellite 6.15.2
+# you can simply cut, paste and edit to create roles
+#
+# To create, update, (present) or delete (absent) a role for day 2 operations simple use
+#
+# ansible-playbook -i inventory run_role.yml -e "role_name=user_roles"
+
 sat_roles_rhisam:
   - name: "operator"
     state: present
@@ -99,7 +114,6 @@ sat_roles_rhisam:
       - resource_type: "ForemanOpenscap::OvalPolicy"
         permissions:
           - "view_oval_policies"
-          - "view_policies"
 
       - resource_type: "ForemanOpenscap::ScapContent"
         permissions:
@@ -108,6 +122,10 @@ sat_roles_rhisam:
       - resource_type: "ForemanOpenscap::TailoringFile"
         permissions:
           - "view_tailoring_files"
+
+      - resource_type: "ForemanOpenscap::Policy"
+        permissions:
+          - "view_policies"
 
       - resource_type: "ForemanVirtWhoConfigure::Config"
         permissions:
@@ -272,6 +290,12 @@ sat_roles_rhisam:
         permissions:
           - "view_webhook_templates"
 
+      # - resource_type: "Katello::AlternateContentSource"
+      #   permissions:
+      #     - "view_alternate_content_sources"
+      #     - "create_alternate_content_sources"
+      #     - "edit_alternate_content_sources"
+      #     - "destroy_alternate_content_sources"
 
 sat_user_groups_rhisam:
   - name: "satellite_administrators"
