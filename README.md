@@ -1,7 +1,20 @@
 # rhis-builder-satellite
-The code in this repo builds the Satellite configuration for an RHIS deployment. Currently, this deployment assumes the Red Hat Infrastructure Standard Adoption Model is being followed and assumes that your Red Hat Identity Management instance has been deployed. If you are following the RH-ISAM and do not have an Identity Management instance for your environment configured yet, please see the rhis-builder-idm repo in this github. You can use the code in the repo to deploy a Red Hat Identity Management server quickly. 
+The code in this repo builds the Satellite configuration for an RHIS deployment. Currently, this deployment assumes the Red Hat Infrastructure Standard Adoption Model is being followed. You can now deploy with or without Red Hat Identity Management integration. If you are following the RH-ISAM and **want** to have an Identity Management instance for your environment, please see the rhis-builder-idm repo in this github and build it before you deploy Satellite. You can use the code in the repo to deploy a Red Hat Identity Management server quickly. 
 
-If you do not want to deploy your Satellite integrated with an Identity Management instance, you must ensure that you provide for the related services for authentication, dns, certificates, etc.. within your configuration. We are working on a skip_ipa flag that will configure the Satellite in an IdM-independent way. This is one of our top priorities. We will update this message when complete and tested. For now, you will need to comment out a few lines of code in the satellite_pre role (everything after task 5 that installs the binaries).
+If you do not want to deploy your Satellite integrated with an Identity Management instance, you must ensure that you provide for the related services for authentication, dns, certificates, etc.. within your configuration. You will need to set the satellite_pre_use_idm to false in your satellite_pre.yml variable file
+e.g.
+```
+satellite_pre_use_idm: false
+```
+#### Note: this probably means you aren't using Realms anywhere unless they are AD realms, so check variable files referencing realms, like hostgroups, realms, etc..
+
+#### If you are integrating with IdM and you don't want to regenerate the keytab file for your realm user (because you have capsules that are currently using it) set skip_prepare_realm below to true. This will avoid having to redistribute the keytab file to your capsules.
+e.g.
+```
+skip_prepare_realm: true
+```
+### What's new
+rhis-builder-satellite now configures user roles, groups and users. This supports external users and groups from IdM
 
 ### What rhis-builder-satellite does NOT do
 rhis-builder-satellite configures most things in satellite, however, it currently does not do the following:
@@ -21,7 +34,6 @@ rhis-builder-satellite configures most things in satellite, however, it currentl
 - we don't configure Cloud Connector / Insights / obfiscation
 - we don't configure HTTP proxies
 - we don't configure LDAP auth sources (IdM does get configured)
-- we don't configure roles
 - we don't configure bookmarks
 - we don't configure web hooks
 
@@ -59,6 +71,7 @@ rhis-builder-satellite makes the following changes to a system installed with an
 - configure discovery and discovery rules for bare metal
 - configure global parameters
 - configure all satellite settings
+- configure user roles, groups and users, internal and external
 
 The rhisam configuration defaults are included in the hostvars directory for satellite.example.ca
 We have set this up so that you can keep the rhisam configurations and add your own configuration through *config_name*_user, see below.
