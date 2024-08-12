@@ -250,4 +250,28 @@
       tags:
         - tags_general_settings
 
+    - name: "Configure satellite user roles"
+      ansible.builtin.import_role:
+        name: user_roles
+      tags:
+        - tags_user_roles
+
+    - name: "Configure satellite user groups"
+      ansible.builtin.import_role:
+        name: user_groups
+      tags:
+        - tags_user_groups
+
+    - name: "Configure satellite external user groups"
+      ansible.builtin.import_role:
+        name: user_groups_external
+      tags:
+        - tags_user_groups_external
+
+    - name: "Configure satellite users"
+      ansible.builtin.import_role:
+        name: users
+      tags:
+        - tags_users
+
 # End of Satellite Configuration

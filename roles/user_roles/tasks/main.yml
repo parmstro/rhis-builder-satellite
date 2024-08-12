@@ -2,24 +2,24 @@
 
 - name: "Ensure the user roles for the rhisam configuration"
   ansible.builtin.include_tasks: "ensure_user_roles.yml"
-  loop: "{{ user_roles_rhisam }}"
+  loop: "{{ sat_roles_rhisam }}"
   loop_control:
-    loop_var: user_group
-  when: "user_roles_rhisam is defined"
+    loop_var: sat_role
+  when: "sat_roles_rhisam is defined"
   tags:
     - tags_rhisam
     - tags_satellite_management_config
-    - tags_user_roles
-    - tags_user_roles_rhisam
+    - tags_sat_roles
+    - tags_sat_roles_rhisam
 
 - name: "Ensure the user roles for the user configuration"
   ansible.builtin.include_tasks: "ensure_user_group.yml"
-  loop: "{{ user_roles_user }}"
+  loop: "{{ sat_roles_user }}"
   loop_control:
-    loop_var: user_roles
-  when: "user_roles_user is defined"
+    loop_var: sat_role
+  when: "sat_roles_user is defined"
   tags:
     - tags_user
     - tags_satellite_management_config
-    - tags_user_roles
-    - tags_user_roles_user
+    - tags_sat_roles
+    - tags_sat_roles_user
