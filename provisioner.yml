@@ -5,14 +5,14 @@
   hosts: build_control
   connection: local
   gather_facts: true
-  
+
   tasks:
 
     - name: "Create ssh keys"
       community.crypto.openssh_keypair:
         path: "~/.ssh/id_rsa"
         size: "4096"
-        mode: 0600
+        mode: "0600"
 
     - name: "Add the new key to authorize_keys"
       ansible.posix.authorized_key:
@@ -51,7 +51,7 @@
         mode: '0700'
 
     - name: "Unarchive the file"
-      ansible.builtin.unarchive: 
+      ansible.builtin.unarchive:
         src: /root/govc_Linux_x86_64.tar.gz
         dest: /usr/bin
         remote_src: true       #because we are not root

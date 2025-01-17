@@ -1,0 +1,52 @@
+---
+# If there are repositories enabled for third party repos
+# disable the repos and ensure only repositories for Red Hat Satellite are enabled
+
+# Satellite is an appliance-like deployment. It should only have the designated repos.
+# disable all third party repos
+- name: "Find all repos"
+  ansible.builtin.find:
+    paths: '/etc/yum.repos.d'
+    file_type: "file"
+    patterns: "*.repo"
+  register: repo_files
+
+- name: "Disable all third party repos"
+  ansible.builtin.copy:
+    src: "{{ repo_file.path }}"
+    dest: "{{ repo_file.path }}.rhis_disabled"
+    owner: root
+    group: root
+    mode: "0644"
+    remote_src: true
+  loop: "{{ repo_files.files }}"
+  loop_control:
+    loop_var: repo_file
+
+# Satellite is an appliance-like deployment. It must be registered to the CDN with CDN repos.
+# uninstall any RHUI client
+- name: "Find any RHUI client packages"
+  ansible.builtin.yum:
+    list: "*rhui*"
+  register: pkg_list
+
+- name: "Remove the RHUI client if it exists"
+  when: pkg_list.results | selectattr( "yumstate", "match", "installed" ) | list | length != 0
+  ansible.builtin.package:
+    name: "{{ rhui_package.name }}"
+    state: absent
+  loop: "{{ pkg_list.results }}"
+  loop_control:
+    loop_var: rhui_package
+
+# clear the dnf/yum cache
+- name: "Clean up the dnf cache"
+  ansible.builtin.command:
+    cmd: "dnf clean all"
+  changed_when: true
+
+# ensure subscription-manager/rhsm is managing repos
+- name: "Update the subscription manager configuration to ensure rhsm manages repos"
+  ansible.builtin.command:
+    cmd: "subscription-manager config --rhsm.manage_repos=1"
+  changed_when: true

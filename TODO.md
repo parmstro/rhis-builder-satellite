@@ -1,5 +1,8 @@
 ## To Do List
 
+### Fixes
+- add code to discover and disable RHUI repos and extensions for cloud instances.
+
 ### Features 
 
 - capsule-build role - build a satellite capsule using a hostgroup 
