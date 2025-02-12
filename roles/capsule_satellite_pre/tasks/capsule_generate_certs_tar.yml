@@ -1,0 +1,29 @@
+---
+
+# Generate the capsule-certs.tar file for the capsule and the installer command
+- name: "Define the secure directory"
+  ansible.builtin.set_fact:
+    capsule_crt_dir: "{{ sat_idm_certs_private }}{{ cert_capsule.fqdn }}/"
+
+- name: "Define the capsule_cert_path"
+  ansible.builtin.set_fact:
+    capsule_crt_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.crt"
+    capsule_key_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.key"
+    capsule_csr_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.csr"
+    capsule_private_key_pem_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.pem"
+
+- name: "Generate the certificate bundle on the Satellite"
+  ansible.builtin.command:
+    cmd: "capsule-certs-generate --no-colors --foreman-proxy-fqdn {{ cert_capsule.fqdn }} --certs-tar '{{ cert_capsule.fqdn }}-certs.tar' --server-cert {{ capsule_crt_path }} --server-key  {{ capsule_key_path }} --server-ca-cert /etc/ipa/ca.crt" # noqa yaml[line-length]
+  changed_when: true
+  register: certs_gen
+
+- name: "Store the results"
+  ansible.builtin.copy:
+    content: "{{ certs_gen.stdout }}"
+    dest: "/root/{{ cert_capsule.fqdn }}-installer.sh"
+    mode: "0700"
+
+- name: "Create the command script"
+  ansible.builtin.command: "sed -i 1,18d /root/{{ cert_capsule.fqdn }}-installer.sh" # noqa command-instead-of-module
+  changed_when: true

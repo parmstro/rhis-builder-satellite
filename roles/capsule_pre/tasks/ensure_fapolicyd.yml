@@ -1,0 +1,15 @@
+---
+
+# Install and enable fapolicyd
+
+- name: "Install the fapolicyd package"
+  ansible.builtin.dnf:
+    name:
+      - "fapolicyd"
+    state: "present"
+
+- name: "Ensure the service is enabled and started"
+  ansible.builtin.service:
+    name: "fapolicyd"
+    enabled: true
+    state: "started"

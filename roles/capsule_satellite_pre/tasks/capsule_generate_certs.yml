@@ -1,0 +1,108 @@
+---
+# currently neither the freeipa.ansible_freeipa collection nor the community collection support certificate management with ansible.
+# we either resort to the IPA API and a URI object or command line for this functionality
+# community certficate commands are not working even with pyOpenSSL > 16.0
+# This task assumes the ipa client is installed and configured.
+- name: "Define the secure directory"
+  ansible.builtin.set_fact:
+    capsule_crt_dir: "{{ sat_idm_certs_private }}{{ cert_capsule.fqdn }}/"
+
+- name: "Define the capsule_cert_path"
+  ansible.builtin.set_fact:
+    capsule_crt_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.crt"
+    capsule_key_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.key"
+    capsule_csr_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.csr"
+    capsule_private_key_pem_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.pem"
+
+- name: "Create a secure directory"
+  ansible.builtin.file:
+    path: "{{ capsule_crt_dir }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+- name: "Set target service name"
+  ansible.builtin.set_fact:
+    target_service: "{{ crt_service_type }}/{{ cert_capsule.fqdn }}"
+
+- name: "Ensure target service is present"
+  community.general.ipa_service:
+    name: "{{ target_service }}"
+    state: present
+    ipa_host: "{{ ipa_server_fqdn }}"
+    ipa_user: "{{ ipa_admin_principal }}"
+    ipa_pass: "{{ ipa_admin_password }}"
+
+- name: "Check for an existing certificate file"
+  ansible.builtin.stat:
+    path: "{{ capsule_crt_path }}"
+  register: cert_exists
+
+- name: "Cert exists and regen requested - stop tracking and clean up"
+  when: cert_exists.stat.exists and cert_capsule.crt_force_regen
+  block:
+    - name: "Read existing cert" # noqa: no-changed-when command-instead-of-module
+      ansible.builtin.shell: "sed -n 2,$(expr $(wc -l < {{ capsule_crt_path }}) - 1)p {{ capsule_crt_path }}"
+      register: cert
+
+    - name: "Get cert serial number"  # noqa: no-changed-when risky-shell-pipe
+      ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa cert-find --certificate='{{ cert.stdout }}' | grep 'Serial number:' | cut -c18-" # noqa: yaml[line-length]
+      register: serial_num
+
+    - name: "Stop tracking cert with certmonger" # noqa: no-changed-when risky-shell-pipe ignore-errors
+      ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -i {{ cert_capsule.fqdn }}" # noqa: yaml[line-length]
+      no_log: true
+      ignore_errors: true
+
+    - name: "Remove the old cert from the service" # noqa: no-changed-when risky-shell-pipe ignore-errors
+      ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa service-remove-cert {{ target_service }} --certificate='{{ cert.stdout }}'" # noqa: yaml[line-length]
+      no_log: true
+      ignore_errors: true
+
+    - name: "Revoke the old cert with reason 6 - certificateHold - an admin can completely revoke it later" # noqa: no-changed-when risky-shell-pipe ignore-errors yaml[line-length]
+      ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa cert-revoke {{ serial_num.stdout_lines.1 }} --revocation-reason=6" # noqa: yaml[line-length]
+      no_log: true
+      ignore_errors: true
+
+    - name: "Cert exists, rename old cert .revoked"
+      ansible.builtin.copy:
+        src: "{{ capsule_crt_path }}"
+        dest: "{{ capsule_crt_path }}.revoked"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0640"
+
+- name: Generating New Certificate
+  when: not cert_exists.stat.exists or cert_capsule.crt_force_regen
+  block:
+
+    - name: "Generate configuration files"
+      ansible.builtin.lineinfile:
+        path: "{{ passfile }}"
+        state: present
+        create: true
+        line: "{{ capsule_rsa_key_pass }}"
+        owner: "root"
+        mode: "0740"
+
+    - ansible.builtin.command: "openssl genrsa -{{ ssl_private_key_cipher }} -out {{ capsule_private_key_pem_path }} -passout file:/{{ passfile }} {{ ssl_private_key_size }}" # noqa: yaml[line-length] name[missing] no-changed-when
+
+    - ansible.builtin.command: "openssl rsa -in {{ capsule_private_key_pem_path }} -out {{ capsule_key_path }} -passin file:/{{ passfile }}" # noqa: yaml[line-length] name[missing] no-changed-when
+
+    - name: "Create request"
+      ansible.builtin.command: "openssl req -new -key {{ capsule_key_path }} -out {{ capsule_csr_path }} -subj \"/C={{ csr_country_name }}/ST={{ csr_state_or_province_name }}/L={{ csr_locality_name }}/O={{ csr_organization_name }}/OU={{ csr_organization_unit_name }}/CN={{ cert_capsule.fqdn }}/subjectAltName=DNS.1={{ cert_capsule.fqdn }}\"" # noqa: yaml[line-length] name[missing] no-changed-when
+
+    - name: "Generate the certificate for the service"
+      ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ capsule_csr_path }} --certificate-out={{ capsule_crt_path }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      no_log: true
+
+    - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"
+      ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      no_log: true
+
+- name: Cleanup
+  ansible.builtin.file:
+    path: "{{ passfile }}"
+    state: absent

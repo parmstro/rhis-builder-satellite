@@ -1,0 +1,14 @@
+---
+
+# Assert user
+- name: "Lookup user information"
+  ansible.builtin.command: "getent passwd {{ user.name }}"
+  register: user_info
+  failed_when: user_info.rc == 1 or user_info.rc >2
+  changed_when: false
+
+- name: "Asset user is absent"
+  when: user.state == "absent"
+  ansible.builtin.assert:
+    that:
+      - user_info.stdout == ""

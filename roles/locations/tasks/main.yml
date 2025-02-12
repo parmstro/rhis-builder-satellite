@@ -1,0 +1,7 @@
+---
+
+- name: "Ensure Locations"
+  ansible.builtin.include_tasks: "ensure_location.yml"
+  loop: "{{ locations }}"
+  loop_control:
+    loop_var: location

@@ -1,0 +1,14 @@
+---
+
+# Set the firewalld policies
+
+- name: "Configure firewalld"
+  ansible.posix.firewalld:
+    port: "{{ config.port | default(omit) }}"
+    protocol: "{{ config.protocol | default(omit) }}"
+    service: "{{ config.service | default(omit) }}"
+    state: "{{ config.state | default(omit) }}"
+    zone: "{{ config.zone | default(omit) }}"
+  loop: "{{ capsule_pre_firewalld_config }}"
+  loop_control:
+    loop_var: config

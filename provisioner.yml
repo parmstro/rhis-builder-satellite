@@ -2,31 +2,34 @@
 # These plays set up your provisioner node to run rhis_builder
 
 - name: "Setup provisioner"
-  hosts: build_control
+  hosts: provisioner
   connection: local
   gather_facts: true
 
   tasks:
 
+      # In RHEL9 and later ecdsa keys are configured as standard
+      # non-trivial sshd configuration needs to be done to permit rsa or less secure algorithms
+      # i.e. the following won't work with rsa 2048 keys on RHEL9
     - name: "Create ssh keys"
       community.crypto.openssh_keypair:
-        path: "~/.ssh/id_rsa"
-        size: "4096"
+        path: "~/.ssh/id_ecdsa"
+        type: "ecdsa"
         mode: "0600"
 
     - name: "Add the new key to authorize_keys"
       ansible.posix.authorized_key:
         user: "{{ ansible_user_id }}"
-        key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        key: "{{ lookup('file', '~/.ssh/id_ecdsa.pub') }}"
 
     - name: "Ensure we can ssh"
-      ansible.builtin.shell: "ssh localhost 'whoami'"
+      ansible.builtin.shell: "ssh localhost 'whoami'" # noqa command-instead-of-shell
       changed_when: ansible_user_id in result.stdout
       register: result
 
 
 - name: "Setup root configuration"
-  hosts: build_control
+  hosts: provisioner
   become: true
   connection: local
   gather_facts: true
@@ -54,7 +57,7 @@
       ansible.builtin.unarchive:
         src: /root/govc_Linux_x86_64.tar.gz
         dest: /usr/bin
-        remote_src: true       #because we are not root
+        remote_src: true       # because we are not root
 
     - name: "Ensure that provisioner can resolve itself"
       ansible.builtin.lineinfile:
@@ -71,21 +74,24 @@
         port: 22
         timeout: 10
 
-    - name: "Include the vmware variables"
-      ansible.builtin.include_vars:
-        file: "init_env/vmware/group_vars/all/vmware_vars.yml"
-        
-    - name: "Ensure that provisioner can resolve vcenter"
-      ansible.builtin.lineinfile:
-        path: /etc/hosts
-        search_string: "{{ vcenter_ip }}"
-        line: "{{ vcenter_ip }} {{ vcenter_hostname }}"
-        owner: root
-        group: root
-        mode: '0644'
+# Uncomment these line to use image builder images uploaded to vmware
+# create a file called provisioner_vmware_vars_file
 
-    - name: "Ensure we can reach the vcenter"
-      ansible.builtin.wait_for:
-        host: "{{ vcenter_hostname }}"
-        port: 443
-        timeout: 10
+    # - name: "Include the vmware variables"
+    #   ansible.builtin.include_vars:
+    #     file: "{{ provisioner_vmware_vars_file }}"
+
+    # - name: "Ensure that provisioner can resolve vcenter"
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/hosts
+    #     search_string: "{{ vcenter_ip }}"
+    #     line: "{{ vcenter_ip }} {{ vcenter_hostname }}"
+    #     owner: root
+    #     group: root
+    #     mode: '0644'
+
+    # - name: "Ensure we can reach the vcenter"
+    #   ansible.builtin.wait_for:
+    #     host: "{{ vcenter_hostname }}"
+    #     port: 443
+    #     timeout: 10

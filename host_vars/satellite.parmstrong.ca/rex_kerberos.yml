@@ -1,9 +1,0 @@
----
-
-# Settings for rex kerberos integration
-# The foreman-proxy user needs to have the keytab for the rex_realm_principal
-# Typically we will just use the realm-capsule user that already has access
-# set up for integrating with the realm
-rex_kerberos_enabled: true
-rex_realm_principal: "realm-capsule"
-rex_executor: "foreman-proxy"

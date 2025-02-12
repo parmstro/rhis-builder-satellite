@@ -1,0 +1,6 @@
+---
+
+- name: "Run the capsule installation script"
+  ansible.builtin.command: "/root/{{ ansible_fqdn }}-installer.sh"
+  register: installer_result
+  changed_when: installer_result.rc == 0

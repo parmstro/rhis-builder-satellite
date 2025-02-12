@@ -1,0 +1,33 @@
+---
+# This role is applied to the provisioner node.
+# The provisioner node is responsible for bootstrapping the remainder of the environment using Satellite
+#
+
+- name: "Create the ansible platform hosts"
+  ansible.builtin.include_tasks: "create_host_from_hostgroup.yml"
+  loop: "{{ platform_hosts }}"
+  loop_control:
+    loop_var: host
+  register: async_list
+
+- name: "Wait for all nodes to be built- Task will complete when the last host is up and running."
+  ansible.builtin.wait_for:
+    timeout: 7200
+    sleep: 60
+    port: 22
+    host: "{{ host.fqdn }}"
+    search_regex: "OpenSSH"
+  loop: "{{ platform_hosts }}"
+  loop_control:
+    loop_var: host
+
+- name: "Wait an additional time out for any post configuration."
+  ansible.builtin.wait_for:
+    timeout: "{{ post_deploy_timeout }}"
+    sleep: 60
+    port: 22
+    host: "{{ host.fqdn }}"
+    search_regex: "OpenSSH"
+  loop: "{{ platform_hosts }}"
+  loop_control:
+    loop_var: host

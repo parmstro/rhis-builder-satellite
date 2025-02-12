@@ -1,0 +1,17 @@
+---
+# disable cockpit or change the cockpit port
+
+- name: "Disable cockpit"
+  when: capsule_pre_disable_cockpit
+  block:
+    - name: "Stop and mask cockpit.socket"
+      ansible.builtin.systemd_service:
+        name: "cockpit.socket"
+        state: "stopped"
+        masked: true
+
+    - name: "Stop and mask cockpit"
+      ansible.builtin.systemd_service:
+        name: "cockpit"
+        state: "stopped"
+        masked: true

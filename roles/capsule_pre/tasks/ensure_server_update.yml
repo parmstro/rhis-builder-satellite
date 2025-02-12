@@ -1,0 +1,8 @@
+---
+
+# Update all packages to the latest
+
+- name: "Update all packages package" # noqa package-latest
+  ansible.builtin.dnf:
+    name: "*"
+    state: "latest"

@@ -1,0 +1,15 @@
+---
+
+- name: "Gather the subscription registration information"
+  ansible.builtin.command: "subscription-manager config"
+  register: subscription_config
+  changed_when: false
+
+- name: "Extract the registration host"
+  ansible.builtin.set_fact:
+    registration_host: "{{  subscription_config.stdout_lines[1] | regex_search('(?<= =).+') | trim }}"
+
+- name: "Assert that we are registered to the configured satellite server"
+  ansible.builtin.assert:
+    that:
+      registration_host == satellite_fqdn

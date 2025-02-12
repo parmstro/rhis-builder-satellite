@@ -1,0 +1,9 @@
+---
+
+# Install satellite capsule packages
+
+- name: "Install the satellite capsule package"
+  ansible.builtin.dnf:
+    name:
+      - "satellite-capsule"
+    state: "present"

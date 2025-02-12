@@ -1,0 +1,7 @@
+---
+
+- name: "Ensure Organizations"
+  ansible.builtin.include_tasks: "ensure_organization.yml"
+  loop: "{{ organizations }}"
+  loop_control:
+    loop_var: organization

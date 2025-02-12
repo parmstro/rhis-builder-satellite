@@ -1,0 +1,86 @@
+---
+# entry point for capsule_pre role
+
+- name: "Ensure forward and reverse lookup"
+  ansible.builtin.include_tasks: "ensure_name_resolution.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_name_resolution
+
+- name: "Ensure satellite registration"
+  ansible.builtin.include_tasks: "ensure_satellite_registration.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_satellite_registration
+
+- name: "Ensure satellite OS and version"
+  ansible.builtin.include_tasks: "ensure_satellite_os_and_version.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_satellite_registration
+
+- name: "Ensure storage space"
+  ansible.builtin.include_tasks: "ensure_storage_space.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_storage_space
+
+- name: "Ensure users"
+  ansible.builtin.include_tasks: "ensure_users.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_users
+
+- name: "Ensure time"
+  ansible.builtin.include_tasks: "ensure_time.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_time
+
+- name: "Ensure selinux"
+  ansible.builtin.include_tasks: "ensure_selinux.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_selinux
+
+- name: "Ensure ports"
+  ansible.builtin.include_tasks: "ensure_ports.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_ports
+
+- name: "Ensure repositories"
+  ansible.builtin.include_tasks: "ensure_repositories.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_repos
+
+- name: "Ensure fapolicyd"
+  ansible.builtin.include_tasks: "ensure_fapolicyd.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_fapolicyd
+
+- name: "Ensure the servers are updated"
+  ansible.builtin.include_tasks: "ensure_server_update.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_dnf_update
+
+- name: "Ensure the capsule server packages are installed"
+  ansible.builtin.include_tasks: "ensure_capsule_packages.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule_pre
+    - tags_capsule_pre_dnf_update

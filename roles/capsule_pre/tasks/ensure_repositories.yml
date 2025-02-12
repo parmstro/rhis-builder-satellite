@@ -1,0 +1,14 @@
+---
+
+# Ensure the proper repos are enabled.
+
+- name: "Enforce the proper content view and Organization"
+  community.general.redhat_subscription:
+    org_id: "{{ satellite_initial_organization_label }}"
+    activationkey: "{{ capsule_pre_activation_key }}"
+    force_register: true
+
+- name: "Enable the proper repositories"
+  community.general.rhsm_repository:
+    name: "{{ capsule_pre_repositories }}"
+    state: "enabled"

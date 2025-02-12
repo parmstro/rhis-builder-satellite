@@ -1,0 +1,8 @@
+---
+
+# Ensure SeLinux state
+
+- name: "Set the se linux state"
+  ansible.posix.selinux:
+    state: "{{ capsule_pre_selinux_state }}"
+    policy: "{{ capsule_pre_selinux_policy }}"

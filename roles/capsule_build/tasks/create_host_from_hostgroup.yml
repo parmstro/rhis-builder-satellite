@@ -1,0 +1,91 @@
+---
+# This task creates a host from a definition
+# based on a hostgroup
+# This task expects a dictionary called "buildconfig" to be defined in host_vars for the target
+#
+# When compute_resource is NOT baremetal
+# specify the bogus MAC "00:50:56:ff:ff:ff" or omit the entry
+# The value will be replaced when the VM/Instance is deployed
+#
+# e.g. for VMware, Azure, etc..
+#
+# buildconfig:
+#   fqdn: "testjboss2.example.ca"
+#   organization: "example"
+#   hostgroup: "baseRHEL8/JBossSOE"
+#   kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.8"
+#   compute_resource: "VMware_Lab"
+#   compute_profile: "SOE_Medium"
+#   mac: "00:50:56:ff:ff:ff"
+#
+# When compute_resource == 'baremetal' do one of the following
+#   - Specify a valid MAC for a discovered host and that host will be used for deployment
+#   - Provide the bogus MAC "ff:ff:ff:ff:ff:ff" and search criteria to find and use the first matching discovered host
+#
+# e.g. for baremetal
+#
+# buildconfig:
+#   fqdn: "testjboss2.example.ca"
+#   organization: "example"
+#   hostgroup: "baseRHEL8/JBossSOE"
+#   kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.8"
+#   compute_resource: "baremetal"
+#   mac: "ff:ff:ff:ff:ff:ff"
+#   search: "disk_count = 1 and memory > 32000"
+#   req_nic_count: 1
+#
+
+- name: "Intialize values"
+  when: use_sync_build is not defined
+  ansible.builtin.set_fact:
+    use_sync_build: true
+
+- name: "Determine if host already exists"
+  ansible.builtin.include_tasks: check_for_host.yml
+
+- name: "Log host_exists"
+  ansible.builtin.debug:
+    var: host_exists
+
+- name: "Log delete_host"
+  ansible.builtin.debug:
+    var: host.delete_host
+
+- name: "Log proposed action"
+  when: host_exists and not host.delete_host
+  ansible.builtin.debug:
+    msg: "Host exists and we are not rebuilding."
+
+- name: "Build the host, if required"
+  when: (not host_exists) or ( host_exists and host.delete_host )
+  block:
+
+    - name: "Delete host has been requested - deleting host"
+      when: host.delete_host
+      ansible.builtin.include_tasks: delete_host.yml
+
+    - name: "Creating the host"
+      ansible.builtin.include_tasks: create_host.yml
+
+    - name: "Synchronous build requested"
+      when: use_sync_build
+      block:
+        - name: "Synchronous Build - Waiting for system to come up on port 22 - checking every 60s"
+          ansible.builtin.wait_for:
+            timeout: 7200
+            sleep: 60
+            port: 22
+            host: "{{ host.fqdn }}"
+            search_regex: "OpenSSH"
+            delay: 600
+          connection: local
+
+        - name: "Synchronous Build - Wait an additional time out for post configuration."
+          ansible.builtin.wait_for:
+            timeout: "{{ post_deploy_timeout }}"
+            sleep: 60
+            port: 22
+            host: "{{ host.fqdn }}"
+            search_regex: "OpenSSH"
+            delay: "{{ post_deploy_timeout }}"
+          connection: local

@@ -1,4 +1,4 @@
-[build_control]
+[provisioner]
 localhost
 
 [idm_primary]
@@ -7,11 +7,13 @@ idm.example.ca
 [idm_replicas]
 
 [sat_primary]
-satellite.parmstrong.ca
-# satdev.parmstrong.ca
-# sat.example.ca
+sat6.parmstrong.ca
+#satellite.example.ca
+#testrhuicleanup.parmstrong.ca
 
-[sat_capsule]
+[sat_capsules]
+capsule1.parmstrong.ca
+capsule2.parmstrong.ca
 
 [aap_controller]
 controller1.example.ca
@@ -24,3 +26,4 @@ containerhost1.example.ca
 containerhost2.example.ca
 
 [aws_nodes]
+

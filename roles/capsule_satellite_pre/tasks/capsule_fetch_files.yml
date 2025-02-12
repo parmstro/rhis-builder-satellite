@@ -1,0 +1,45 @@
+---
+
+# Fetch files
+- name: "Fetch tar the files"
+  ansible.builtin.fetch:
+    src: "/root/{{ cert_capsule.fqdn }}-certs.tar"
+    dest: "/tmp/{{ cert_capsule.fqdn }}-certs.tar"
+    flat: true
+
+# Fetch files
+- name: "Fetch script the files"
+  ansible.builtin.fetch:
+    src: "/root/{{ cert_capsule.fqdn }}-installer.sh"
+    dest: "/tmp/{{ cert_capsule.fqdn }}-installer.sh"
+    flat: true
+
+# # Copy files
+# - name: "Copy tar the files"
+#   ansible.builtin.copy:
+#     src: "/tmp/{{ cert_capsule.fqdn }}-certs.tar"
+#     dest: "~/{{ cert_capsule.fqdn }}-certs.tar"
+#     mode: "0600"
+#   delegate_to: localhost
+
+# # Copy files
+# - name: "Copy script the files"
+#   ansible.builtin.copy:
+#     src: "/tmp/{{ cert_capsule.fqdn }}-installer.sh"
+#     dest: "~/{{ cert_capsule.fqdn }}-installer.sh"
+#     mode: "0600"
+#   delegate_to: localhost
+
+# # Delete tmp files
+# - name: "Delete the tmp files"
+#   ansible.builtin.file:
+#     path: "/tmp/{{ cert_capsule.fqdn }}-certs.tar"
+#     state: absent
+#   delegate_to: localhost
+
+# # Delete tmp files
+# - name: "Delete the tmp files"
+#   ansible.builtin.file:
+#     path: "/tmp/{{ cert_capsule.fqdn }}-installer.sh"
+#     state: absent
+#   delegate_to: localhost
