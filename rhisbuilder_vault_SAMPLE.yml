@@ -93,7 +93,7 @@ baseimage_password_vault: "eyJhbGciOiJIUz"                                      
 
 default_environment_username_vault: "{{ rhisbuilder_default_user }}"                             # notsecret
 default_environment_password_vault: "eyJhbGciOiJIUz"                                             # notsecret
-satellite_server_url_vault: "https://sat.example.ca"
+satellite_server_url_vault: "https://satellite.example.ca"
 
 # Satellite administrator
 satellite_username_vault: "{{ default_admin_username }}"                                         # notsecret

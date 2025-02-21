@@ -84,7 +84,7 @@ Basic Steps:
 1. Clone the repo to your provisioning server.
 2. Set sat_primary in the inventory to the FQDN of a @Base RHEL 8 build system (virtual, physical or prepared cloud image (non-RHUI)).
 3. Create a directory with for the FQDN of the sat_primary server under the host_vars directory. (e.g. rhis-builder-satellite/host_vars/rhissat.mydomain.com)
-4. Copy the contents of the sat.example.ca directory into your directory created in the previous step.
+4. Copy the contents of the satellite.example.ca directory into your directory created in the previous step.
 5. Update the inventory file and set [sat_primary] to the FQDN of your system that will become the satellite.
 6. Update the variables to suit your configuration.
 7. Configure your secrets.

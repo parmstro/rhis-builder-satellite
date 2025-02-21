@@ -1,2 +1,5 @@
+inventory
 ansible.cfg
 rhis-builder-satellite.code-workspace
+/home/parmstro/Projects/ansible/rhis-builder-satellite/hostvars
+

@@ -1,0 +1,38 @@
+---
+# Delete the host
+- name: "Delete the host"
+  connection: local
+  block:
+
+    - name: "The host to delete is baremetal - wiping the disks"
+      when: compute_resource == 'baremetal'
+      redhat.satellite.job_invocation:
+        username: "{{ satellite_admin_username }}"
+        password: "{{ satellite_admin_password }}"
+        server_url: "{{ satellite_server_url }}"
+        job_template: "Provisioning Action - Re-init baremetal Linux Host"
+        inputs:
+          "action: wipe"
+        search_query: "name = {{ host.delete_host }}"
+        validate_certs: "{{ satellite_validate_certs }}"
+
+    - name: "Delete the host"
+      redhat.satellite.host:
+        username: "{{ satellite_admin_username }}"
+        password: "{{ satellite_admin_password }}"
+        server_url: "{{ satellite_server_url }}"
+        organization: "{{ host.organization }}"
+        location: "{{ host.location }}"
+        name: "{{ host.delete_host }}"
+        state: absent
+        validate_certs: "{{ satellite_validate_certs }}"
+
+    # for baremetal we invoke shutdown 1, for vm and cloud systems it can take a bit to deprovision
+    - name: "Wait for host to be deleted"
+      ansible.builtin.wait_for:
+        host: "{{ host.delete_host }}"
+        timeout: 600
+        sleep: 60
+        port: 22
+        delay: 120
+        state: stopped

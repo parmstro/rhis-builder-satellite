@@ -1,4 +1,8 @@
 ---
+# If there are repositories enabled for third party repos
+# disable the repos and ensure only repositories for Red Hat Satellite are enabled
+
+
 - name: "Ensure the proper repositories are enabled"
   community.general.rhsm_repository:
     name: "{{ repository_ids }}"

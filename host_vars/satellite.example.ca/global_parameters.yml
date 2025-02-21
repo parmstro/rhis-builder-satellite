@@ -8,7 +8,7 @@
 
 global_parameters_rhisam:
   - name: "ansible_host_config_key"
-    value: "50f79524-5415-462b-b5d3-2eeebc65aaac"
+    value: "{{ satellite_ansible_callback_config_key_vault }}"
     parameter_type: "string"
     hidden_value: false
     state: "present"

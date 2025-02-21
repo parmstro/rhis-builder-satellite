@@ -9,6 +9,7 @@
 # call it with an extravar instead
 
 - name: "Get the unique list of rhisam products"
+  when: repository_sets_rhisam is defined
   ansible.builtin.set_fact:
     products_to_sync: "{{ repository_sets_rhisam | map(attribute='product') | list | unique }}"
 
@@ -23,6 +24,7 @@
     loop_var: product_to_sync
 
 - name: "Get the unique list of user products"
+  when: repository_sets_user is defined
   ansible.builtin.set_fact:
     products_to_sync: "{{ repository_sets_user | map(attribute='product') | list | unique }}"
 
@@ -37,6 +39,7 @@
     loop_var: product_to_sync
 
 - name: "Get the unique list of custom products"
+  when: custom_products is defined
   ansible.builtin.set_fact:
     products_to_sync: "{{ custom_products | map(attribute='name') | list | unique }}"
 

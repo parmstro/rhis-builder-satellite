@@ -24,9 +24,11 @@
   ansible.builtin.command: "dnf -y module reset postgresql"
 
 - name: "Reset the Satellite module" # noqa: no-changed-when
+  when: ansible_distribution_major_version == 8
   ansible.builtin.command: "dnf -y module reset satellite:el8"
 
 - name: "Enable the Satellite module" # noqa: no-changed-when
+  when: ansible_distribution_major_version == 8
   ansible.builtin.command: "dnf -y module enable satellite:el8"
 
 - name: "Install the Satellite RPM packages"

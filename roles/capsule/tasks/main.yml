@@ -1,0 +1,17 @@
+---
+# entry point for capsule role
+
+- name: "Upload the capsule configuration files"
+  ansible.builtin.include_tasks: "capsule_upload_files.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule
+    - tags_capsule_upload_files
+
+
+- name: "Run capsule installer"
+  ansible.builtin.include_tasks: "run_installer_script.yml"
+  tags:
+    - tags_rhisam
+    - tags_capsule
+    - tags_capsule_run_installer_script.yml

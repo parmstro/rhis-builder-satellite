@@ -1,0 +1,44 @@
+# this controls our build in Satellite
+
+satellite_fqdn: "sat6.parmstrong.ca"
+satellite_admin_username: "{{ satellite_admin_username_vault }}"
+satellite_admin_password: "{{ satellite_admin_password_vault }}"
+satellite_initial_location: "Default Location"
+satellite_initial_organization: "Default Organization"
+satellite_location: "{{ satellite_initial_location }}"
+satellite_organization: "{{ satellite_initial_organization }}"
+satellite_domain: "parmstrong.ca"
+satellite_server_url: "https://{{ satellite_fqdn }}"
+satellite_validate_certs: true
+
+search_dh_mac: "ff:ff:ff:ff:ff:ff"
+default_vm_mac: "00:50:56:ff:ff:ff"
+
+post_deploy_timeout: 600  # seconds
+use_sync_build: false
+discovered_hosts_resource: "discovered_hosts"
+
+
+platform_hosts:
+  - name: "capsule1"
+    fqdn: "capsule1.parmstrong.ca"
+    delete_host: false
+    organization: "Default Organization"
+    location: "Default Location"
+    hostgroup: "hg_x86_64_rhel9_metal/satellite_capsule"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.4"
+    compute_resource: "baremetal"
+    mac: "94:c6:91:13:37:9e"
+    boot_ip: "192.168.252.81"
+    crt_force_regen: false
+  - name: "capsule2"
+    fqdn: "capsule2.parmstrong.ca"
+    delete_host: false
+    organization: "Default Organization"
+    location: "Default Location"
+    hostgroup: "hg_x86_64_rhel9_metal/satellite_capsule"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.4"
+    compute_resource: "baremetal"
+    mac: "94:c6:91:a3:19:41"
+    boot_ip: "192.168.252.82"
+    crt_force_regen: false

@@ -14,10 +14,10 @@
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}" # drop through to the module default (true)
-    name: "{{ user_group.name }}"
-    admin: "{{ user_group.is_admin | default(omit) }}" # drop through to the module default (false)
-    roles: "{{ user_group.roles_list | default(omit) }}" # pass a list object
-    users: "{{ user_group.user_list | default(omit) }}" # pass a list object
-    usergroups: "{{ user_group.usergroups_list | default(omit) }}" # pass a list object
-    updated_name: "{{ user_group.updated_name | default(omit) }}"
-    state: "{{ user_group.state | default(omit) }}" # drop through to the module default (present)
+    name: "{{ sat_user_group.name }}"
+    admin: "{{ sat_user_group.admin | default(omit) }}" # drop through to the module default (false)
+    roles: "{{ sat_user_group.roles_list | default(omit) }}" # pass a list object
+    users: "{{ sat_user_group.user_list | default(omit) }}" # pass a list object
+    usergroups: "{{ sat_user_group.usergroups_list | default(omit) }}" # pass a list object
+    updated_name: "{{ sat_user_group.updated_name | default(omit) }}"
+    state: "{{ sat_user_group.state | default(omit) }}" # drop through to the module default (present)

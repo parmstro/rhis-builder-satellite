@@ -1,0 +1,15 @@
+---
+
+- name: "Ensure the organization configuration"
+  redhat.satellite.organization:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    state: "{{ organization.state | default(omit) }}"
+    description: "{{ organization.description | default(omit) }}"
+    name: "{{ organization.name }}"
+    label: "{{ organization.label | default(omit) }}"
+    select_all_types: "{{ organization.select_all_types | default(omit) }}"
+    ignore_types: "{{ organization.ignore_types | default(omit) }}"
+    parameters: "{{ organization.parameters | default('[]') }}"

@@ -8,7 +8,7 @@ hostgroups_rhisam:
     architecture: "x86_64"
     compute_profile: "SOE_Medium"
     compute_resource: "VMware_Lab"
-    content_source: "sat.example.ca"
+    content_source: "satellite.example.ca"
     content_view: "SOE_RHEL8"
     domain: "{{ satellite_domain }}"
     lifecycle_environment: "Development"

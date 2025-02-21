@@ -1,0 +1,9 @@
+---
+
+# entry point for capsule_post role
+
+- name: "Assign Capsule Organization and Location"
+  ansible.builtin.include_tasks: "assign_capsule_org_loc.yml"
+  loop: "{{ capsules }}"
+  loop_control:
+    loop_var: capsule

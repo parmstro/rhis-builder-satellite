@@ -1,0 +1,18 @@
+---
+# get the tar file and the script file from the satellite
+
+- name: "Upload the tar file"
+  ansible.builtin.copy:
+    src: "/tmp/{{ ansible_fqdn }}-certs.tar"
+    dest: "/root/{{ ansible_fqdn }}-certs.tar"
+    mode: "0644"
+
+- name: "Get the script file"
+  ansible.builtin.copy:
+    src: "/tmp/{{ ansible_fqdn }}-installer.sh"
+    dest: "/root/{{ ansible_fqdn }}-installer.sh"
+    mode: "0700"
+
+- name: "Add the whole shebang"
+  ansible.builtin.command: 'sed -i "1i #!/bin/bash" /root/{{ ansible_fqdn }}-installer.sh' # noqa command-instead-of-module
+  changed_when: true

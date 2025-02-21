@@ -1,0 +1,8 @@
+---
+
+# Ensure that the satellite users DO NOT exist.
+- name: "Assert user is not present"
+  ansible.builtin.include_tasks: "assert_user.yml"
+  loop: "{{ capsule_pre_assert_users }}"
+  loop_control:
+    loop_var: user

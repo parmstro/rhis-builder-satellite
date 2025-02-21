@@ -1,0 +1,79 @@
+<%#
+name: iron_Server_Compliance_Encrypted_RAID
+description: "This will configure RAID1 for all partitions and encrypt the partition containing root_vg. This partition scheme meets most major Compliance Profiles (CPGPC, DISA-STIG, CIS, PCI-DSS, etc..).  Minimum 100GB disk required."
+snippet: false
+model: Ptable
+os_family: Redhat
+-%>
+# NOTE: requires 2 disks >= 600G
+# THIS IS INTENDED PRIMARILY FOR BAREMETAL SYSTEMS 
+
+zerombr
+clearpart --all
+
+# The system will reencrypt the drive with a secret key on reboot
+## This was written for ceph storage nodes containing 24 disks.
+
+<% if @host.provider.downcase == 'vmware' %>
+
+ignoredisk --only-use=sda,sdb
+## partitions for /boot
+part raid.01 --fstype="mdmember" --size=1024 --ondisk=sda
+part raid.02 --fstype="mdmember" --size=1024 --ondisk=sdb
+## partitions for /boot/efi
+part raid.11 --fstype="mdmember" --size=1024 --ondisk=sda
+part raid.12 --fstype="mdmember"  --size=1024 --ondisk=sdb
+## partitions for /
+part raid.21 --fstype="mdmember"  --size=1 --grow --ondisk=sda
+part raid.22 --fstype="mdmember"  --size=1 --grow --ondisk=sdb
+
+<% end -%>
+
+<% if @host.provider.downcase == 'rhv' %>
+
+ignoredisk --only-use=vda,vdb
+## partitions for /boot
+part raid.01 --fstype="mdmember" --size=1024 --ondisk=vda
+part raid.02 --fstype="mdmember" --size=1024 --ondisk=vdb
+## partitions for /boot/efi
+part raid.11 --fstype="mdmember" --size=1024 --ondisk=vda
+part raid.12 --fstype="mdmember"  --size=1024 --ondisk=vdb
+## partitions for /
+part raid.21 --fstype="mdmember"  --size=1 --grow --ondisk=vda
+part raid.22 --fstype="mdmember"  --size=1 --grow --ondisk=vdb
+
+<% end -%>
+
+<% if @host.provider.downcase == 'baremetal' %>
+
+ignoredisk --only-use=sda,sdb
+## partitions for /boot
+part raid.01 --fstype="mdmember" --size=1024 --ondisk=sda
+part raid.02 --fstype="mdmember" --size=1024 --ondisk=sdb
+## partitions for /boot/efi
+part raid.11 --fstype="mdmember" --size=1024 --ondisk=sda
+part raid.12 --fstype="mdmember"  --size=1024 --ondisk=sdb
+## partitions for /
+part raid.21 --fstype="mdmember"  --size=1 --grow --ondisk=sda
+part raid.22 --fstype="mdmember"  --size=1 --grow --ondisk=sdb
+
+<% end -%>
+
+## create raid devices
+raid /boot --level=RAID1 --fstype="xfs" --device=boot --label=rhel8-boot raid.01 raid.02
+raid /boot/efi --level=RAID1 --device=boot-efi --label=gpt --fstype="efi" --fsoptions="umask=0077,shortname=winnt" raid.11 raid.12
+## create encrypted device for root disk
+raid pv.42 --level=RAID1 --fstype="lvmpv" --device=root --label=rhel8-root raid.21 raid.22 --encrypted --passphrase <%= host_param('default_passphrase') %>
+
+## create a CIS2 (or similar) volume layout
+## the CIS2 layout is created for required volumes and sizes
+## var is allowed to consume the remaining space up to 400GB, this can be extend further post deployment
+volgroup vg_root --pesize=4096 pv.42
+logvol swap           --vgname=vg_root --name=lv_swap --recommended
+logvol /tmp           --vgname=vg_root --fstype=xfs --name=lv_tmp       --size=2048
+logvol /var/tmp       --vgname=vg_root --fstype=xfs --name=lv_var_tmp   --size=2048
+logvol /var/log       --vgname=vg_root --fstype=xfs --name=lv_var_log   --size=6144
+logvol /var/log/audit --vgname=vg_root --fstype=xfs --name=lv_var_audit --size=2048
+logvol /              --vgname=vg_root --fstype=xfs --name=lv_root      --size=102400 
+logvol /home          --vgname=vg_root --fstype=xfs --name=lv_home      --size=10240
+logvol /var           --vgname=vg_root --fstype=xfs --name=lv_var       --size=32768 --maxsize=409600 --grow

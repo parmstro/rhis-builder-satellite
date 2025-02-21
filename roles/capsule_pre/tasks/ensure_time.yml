@@ -1,0 +1,23 @@
+---
+
+# ensure that chronyc is running
+# ensure out time servers are in the chronyc.conf file
+# makestep
+
+- name: "Ensure time servers"
+  ansible.builtin.template:
+    src: chrony.conf.j2
+    dest: /etc/chrony.conf
+    mode: "0644"
+
+- name: "Ensure chronyd"
+  ansible.builtin.service:
+    name: "chronyd"
+    enabled: true
+    state: restarted
+
+- name: "Force a time update"
+  ansible.builtin.command: "chronyc makestep"
+  register: makestep_result
+  failed_when: makestep_result.stdout != "200 OK"
+  changed_when: makestep_result.stdout == "200 OK"

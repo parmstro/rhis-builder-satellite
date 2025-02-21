@@ -1,0 +1,11 @@
+---
+
+- name: "Ensure the volume configuration for {{ volume.lv_name }}"
+  community.general.lvol:
+    lv: "{{ volume.lv_name }}"
+    vg: "{{ volume.vg_name }}"
+    resizefs: "{{ volume.resize | default(true) }}"
+    size: "{{ volume.minimum_size }}"
+    shrink: "{{ volume.shrink | default(false) }}"
+    state: "{{ volume.state }}"
+    force: "{{ volume.force | default(false) }}"

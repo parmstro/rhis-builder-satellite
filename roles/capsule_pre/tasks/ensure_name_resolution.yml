@@ -1,0 +1,20 @@
+---
+# Assert that we can find each of the capsules by name and ip
+
+- name: "Lookup the hostname"
+  ansible.builtin.set_fact:
+    found_ip: "{{ lookup('community.general.dig', ansible_fqdn, fail_on_error='true', qtype='A', tcp='true') }}"
+
+- name: "Ensure IP match"
+  ansible.builtin.assert:
+    that:
+      ansible_default_ipv4.address == found_ip
+
+- name: "Lookup the ip"
+  ansible.builtin.set_fact:
+    found_fqdn: "{{ lookup('community.general.dig', ansible_default_ipv4.address + '/PTR', fail_on_error='true', tcp='true') }}"
+
+- name: "Ensure hostname matches with a trailing dot"
+  ansible.builtin.assert:
+    that:
+      found_fqdn == ansible_fqdn + "."

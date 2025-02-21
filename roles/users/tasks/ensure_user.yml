@@ -6,19 +6,19 @@
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
-    name: "{{ user.name }}"
-    firstname: "{{ user.firstname | default(omit) }}"
-    lastname: "{{ user.lastname | default(omit) }}"
-    mail: "{{ user.email | default(omit) }}"
-    description: "{{ user.description | default(omit) }}"
-    admin: "{{ user.is_admin | default(omit) }}"
-    user_password: "{{ user.password | default(omit) }}"
-    default_location: "{{ user.location_on_login | default(omit) }}"
-    default_organization: "{{ user.organization_on_login | default(omit) }}"
-    auth_source: "{{ user.auth_source | default(omit) }}"
-    timezone: "{{ user.time_zone | default(omit) }}"
-    locale: "{{ user.locale | default(omit) }}"
-    roles: "{{ user.role_list | default(omit) }}" # pass a list object
-    locations: "{{ user.location_list | default(omit) }}" # pass a list object
-    organizations: "{{ user.organization_list | default(omit) }}" # pass a list object
-    state: "{{ user.state | default(omit) }}"
+    name: "{{ sat_user.name }}"
+    firstname: "{{ sat_user.firstname | default(omit) }}"
+    lastname: "{{ sat_user.lastname | default(omit) }}"
+    mail: "{{ sat_user.email | default(omit) }}"
+    description: "{{ sat_user.description | default(omit) }}"
+    admin: "{{ sat_user.admin | default(omit) }}"
+    user_password: "{{ sat_user.password | default(omit) }}"
+    default_location: "{{ sat_user.location_on_login | default(omit) }}"
+    default_organization: "{{ sat_user.organization_on_login | default(omit) }}"
+    auth_source: "{{ sat_user.auth_source | default(omit) }}"
+    timezone: "{{ sat_user.time_zone | default(omit) }}"
+    locale: "{{ sat_user.locale | default(omit) }}"
+    roles: "{{ sat_user.role_list | default(omit) }}" # pass a list object
+    locations: "{{ sat_user.location_list | default(omit) }}" # pass a list object
+    organizations: "{{ sat_user.organization_list | default(omit) }}" # pass a list object
+    state: "{{ sat_user.state | default(omit) }}"
