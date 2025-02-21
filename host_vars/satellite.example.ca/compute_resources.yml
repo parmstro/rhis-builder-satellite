@@ -1,0 +1,79 @@
+---
+# define the compute resources for all organizations and locations
+
+# Compute resource types:
+# vmware
+# libvirt
+# ovirt
+# proxmox
+# EC2
+# AzureRm
+# GCE
+# Openstack
+
+vcenter_service_username: "{{ vcenter_service_username_vault }}"
+vcenter_service_password: "{{ vcenter_service_password_vault }}"
+
+azure1_tenant_id: "{{ azure1_tenant_id_vault }}"
+azure1_subscription_id: "{{ azure1_subscription_id_vault }}"
+azure1_client_id: "{{ azure1_client_id_vault }}"
+azure1_client_secret_id: "{{ azure1_client_secret_id_vault }}"
+azure1_client_secret: "{{ azure1_client_secret_vault }}"
+azure1_cloud: "azure"
+azure1_region: "Canada Central"
+azure1_resourcegroup1: "rg_example_ca"
+
+aws1_access_key: "{{ aws1_access_key_vault }}"
+aws1_secret_key: "{{ aws1_secret_key_vault }}"
+aws1_gov_cloud: false
+aws1_region: "ca-central-1"
+
+compute_resources_rhisam:
+  - name: "VMware_Lab"
+    provider: "vmware"
+    description: "Lab VCenter Server"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    provider_params:
+      caching_enabled: false  # setting this to true currently causes some server faults.
+      datacenter: "example.ca"
+      url: "192.168.252.30"
+      user: "{{ vcenter_service_username }}"
+      password: "{{ vcenter_service_password }}"
+
+compute_resources_user:
+  - name: "Azure_Lab"
+    provider: "AzureRm"
+    description: "Example.ca Resource Group"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    images:
+      - name: "RHEL88"
+        architecture: "x86_64"
+        operatingsystem: "RHEL 8.8"
+        image_username: "realm-capsule"
+        image_password: "{{ satellite_admin_password }}"
+        uuid: "marketplace://RedHat:rhel-byos:rhel-lvm88-gen2:8.8.2023053015"
+      - name: "ImageBuilderImage"
+        architecture: "x86_64"
+        operatingsystem: "RHEL 8.8"
+        image_username: "realm-capsule"
+        image_password: "{{ satellite_admin_password }}"
+        uuid: "custom://composer-api-50f19253-239a-4478-b5c7-18ee052047df"
+    provider_params:
+      app_ident: "{{ azure1_client_id_vault }}"
+      cloud: "{{ azure1_cloud_vault }}"
+      password: "{{ azure1_client_secret_vault }}"
+      region: "{{ azure1_region_vault }}"
+      sub_id: "{{ azure1_subscription_id_vault }}"
+      tenant: "{{ azure1_tenant_id_vault }}"
+
+  - name: "AWS_Lab"
+    provider: "EC2"
+    description: "AWS EC2 Lab"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    provider_params:
+      user: "{{ aws1_access_key }}"
+      password: "{{ aws1_secret_key }}"
+      region: "{{ aws1_region }}"

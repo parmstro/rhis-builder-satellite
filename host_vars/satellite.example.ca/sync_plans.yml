@@ -1,0 +1,30 @@
+---
+# This defines the plans. We link them to products after they are created.
+
+sync_plans_rhisam:
+  - name: "nightly_os"
+    desc: "Nightly OS repo sync - 00:30"
+    interval: "daily"
+    sync_date: "{{ ansible_date_time.date }} 00:30:00"
+    enabled: true
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+  - name: "nightly_infra"
+    desc: "Nightly non-OS repo sync - 02:30"
+    interval: "daily"
+    sync_date: "{{ ansible_date_time.date }} 02:30:00"
+    enabled: true
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+  - name: "nightly_third_party"
+    desc: "Nightly non-OS repo sync - 03:30"
+    interval: "daily"
+    sync_date: "{{ ansible_date_time.date }} 03:30:00"
+    enabled: true
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+# sync_plans_user:
+# There are none for now
