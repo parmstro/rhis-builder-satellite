@@ -2,8 +2,6 @@
 
 Fork it. Clone it. Configure it. Test it. Change it. Commit it. Create a PR.
 
-Rinse. Repeat.
-
 ***
 
 The code in this repo builds the Satellite configuration for an RHIS deployment. Currently, this deployment assumes the Red Hat Infrastructure Standard Adoption Model is being followed. You can now deploy with or without Red Hat Identity Management integration. If you are following the RH-ISAM and **want** to have an Identity Management instance for your environment, please see the rhis-builder-idm repo in this github and build it before you deploy Satellite. You can use the code in the repo to deploy a Red Hat Identity Management server quickly. 
