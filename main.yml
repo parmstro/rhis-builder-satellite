@@ -4,10 +4,28 @@
   hosts: sat_primary
   become: true
   gather_facts: true
-  vars_files:
-    - "~/rhisbuilder_vault.yml"
 
   tasks:
+
+    - name: "Load the vault variables"
+      when: vault_path is defined
+      ansible.builtin.include_vars:
+        file: "{{ vault_path }}"
+
+    - name: "Load the other variables"
+      when: vars_path is defined
+      ansible.builtin.include_vars:
+        file: "{{ vars_path }}"
+
+    - name: "Load the vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+
+    - name: "Load the other variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
 
     - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
