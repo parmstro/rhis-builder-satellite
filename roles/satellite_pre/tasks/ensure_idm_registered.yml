@@ -2,13 +2,26 @@
 
 # unfortunately, this is necessary on RHEL8
 - name: "Reset the idm module state"  # noqa: no-changed-when
+  when: "ansible_distribution_major_version|int == 8"
   ansible.builtin.command: "dnf -y module reset idm"
 
 - name: "Enable the idm module"  # noqa: no-changed-when
+  when: "ansible_distribution_major_version|int == 8"
   ansible.builtin.command: "dnf -y module enable idm:DL1"
 
 - name: "Ensure the client module is installed"  # noqa: no-changed-when command-instead-of-shell
+  when: "ansible_distribution_major_version|int == 8"
   ansible.builtin.shell: "dnf -y module install idm:DL1/client"
+
+- name: "Ensure /etc/hosts"
+  ansible.builtin.lineinfile:
+    path: "/etc/hosts"
+    line: "{{ ipa_client_dns_servers }}    {{ ipa_server_fqdn }}"
+
+- name: "Ensure idm server is our DNS resolver"
+  ansible.builtin.lineinfile:
+    path: "/etc/resolv.conf"
+    line: "nameserver {{ ipa_client_dns_servers }}"
 
 - name: "Ensure the client configuration"
   ansible.builtin.include_role:

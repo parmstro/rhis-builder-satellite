@@ -66,7 +66,7 @@
 
     - name: "Ensure Satellite manifest configuration"
       ansible.builtin.import_role:
-        name: subscription_manifests
+        name: rex_kerberos
       when:
         - satellite_pre_use_idm
         - rex_kerberos_enabled
@@ -121,11 +121,12 @@
 
 #    We are currently ensuring sync'd content for media
 #    Satellite automatically creates the media when kickstart trees are added.
-#    - name: "Configure OS media"
-#      ansible.builtin.import_role: "media"
-#      tags:
-#        - tags_provisioning_config
-#        - tags_media
+    # - name: "Configure OS media"
+    #   ansible.builtin.import_role:
+    #     name: "media"
+    #   tags:
+    #     - tags_provisioning_config
+    #     - tags_media
 
     - name: "Configure partition tables"
       ansible.builtin.import_role:

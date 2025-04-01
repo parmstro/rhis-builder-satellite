@@ -15,7 +15,7 @@
     state: "{{ compute_resource.state | default(omit) }}"
   no_log: true
 
-- name: "Ensure the state of the compute resource images - {{ image.name }}"
+- name: "Ensure the state of the compute resource images"
   redhat.satellite.image:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"

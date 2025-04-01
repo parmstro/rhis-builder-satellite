@@ -1,25 +1,13 @@
 ---
 
 - name: "Ensure the external user groups for the rhisam configuration"
+  when: "satellite_user_groups_external is defined"
   ansible.builtin.include_tasks: "ensure_user_group_external.yml"
-  loop: "{{ sat_user_groups_external_rhisam }}"
+  loop: "{{ satellite_user_groups_external }}"
   loop_control:
-    loop_var: sat_user_group_external
-  when: "sat_user_groups_external_rhisam is defined"
+    loop_var: satellite_user_group_external
+  no_log: true
   tags:
     - tags_rhisam
     - tags_satellite_management_config
-    - tags_sat_user_groups_external
-    - tags_sat_user_groups_external_rhisam
-
-- name: "Ensure the external user groups for the user configuration"
-  ansible.builtin.include_tasks: "ensure_user_group_external.yml"
-  loop: "{{ sat_user_groups_external_user }}"
-  loop_control:
-    loop_var: sat_user_group_external
-  when: "sat_user_groups_external_user is defined"
-  tags:
-    - tags_user
-    - tags_satellite_management_config
-    - tags_sat_user_groups_external
-    - tags_sat_user_groups__external_user
+    - tags_satellite_user_groups_external

@@ -8,7 +8,7 @@
 #             Suse, VRP, Windows, Xenserver
 
 
-partition_tables_rhisam:
+partition_tables:
   - name: "RHEL_Server_CIS1"
     os_family: "Redhat"
     path: "ptable_rhel_server_cis1.j2"
@@ -38,5 +38,3 @@ partition_tables_rhisam:
       - "{{ satellite_organization }}"
     locations:
       - "{{ satellite_location }}"
-
-# partition_tables_user:

@@ -5,12 +5,13 @@
   ansible.builtin.include_tasks: "set_manifest_state.yml"
 
 - name: "Ensure the proper subscriptions are attached"
+  when: "redhat_manifest.state == 'present'"
   ansible.builtin.include_tasks: "subs_2_manifest.yml"
   loop: "{{ redhat_manifest.subs }}"
   loop_control:
     loop_var: sub
-  when: "redhat_manifest.state == 'present'"
+  no_log: true
 
 - name: "Fetch the manifest"
-  ansible.builtin.include_tasks: "fetch_manifest.yml"
   when: "redhat_manifest.state == 'present'"
+  ansible.builtin.include_tasks: "fetch_manifest.yml"

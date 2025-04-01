@@ -1,7 +1,9 @@
 ---
 
 - name: "Ensure Locations"
+  when: "satellite_locations is defined"
   ansible.builtin.include_tasks: "ensure_location.yml"
-  loop: "{{ locations }}"
+  loop: "{{ satellite_locations }}"
   loop_control:
-    loop_var: location
+    loop_var: satellite_location
+  no_log: true

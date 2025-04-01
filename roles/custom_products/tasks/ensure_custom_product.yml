@@ -19,4 +19,5 @@
   loop: "{{ custom_product.repositories }}"
   loop_control:
     loop_var: custom_product_repository
+  no_log: true
   when: "custom_product.repositories is defined"

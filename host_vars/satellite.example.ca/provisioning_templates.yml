@@ -3,7 +3,7 @@
 # Add your template files to the files directory of the Role
 # OR add them in this hostvars folder and adjust the path
 
-provisioning_templates_rhisam:
+provisioning_templates:
 # snippets
   - name: "soe_create_users_selinux"
     type: "snippet"
@@ -148,6 +148,3 @@ provisioning_templates_rhisam:
       - "{{ satellite_organization }}"
     locations:
       - "{{ satellite_location }}"
-
-# Uncomment below to create your user templates
-# provisioning_templates_user:

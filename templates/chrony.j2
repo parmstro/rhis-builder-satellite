@@ -1,8 +1,9 @@
 # Use public servers from the pool.ntp.org project.
 # Please consider joining the pool (http://www.pool.ntp.org/join.html).
 #
-server {{ timeserver1 }} iburst minpoll 4 maxpoll 8 
-server {{ timeserver2 }} iburst minpoll 4 maxpoll 8 
+{%  for timeserver in timeservers -%}
+server {{ timeserver }} iburst
+{% endfor %}
 
 # Record the rate at which the system clock gains/losses time.
 driftfile /var/lib/chrony/drift

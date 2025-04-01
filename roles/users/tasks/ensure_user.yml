@@ -1,24 +1,24 @@
 ---
 
-- name: "Ensure a user"
+- name: "Ensure user state for - {{ satellite_user.name }}"
   redhat.satellite.user:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
-    name: "{{ sat_user.name }}"
-    firstname: "{{ sat_user.firstname | default(omit) }}"
-    lastname: "{{ sat_user.lastname | default(omit) }}"
-    mail: "{{ sat_user.email | default(omit) }}"
-    description: "{{ sat_user.description | default(omit) }}"
-    admin: "{{ sat_user.admin | default(omit) }}"
-    user_password: "{{ sat_user.password | default(omit) }}"
-    default_location: "{{ sat_user.location_on_login | default(omit) }}"
-    default_organization: "{{ sat_user.organization_on_login | default(omit) }}"
-    auth_source: "{{ sat_user.auth_source | default(omit) }}"
-    timezone: "{{ sat_user.time_zone | default(omit) }}"
-    locale: "{{ sat_user.locale | default(omit) }}"
-    roles: "{{ sat_user.role_list | default(omit) }}" # pass a list object
-    locations: "{{ sat_user.location_list | default(omit) }}" # pass a list object
-    organizations: "{{ sat_user.organization_list | default(omit) }}" # pass a list object
-    state: "{{ sat_user.state | default(omit) }}"
+    name: "{{ satellite_user.name }}"
+    firstname: "{{ satellite_user.firstname | default(omit) }}"
+    lastname: "{{ satellite_user.lastname | default(omit) }}"
+    mail: "{{ satellite_user.email | default(omit) }}"
+    description: "{{ satellite_user.description | default(omit) }}"
+    admin: "{{ satellite_user.admin | default(omit) }}"
+    user_password: "{{ satellite_user.user_password | default(omit) }}"
+    default_location: "{{ satellite_user.location_on_login | default(omit) }}"
+    default_organization: "{{ satellite_user.organization_on_login | default(omit) }}"
+    auth_source: "{{ satellite_user.auth_source | default(omit) }}"
+    timezone: "{{ satellite_user.time_zone | default(omit) }}"
+    locale: "{{ satellite_user.locale | default('ca') }}"
+    roles: "{{ satellite_user.roles | default(omit) }}" # pass a list object
+    locations: "{{ satellite_user.location_list | default(omit) }}" # pass a list object
+    organizations: "{{ satellite_user.organization_list | default(omit) }}" # pass a list object
+    state: "{{ satellite_user.state | default(omit) }}"

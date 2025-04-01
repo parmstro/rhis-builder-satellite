@@ -1,0 +1,15 @@
+---
+
+# This play will create the POC specific usergroups in Satellite
+# and map them to our external IdM groups.
+
+- name: "Ensure external user group state for - {{ satellite_user_group_external.auth_source_group_name }}"
+  redhat.satellite.external_usergroup:
+    username: "{{ satellite_admin_username }}"
+    password: "{{ satellite_admin_password }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}" # drop through to the module default (true)
+    name: "{{ satellite_user_group_external.auth_source_group_name }}"
+    auth_source: "{{ satellite_user_group_external.auth_source }}"
+    usergroup: "{{ satellite_user_group_external.sat_usergroup }}"
+    state: "{{ satellite_user_group_external.state | default(omit) }}" # drop through to the module default (present)

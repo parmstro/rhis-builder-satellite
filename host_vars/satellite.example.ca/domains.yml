@@ -3,15 +3,11 @@
 # A given domain is serviced by only one capsule
 # A given domain may exist in multiple orgs and locations
 
-domains_rhisam:
-# The domain of the Satellite Server
-  - name: "{{ satellite_domain }}"
+satellite_domains:
+  - name: "{{ satellite_domain }}"        # Typically need to set up the one that satellite exists in
     description: "{{ satellite_domain }} - root domain for the installation"
     dns_capsule: "{{ satellite_fqdn }}"
     organizations:
       - "{{ satellite_organization }}"
     locations:
       - "{{ satellite_location }}"
-
-# domains_user:
-# uncomment and add your user domains here

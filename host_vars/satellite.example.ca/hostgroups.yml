@@ -1,5 +1,6 @@
 ---
-hostgroups_rhisam:
+
+satellite_hostgroups:
   - name: "RHEL8base"
     description: "RHEL 8 SOE base hostgroup"
     activation_keys: "SOE_RHEL8"
@@ -12,15 +13,15 @@ hostgroups_rhisam:
     content_view: "SOE_RHEL8"
     domain: "{{ satellite_domain }}"
     lifecycle_environment: "Development"
-    kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.8"
+    kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
     locations: "{{ satellite_location }}"
     organization: "{{ satellite_organization }}"
     openscap_capsule: "{{ satellite_fqdn }}"
-    operatingsystem: "RHEL 8.8"
+    operatingsystem: "RHEL 8.10"
     ptable: "RHEL_Server_CIS1"
-    pxe_loader: "PXELinux BIOS"
+    pxe_loader: "PXELinux UEFI"
     realm: "{{ satellite_domain | upper }}"
-    subnet: "Public"
+    subnet: "example.ca"
     root_pass: "{{ satellite_admin_password }}"
 
   - name: "RHEL8_JBoss"
@@ -50,7 +51,6 @@ hostgroups_rhisam:
     ptable: "RHEL_Server_Compliance"
     organization: "{{ satellite_organization }}"
 
-hostgroups_user:
   - name: "RHEL9base"
     description: "RHEL 9 SOE base hostgroup"
     activation_keys: "SOE_RHEL9"
@@ -63,15 +63,15 @@ hostgroups_user:
     content_view: "SOE_RHEL9"
     domain: "{{ satellite_domain }}"
     lifecycle_environment: "Development"
-    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.2"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
     locations: "{{ satellite_location }}"
     organization: "{{ satellite_organization }}"
     openscap_capsule: "{{ satellite_fqdn }}"
-    operatingsystem: "RHEL 9.2"
+    operatingsystem: "RHEL 9.5"
     ptable: "RHEL_Server_CIS1"
     pxe_loader: "PXELinux BIOS"
     realm: "{{ satellite_domain | upper }}"
-    subnet: "Public"
+    subnet: "example.ca"
     root_pass: "{{ satellite_admin_password }}"
 
   - name: "RHEL8_CIS2"

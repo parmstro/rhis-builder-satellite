@@ -5,7 +5,7 @@
     name: chrony
     state: present
 
-- name: "Configure 2 time servers"
+- name: "Configure time servers"
   ansible.builtin.template:
     src: "chrony.j2"
     dest: "/etc/chrony.conf"

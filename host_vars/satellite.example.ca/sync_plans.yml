@@ -1,7 +1,7 @@
 ---
 # This defines the plans. We link them to products after they are created.
 
-sync_plans_rhisam:
+sync_plans:
   - name: "nightly_os"
     desc: "Nightly OS repo sync - 00:30"
     interval: "daily"
@@ -25,6 +25,3 @@ sync_plans_rhisam:
     enabled: true
     organization: "{{ satellite_organization }}"
     location: "{{ satellite_location }}"
-
-# sync_plans_user:
-# There are none for now

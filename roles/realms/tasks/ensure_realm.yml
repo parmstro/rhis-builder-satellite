@@ -1,15 +1,15 @@
 ---
 # state defaults to present
 
-- name: "Ensure the state of the realm - {{ realm.name }}"
+- name: "Ensure the state of the realm - {{ satellite_realm.name }}"
   redhat.satellite.realm:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    organizations: "{{ realm.organizations }}"
-    locations: "{{ realm.locations }}"
-    name: "{{ realm.name | upper }}"
-    realm_type: "{{ realm.realm_type }}"
-    realm_proxy: "{{ realm.realm_capsule }}"
-    state: "{{ realm.state | default(omit) }}"
+    organizations: "{{ satellite_realm.organizations }}"
+    locations: "{{ satellite_realm.locations }}"
+    name: "{{ satellite_realm.name | upper }}"
+    realm_type: "{{ satellite_realm.realm_type }}"
+    realm_proxy: "{{ satellite_realm.realm_capsule }}"
+    state: "{{ satellite_realm.state | default(omit) }}"

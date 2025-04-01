@@ -1,0 +1,6 @@
+---
+
+# Default values - so you know they exist.
+
+last_sync_threshold_hours: 24
+skip_sync_all: false

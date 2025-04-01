@@ -1,12 +1,12 @@
 ---
 
-- name: "Linking synchronization plan {{ pp.plan }} to the product {{ pp.name }}" # noqa:name[template]
+- name: "Linking synchronization plan {{ product_plan.plan }} to the product {{ product_plan.name }}" # noqa:name[template]
   redhat.satellite.product:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    name: "{{ pp.name }}"
-    sync_plan: "{{ pp.plan }}"
+    name: "{{ product_plan.name }}"
+    sync_plan: "{{ product_plan.plan }}"
     state: present

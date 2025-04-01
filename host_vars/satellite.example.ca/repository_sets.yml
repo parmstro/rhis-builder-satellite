@@ -1,12 +1,6 @@
 ---
 # "Technically" these are products, but lets not quibble
 
-# Red Hat Repositories
-# - rhisam: make demos work - this pattern is used throughout
-# - user: let's *you* do stuff - this pattern is used throughout
-# the repo may or may not have a basearch or releasever - unfortunately, not a lot of consistency here
-#
-
 # Sync / Publish / Promote main control vars
 # set to true to overide default to sync all content, publish all CVs and CCVs, and promote
 # these are valuable in testing or in maintainance runs
@@ -14,23 +8,25 @@
 skip_sync: false
 skip_publish_all: false
 
+# repository sets are for this organization
+satellite_organization: "{{ satellite_initial_organization }}"
+satellite_location: "{{ satellite_initial_location }}"
+
 # Add additional content not needed for boostrap but still valuable and useful
 # Can be set to false to skip managemet of repos, CVs and CCVs
-repository_sets_rhisam:
+repository_sets:
   # RHEL 9.x kickstart
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.2"
-      - releasever: "9.3"
       - releasever: "9.4"
+      - releasever: "9.5"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.2"
-      - releasever: "9.3"
       - releasever: "9.4"
+      - releasever: "9.5"
 
 # RHEL9 repos
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
@@ -55,15 +51,11 @@ repository_sets_rhisam:
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "8.8"
-      - releasever: "8.9"
       - releasever: "8.10"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "8.8"
-      - releasever: "8.9"
       - releasever: "8.10"
 
 # RHEL 8 Repos
@@ -91,11 +83,11 @@ repository_sets_rhisam:
     product: "Red Hat Ansible Automation Platform"
 
 
-# Satellite 6.15
-  - name: "Red Hat Satellite Capsule 6.15 for RHEL 8 x86_64 (RPMs)"
+# Satellite 6.16
+  - name: "Red Hat Satellite Capsule 6.16 for RHEL 8 x86_64 (RPMs)"
     product: "Red Hat Satellite Capsule"
 
-  - name: "Red Hat Satellite Maintenance 6.15 for RHEL 8 x86_64 (RPMs)"
+  - name: "Red Hat Satellite Maintenance 6.16 for RHEL 8 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
 
 
@@ -107,7 +99,6 @@ repository_sets_rhisam:
 # however, if you want to do convert2rhel and LEAPP piplines, you need these
 # Thes pull in the RHEL 7 and RHEL 8 repos and other Red Hat products
 
-repository_sets_user:
 # RHEL 7 Repos for convert2rhel and LEAPP_7_2_8
   - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
     product: "Red Hat Enterprise Linux Server"
@@ -153,52 +144,46 @@ repository_sets_user:
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "8.8"
       - releasever: "8.10"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "8.8"
       - releasever: "8.10"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "8.8"
       - releasever: "8.10"
 
 # RHEL9.2 repos for LEAPP_8_2_9
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.2"
       - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.2"
       - releasever: "9.4"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.2"
       - releasever: "9.4"
 
 # RHEL9_aarch64 kickstart repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
-      - releasever: "9.3"
       - releasever: "9.4"
+      - releasever: "9.5"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
-      - releasever: "9.3"
       - releasever: "9.4"
+      - releasever: "9.5"
 
 # RHEL9_aarch64 repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (RPMs)"

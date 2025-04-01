@@ -7,9 +7,7 @@ idm.example.ca
 [idm_replicas]
 
 [sat_primary]
-sat6.parmstrong.ca
-#satellite.example.ca
-#testrhuicleanup.parmstrong.ca
+satellite.example.ca
 
 [sat_capsules]
 capsule1.parmstrong.ca

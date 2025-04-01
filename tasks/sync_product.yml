@@ -5,6 +5,7 @@
     sync_content: false                              # default to false - only sync when necessary
     hours_since_sync: 8766                           # assume the last sync was long ago.. one year - 365.25 days
     last_sync_datetime: 0                            # reset the last_sync_datetime
+    must_sync_product: false
 
 - name: "Get the product info"
   redhat.satellite.resource_info:
@@ -27,7 +28,7 @@
 - name: "Determine if the product is in sync"
   when:
     - product_info.resources[0].sync_state is defined
-    - (product_info.resources[0].sync_state | type_debug) == "NoneType"
+    - (product_info.resources[0].sync_state | type_debug) == "NoneType" # Product never sync'd
   ansible.builtin.set_fact:
     must_sync_product: true
 
@@ -38,7 +39,7 @@
 
 - name: "Display the last_sync_datetime"
   ansible.builtin.debug:
-    msg: "The last sync was on {{ last_sync_datetime }}, {{ hours_since_sync }} hours ago."
+    msg: "The last sync was on {{ last_sync_datetime | default('Never') }}, {{ hours_since_sync }} hours ago."
 
 - name: "Determine if we need to sync based on time"
   when:
@@ -51,7 +52,7 @@
   when:
     - must_sync_product
   ansible.builtin.debug:
-    msg: "We must sync the product"
+    msg: "We must sync the product {{ product_to_sync }}"
 
 - name: "Sync product"
   when:

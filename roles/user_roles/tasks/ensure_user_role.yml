@@ -12,15 +12,15 @@
 # satgroup-operator - combines a number of roles - BootStrap_User, Remote Execution User, Task Manager, Edit Hosts, Discovery Manager, Viewer
 # For the POC we only need to create the Operator Role
 
-- name: "Ensure the role state"
+- name: "Ensure the role state for - {{ satellite_role.name }}"
   redhat.satellite.role:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    state: "{{ sat_role.state }}"
-    name: "{{ sat_role.name }}"
-    description: "{{ sat_role.description | default(omit) }}"
-    locations: "{{ sat_role.locations | default(omit) }}"
-    organizations: "{{ sat_role.organizations | default(omit) }}"
-    filters: "{{ sat_role.filters | ansible.utils.remove_keys('resource_type')  | default(omit) }}"
+    state: "{{ satellite_role.state }}"
+    name: "{{ satellite_role.name }}"
+    description: "{{ satellite_role.description | default(omit) }}"
+    locations: "{{ satellite_role.locations | default(omit) }}"
+    organizations: "{{ satellite_role.organizations | default(omit) }}"
+    filters: "{{ satellite_role.filters | ansible.utils.remove_keys(target=['resource_type']) | default(omit) }}"

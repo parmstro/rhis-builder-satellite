@@ -7,3 +7,4 @@
   loop: "{{ capsules }}"
   loop_control:
     loop_var: capsule
+  no_log: true

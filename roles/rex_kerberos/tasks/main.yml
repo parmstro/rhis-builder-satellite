@@ -13,6 +13,14 @@
   changed_when: true  # this must always execute
   failed_when: "'no such user' in result.stdout"
 
+- name: "Ensure that the target directory exists"
+  ansible.builtin.file:
+    path: "/var/kerberos/krb5/user/{{ result.stdout }}/"
+    state: directory
+    owner: "{{ rex_executor }}"
+    group: "{{ rex_executor }}"
+    mode: "0640"
+
 # the keytab file *must* always be named client.keytab
 # and be located in the path below related to the impersonating users uid, in our case foreman-proxy
 - name: "Set the path for the deploying the keytab"
@@ -31,4 +39,4 @@
     remote_src: true
     owner: "{{ rex_executor }}"
     group: "{{ rex_executor }}"
-    mode: "0644"
+    mode: "0640"

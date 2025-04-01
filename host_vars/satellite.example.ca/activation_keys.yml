@@ -1,7 +1,7 @@
 ---
 # Activation keys that we use in the RH-ISAM
 
-activation_keys_rhisam:
+activation_keys:
   - name: "SOE_RHEL8"
     state: "present"
     description: "Activate a RHEL 8 system"
@@ -40,7 +40,6 @@ activation_keys_rhisam:
     lifecycle_environment: "Development"
     unlimited_hosts: true
 
-activation_keys_user:
   - name: "SOE_RHEL7"
     state: "present"
     description: "Activate a RHEL 7 system"

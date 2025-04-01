@@ -1,15 +1,15 @@
 ---
 
-- name: "Ensure the organization configuration"
+- name: "Ensure the state of the satellite organization - {{ satellite_organization.name }}"
   redhat.satellite.organization:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    state: "{{ organization.state | default(omit) }}"
-    description: "{{ organization.description | default(omit) }}"
-    name: "{{ organization.name }}"
-    label: "{{ organization.label | default(omit) }}"
-    select_all_types: "{{ organization.select_all_types | default(omit) }}"
-    ignore_types: "{{ organization.ignore_types | default(omit) }}"
-    parameters: "{{ organization.parameters | default('[]') }}"
+    state: "{{ satellite_organization.state | default(omit) }}"
+    description: "{{ satellite_organization.description | default(omit) }}"
+    name: "{{ satellite_organization.name }}"
+    label: "{{ satellite_organization.label | default(omit) }}"
+    select_all_types: "{{ satellite_organization.select_all_types | default(omit) }}"
+    ignore_types: "{{ satellite_organization.ignore_types | default(omit) }}"
+    parameters: "{{ satellite_organization.parameters | default('[]') }}"

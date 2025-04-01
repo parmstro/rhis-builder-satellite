@@ -2,7 +2,7 @@
 # discovery rules.
 # ensure target hostgroup exists
 
-discovery_rules_rhisam:
+discovery_rules:
   - name: "3nic_host"
     enabled: false
     state: present

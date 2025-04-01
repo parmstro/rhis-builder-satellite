@@ -1,7 +1,7 @@
 ---
 # This playbook configures the rhisam hostgroups
 #
-- name: "Create the rhisam hostgroups"
+- name: "Create the hostgroups"
   ansible.builtin.include_tasks: create_hostgroup.yml
   loop: "{{ hostgroups_baremetal }}"
   loop_control:

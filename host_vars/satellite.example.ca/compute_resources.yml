@@ -28,7 +28,7 @@ aws1_secret_key: "{{ aws1_secret_key_vault }}"
 aws1_gov_cloud: false
 aws1_region: "ca-central-1"
 
-compute_resources_rhisam:
+compute_resources:
   - name: "VMware_Lab"
     provider: "vmware"
     description: "Lab VCenter Server"
@@ -37,11 +37,10 @@ compute_resources_rhisam:
     provider_params:
       caching_enabled: false  # setting this to true currently causes some server faults.
       datacenter: "example.ca"
-      url: "192.168.252.30"
+      url: "192.168.140.30"
       user: "{{ vcenter_service_username }}"
       password: "{{ vcenter_service_password }}"
 
-compute_resources_user:
   - name: "Azure_Lab"
     provider: "AzureRm"
     description: "Example.ca Resource Group"

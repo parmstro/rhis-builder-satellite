@@ -6,26 +6,14 @@
 # that may be incompatible with anisble template parsing,
 # these occurences should be rare.
 
-- name: "Configure the rhisam provisioning templates"
+- name: "Ensure the state of the provisioning templates"
+  when: "provisioning_templates is defined"
   ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
-  loop: "{{ provisioning_templates_rhisam }}"
+  loop: "{{ provisioning_templates }}"
   loop_control:
     loop_var: provisioning_template
-  when: "provisioning_templates_rhisam is defined"
+  no_log: true
   tags:
     - tags_rhisam
     - tags_provisioning_config
     - tags_partition_tables
-    - tags_partition_tables_rhisam
-
-- name: "Configure the user provisioning templates"
-  ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
-  loop: "{{ provisioning_templates_user }}"
-  loop_control:
-    loop_var: provisioning_template
-  when: "provisioning_templates_user is defined"
-  tags:
-    - tags_user
-    - tags_provisioning_config
-    - tags_partition_tables
-    - tags_partition_tables_user

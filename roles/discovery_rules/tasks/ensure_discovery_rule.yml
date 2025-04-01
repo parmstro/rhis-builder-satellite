@@ -2,7 +2,7 @@
 # This task ensures the state of the discovery rule
 # state defaults to present
 
-- name: "Ensure discovery rule - {{ discovery_rule.name }}"
+- name: "Ensure discovery rule state for - {{ discovery_rule.name }}"
   redhat.satellite.discovery_rule:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"

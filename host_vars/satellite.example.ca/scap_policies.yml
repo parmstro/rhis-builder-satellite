@@ -2,7 +2,7 @@
 # SCAP policy definitions
 
 # Draft definition
-scap_policies_rhisam:
+scap_policies:
   - name: "RHEL9_CIS2"
     description: "CIS Server Level 2 for RHEL9 scan"
     deploy_by: "ansible"
@@ -20,5 +20,3 @@ scap_policies_rhisam:
       - "{{ satellite_organization }}"
     locations:
       - "{{ satellite_location }}"
-
-# scap_policies_user

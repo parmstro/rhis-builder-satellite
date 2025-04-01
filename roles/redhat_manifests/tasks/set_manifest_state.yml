@@ -10,13 +10,3 @@
     content_access_mode: "{{ redhat_manifest.content_access_mode | default(omit) }}"
     validate_certs: "{{ redhat_manifest.validate_certs }}"
   register: result
-
-- name: "Display the result"
-  ansible.builtin.debug:
-    var: result
-
-# TODO: add the uuid by appending to the list??
-# - name: "Set manifest UUID when present"
-#   ansible.builtin.set_fact:
-#     redhat_manifest.uuid: "{{ result.uuid }}"  # noqa var-naming[pattern]
-#   when: "redhat_manifest.state == 'present'"

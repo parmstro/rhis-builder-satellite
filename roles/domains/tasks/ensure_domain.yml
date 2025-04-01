@@ -1,16 +1,16 @@
 ---
 # state defaults to present
 
-- name: "Ensure the state of the domain - {{ domain.name }}"
+- name: "Ensure the state of the domain - {{ satellite_domain.name }}"
   redhat.satellite.domain:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    organizations: "{{ domain.organizations }}"
-    locations: "{{ domain.locations }}"
-    name: "{{ domain.name }}"
-    state: "{{ domain.state | default(omit) }}"
-    dns_proxy: "{{ domain.dns_capsule }}"
-    description: "{{ domain.description | default(omit) }}"
-    parameters: "{{ domain.parameters | default(omit) }}"
+    organizations: "{{ satellite_domain.organizations }}"
+    locations: "{{ satellite_domain.locations }}"
+    name: "{{ satellite_domain.name }}"
+    state: "{{ satellite_domain.state | default(omit) }}"
+    dns_proxy: "{{ satellite_domain.dns_capsule }}"
+    description: "{{ satellite_domain.description | default(omit) }}"
+    parameters: "{{ satellite_domain.parameters | default(omit) }}"

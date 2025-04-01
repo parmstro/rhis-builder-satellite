@@ -2,14 +2,13 @@
 # Tell the YAML linter to ignore long lines
 # yamllint disable rule:line-length
 
-# NOTE: Kickstart media is now included in all of the content views
-# If you need to create media, it should look like the following
+# Where we have full kickstart trees, we sync them and include them in the content view
+# This is an example of web based media.
+# a server installing with this media needs internet access to the specified path/url
 
-# media_rhisam:
-#  - name: RHEL7Server
-#    os_family: Redhat
-#    path: "http://{{ satellite_fqdn }}/pulp/repos/{{ satellite_organization | replace(' ', '_') }}/Library/content/dist/rhel/server/7/$major.$minor/$arch/kickstart/"
-#    organization: "{{ satellite_organization }}"
-#    location: "{{ satellite_location }}"
-
-# media_user:
+media:
+  - name: "CentOS 7 mirror"
+    os_family: "Redhat"
+    path: "http://vault.centos.org/7.9.2009/os/x86_64/"
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"

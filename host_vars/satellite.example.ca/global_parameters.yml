@@ -6,7 +6,7 @@
 # Tell the YAML linter to ignore long lines
 # yamllint disable rule:line-length
 
-global_parameters_rhisam:
+global_parameters:
   - name: "ansible_host_config_key"
     value: "{{ satellite_ansible_callback_config_key_vault }}"
     parameter_type: "string"
@@ -14,7 +14,7 @@ global_parameters_rhisam:
     state: "present"
 
   - name: "ansible_job_template_id"
-    value: 11
+    value: 13
     parameter_type: "integer"
     hidden_value: false
     state: "present"
@@ -110,8 +110,6 @@ global_parameters_rhisam:
     value: "sudo"
     parameter_type: "string"
 
-# Syspurpose global params removed since we are moved to SCA
-
   - name: "use_foreman_users"
     value: true
     parameter_type: "boolean"
@@ -119,8 +117,6 @@ global_parameters_rhisam:
   - name: "use_ntp"
     value: false
     parameter_type: "boolean"
-
-global_parameters_user:
 
   - name: "an_example_user_global_parameter"
     value: "Delete Me"

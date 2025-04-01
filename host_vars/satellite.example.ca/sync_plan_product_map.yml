@@ -3,7 +3,7 @@
 # Maps our product into our sync plans
 # NOTE - the file is named the other way around so you see it in the list and don't forget about it!
 
-product_plan_rhisam:
+product_plans:
   - name: "Red Hat Enterprise Linux Server for x86_64"
     plan: "nightly_os"
     organization: "{{ satellite_organization }}"
@@ -24,8 +24,6 @@ product_plan_rhisam:
     plan: "nightly_infra"
     organization: "{{ satellite_organization }}"
 
-# If you added the user repos, make sure they get sync'd too.
-product_plan_user:
   - name: "Red Hat Enterprise Linux Server"
     plan: "nightly_os"
     organization: "{{ satellite_organization }}"
@@ -43,5 +41,9 @@ product_plan_user:
     organization: "{{ satellite_organization }}"
 
   - name: "Microsoft SQL Server for Linux 2022 for RHEL 8"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
+  - name: "Microsoft SQL Server for Linux 2022 for RHEL 9"
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"

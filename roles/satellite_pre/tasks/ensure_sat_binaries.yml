@@ -39,7 +39,7 @@
   poll: 0
   register: async_update
 
-- name: "Check on system update"
+- name: "Wait for Satellite binary install to complete"
   ansible.builtin.async_status:
     jid: "{{ async_update.ansible_job_id }}"
   register: job_result

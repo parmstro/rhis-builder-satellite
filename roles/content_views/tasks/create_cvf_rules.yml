@@ -2,29 +2,29 @@
 # This play adds the filter rules to a content view filter
 # There are a lot of ways to create rules. Please consult the latest documentation
 
-- name: "Configure the content view filter - {{ cvfr.name }}"
+- name: "Configure the content view filter - {{ content_view_filter_rule.name }}"
   redhat.satellite.content_view_filter_rule:
     username: "{{ satellite_admin_username }}"
     password: "{{ satellite_admin_password }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    content_view: "{{ cv.name }}"
-    content_view_filter: "{{ cvf.name }}"
-    name: "{{ cvfr.name | default(omit) }}"
-    state: "{{ cvfr.state | default(omit) }}"
-    min_version: "{{ cvfr.min_version | default(omit) }}"
-    max_version: "{{ cvfr.max_version | default(omit) }}"
-    version: "{{ cvfr.version | default(omit) }}"
-    errata_id: "{{ cvfr.errata_id | default(omit) }}"
-    stream: "{{ cvfr.stream | default(omit) }}"
-    context: "{{ cvfr.context | default(omit) }}"
-    architecture: "{{ cvfr.architecture | default(omit) }}"
-    date_type: "{{ cvfr.date_type | default(omit) }}"
-    start_date: "{{ cvfr.start_date | default(omit) }}"
-    end_date: "{{ cvfr.end_date | default(omit) }}"
-    rule_name: "{{ cvfr.rule_name | default(omit) }}"  # name alias
-    module_name: "{{ cvfr.module_name | default(omit) }}"  # name alias
-    package_name: "{{ cvfr.package_name | default(omit) }}"  # name alias
-    package_group: "{{ cvfr.package_group | default(omit) }}"  # name alias
-    arch: "{{ cvfr.arch | default(omit) }}" # architecture alias
+    content_view: "{{ content_view.name }}"
+    content_view_filter: "{{ content_view_filter.name }}"
+    name: "{{ content_view_filter_rule.name | default(omit) }}"
+    state: "{{ content_view_filter_rule.state | default(omit) }}"
+    min_version: "{{ content_view_filter_rule.min_version | default(omit) }}"
+    max_version: "{{ content_view_filter_rule.max_version | default(omit) }}"
+    version: "{{ content_view_filter_rule.version | default(omit) }}"
+    errata_id: "{{ content_view_filter_rule.errata_id | default(omit) }}"
+    stream: "{{ content_view_filter_rule.stream | default(omit) }}"
+    context: "{{ content_view_filter_rule.context | default(omit) }}"
+    architecture: "{{ content_view_filter_rule.architecture | default(omit) }}"
+    date_type: "{{ content_view_filter_rule.date_type | default(omit) }}"
+    start_date: "{{ content_view_filter_rule.start_date | default(omit) }}"
+    end_date: "{{ content_view_filter_rule.end_date | default(omit) }}"
+    rule_name: "{{ content_view_filter_rule.rule_name | default(omit) }}"  # name alias
+    module_name: "{{ content_view_filter_rule.module_name | default(omit) }}"  # name alias
+    package_name: "{{ content_view_filter_rule.package_name | default(omit) }}"  # name alias
+    package_group: "{{ content_view_filter_rule.package_group | default(omit) }}"  # name alias
+    arch: "{{ content_view_filter_rule.arch | default(omit) }}" # architecture alias

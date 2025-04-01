@@ -5,10 +5,10 @@ cdn_organization_id: "{{ cdn_organization_id_vault }}"
 cdn_sat_activation_key: "{{ cdn_sat_activation_key_vault }}"
 
 repository_ids:
-  - rhel-8-for-x86_64-baseos-rpms
-  - rhel-8-for-x86_64-appstream-rpms
-  - satellite-6.15-for-rhel-8-x86_64-rpms
-  - satellite-maintenance-6.15-for-rhel-8-x86_64-rpms
+  - rhel-9-for-x86_64-baseos-rpms
+  - rhel-9-for-x86_64-appstream-rpms
+  - satellite-6.16-for-rhel-9-x86_64-rpms
+  - satellite-maintenance-6.16-for-rhel-9-x86_64-rpms
 
 sat_firewalld_zone: "public"
 sat_firewalld_services:
@@ -19,8 +19,10 @@ sat_firewalld_services:
   - dns
   - tftp
 
-timeserver1: "192.168.252.8"
-timeserver2: "192.168.252.7"
+timeservers:
+  - "192.168.252.7"
+  - "192.168.252.8"
+  - "192.168.252.9"
 
 # Set this variable to false to skip IdM integration
 # Note: this probably means you aren't using Realms anywhere
@@ -31,7 +33,7 @@ satellite_pre_use_idm: true
 # keytab file for your realm user (because you have capsules that are currently using it)
 # set skip_prepare_realm below to true. This will avoid having
 # to redistribute the keytab file to your capsules.
-skip_prepare_realm: false
+skip_prepare_realm: true
 
 # IdM client vars
 ipa_admin_password: "{{ ipa_admin_password_vault }}"
@@ -41,12 +43,14 @@ ipa_server_domain: "example.ca"
 ipa_server_realm: "{{ ipa_server_domain | upper }}"
 ipa_client_domain: "{{ ipa_server_domain }}"
 ipa_client_configure_dns_resolver: true
-ipa_client_dns_servers: "192.168.252.5"
+ipa_client_dns_servers: "192.168.140.5"
 ipa_client_mkhomedir: true
 ipasssd_enable_dns_updates: true
 ipa_dns_reverse_zone: "168.192.in-addr.arpa"
-ipa_dns_forward_zone: "example.ca"
+ipa_dns_zone: "example.ca"
 ipa_default_bind_policy: "grant {{ ipa_server_realm }} krb5-self * A; grant {{ ipa_server_realm }} krb5-self * AAAA; grant {{ ipa_server_realm }} krb5-self * SSHFP;" # noqa yaml[line-length]
+ipa_default_bind_policy_reverse: "grant {{ ipa_server_realm }} krb5-subdomain {{ ipa_dns_reverse_zone }} PTR;"
+
 
 # ipaclient role vars: these do not follow standards
 ipaadmin_password: "{{ ipa_admin_password_vault }}"
@@ -57,15 +61,17 @@ ipaclient_realm: "{{ ipa_server_domain | upper }}"
 ipaclient_configure_dns_resolver: "{{ ipa_client_configure_dns_resolver }}"
 ipaclient_dns_servers: "{{ ipa_client_dns_servers }}"
 ipaclient_mkhomedir: "{{ ipa_client_mkhomedir }}"
-
+ipaclient_force_join: true # force rejoin of realm if we are rebuilding satellite without rebuilding IdM
 
 # Satellite specific vars used with IdM
 ipa_generate_certs: true
 
 # this is the name of the user being passed to prepare realm
 foreman_proxy_realm_principal: "realm-capsule"
-
-foreman_proxy_bind_update_policy: "{{ ipa_default_bind_policy }} grant {{ foreman_proxy_realm_principal }}\\@{{ ipa_server_realm }} wildcard * ANY;"
+foreman_proxy_dns_update_policy: "grant {{ foreman_proxy_realm_principal }}\\@{{ ipa_server_realm }} wildcard * ANY;"
+foreman_proxy_bind_update_policy: "{{ ipa_default_bind_policy }}{{ foreman_proxy_dns_update_policy }}"
+foreman_proxy_dns_update_policy_reverse: "grant {{ foreman_proxy_realm_principal }}\\@{{ ipa_server_realm }} krb5-subdomain {{ ipa_dns_reverse_zone }} PTR;"
+foreman_proxy_bind_update_policy_reverse: "{{ ipa_default_bind_policy_reverse }}{{ foreman_proxy_dns_update_policy_reverse }}"
 keytab_retrieval_password: "{{ ipa_admin_password_vault }}"
 keytab_retrieval_dn: "{{ ipa_keytab_dn }}"
 

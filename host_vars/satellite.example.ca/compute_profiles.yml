@@ -2,12 +2,12 @@
 # compute_profiles
 # yamllint disable rule:line-length
 
-vmware_cluster1_name: "ExampleLab"
+vmware_cluster1_name: "chassis3"
 vmware_cluster1_path: "/Datacenters/example.ca/vm"
-vmware_cluster1_datastore: "example_datastore"
+vmware_cluster1_datastore: "NASAEX_VMS"
 vmware_cluster1_network: "VM Network"
 
-compute_profiles_rhisam:
+compute_profiles:
   - name: "SOE_Small"
     compute_attributes:
       - compute_resource: "VMware_Lab"
@@ -58,7 +58,7 @@ compute_profiles_rhisam:
           nvidia_gpu_extension: "false"
           interfaces_attributes:
             0:
-              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
+              network: "/subscriptions/{{ azure1_subscription_id_vault }}/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_example_ca_vnet/subnets/az_example_ca_subnet"
               public_ip: "None"
               private_ip: "true"
           volumes_attributes:
@@ -116,7 +116,7 @@ compute_profiles_rhisam:
           nvidia_gpu_extension: "false"
           interfaces_attributes:
             0:
-              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
+              network: "/subscriptions/{{ azure1_subscription_id_vault }}/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_example_ca_vnet/subnets/az_example_ca_subnet"
               public_ip: "None"
               private_ip: "true"
           volumes_attributes:
@@ -174,7 +174,7 @@ compute_profiles_rhisam:
           nvidia_gpu_extension: "false"
           interfaces_attributes:
             0:
-              network: "/subscriptions/24ed9aea-b17b-4193-a137-29f19a947277/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_demo_vnet/subnets/az_demo_subnet"
+              network: "/subscriptions/{{ azure1_subscription_id_vault }}/resourceGroups/rg_example_ca/providers/Microsoft.Network/virtualNetworks/az_example_ca_vnet/subnets/az_example_ca_subnet"
               public_ip: "None"
               private_ip: "true"
           volumes_attributes:
@@ -184,6 +184,3 @@ compute_profiles_rhisam:
             1:
               disk_size_gb: "100"
               data_disk_caching: ""
-
-# Uncomment below and add your user compute profiles
-# compute_profiles_user:

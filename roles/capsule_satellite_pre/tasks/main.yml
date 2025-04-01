@@ -22,3 +22,4 @@
   loop: "{{ capsules }}"
   loop_control:
     loop_var: cert_capsule
+  no_log: true
