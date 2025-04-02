@@ -24,6 +24,6 @@
   register: usergroup_result
 
 - name: "Log Result"
-  when: "dbug_log"
+  when: dbug_log is defined and dbug_log
   ansible.builtin.debug:
     var: usergroup_result
