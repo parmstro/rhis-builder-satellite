@@ -1,5 +1,7 @@
 ---
 # This file holds the main satellite level variables.
+use_completion_logic: true
+
 
 satellite_fqdn: satellite.example.ca
 satellite_admin_username: "{{ satellite_admin_username_vault }}"
