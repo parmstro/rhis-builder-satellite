@@ -28,6 +28,7 @@
         dir: "{{ vars_dir }}"
 
     - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
+      when: not satellite_pre_complete
       ansible.builtin.include_role:
         name: satellite_pre
       tags:
@@ -275,6 +276,12 @@
       tags:
         - tags_user_roles
 
+    - name: "Configure satellite users"
+      ansible.builtin.import_role:
+        name: users
+      tags:
+        - tags_users
+
     - name: "Configure satellite user groups"
       ansible.builtin.import_role:
         name: user_groups
@@ -286,11 +293,5 @@
         name: user_groups_external
       tags:
         - tags_user_groups_external
-
-    - name: "Configure satellite users"
-      ansible.builtin.import_role:
-        name: users
-      tags:
-        - tags_users
 
 # End of Satellite Configuration
