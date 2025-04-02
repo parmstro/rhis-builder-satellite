@@ -28,7 +28,6 @@
         dir: "{{ vars_dir }}"
 
     - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
-      when: not satellite_pre_complete
       ansible.builtin.include_role:
         name: satellite_pre
       tags:
