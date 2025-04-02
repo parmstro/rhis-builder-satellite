@@ -1,5 +1,8 @@
 ---
 
+async_timeout: 3600
+async_delay: 60
+
 # prerequisites
 cdn_organization_id: "{{ cdn_organization_id_vault }}"
 cdn_sat_activation_key: "{{ cdn_sat_activation_key_vault }}"
@@ -33,7 +36,7 @@ satellite_pre_use_idm: true
 # keytab file for your realm user (because you have capsules that are currently using it)
 # set skip_prepare_realm below to true. This will avoid having
 # to redistribute the keytab file to your capsules.
-skip_prepare_realm: true
+skip_prepare_realm: false
 
 # IdM client vars
 ipa_admin_password: "{{ ipa_admin_password_vault }}"
