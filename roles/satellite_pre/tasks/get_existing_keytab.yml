@@ -3,6 +3,7 @@
 - name: "Fetch existing keytab to server" # noqa: no-changed-when
   ansible.builtin.command:
     cmd: "ipa-getkeytab -p {{ foreman_proxy_realm_principal }} -s {{ ipaserver_fqdn }} -r -k /root/freeipa.keytab -D '{{ keytab_retrieval_dn }}' -w {{ keytab_retrieval_password }}" # noqa: yaml[line-length]
+  no_log: true
 
 - name: "Move keytab to foreman-proxy directory"
   ansible.builtin.copy:
