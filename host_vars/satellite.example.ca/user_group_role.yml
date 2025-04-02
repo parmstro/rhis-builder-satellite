@@ -70,6 +70,7 @@ satellite_roles:
           - "view_architectures"
       - resource_type: "Audit"
         permissions:
+          - "view_audit_logs"
       - resource_type: "AuthSource"
         permissions:
           - "view_authenticators"
@@ -87,7 +88,7 @@ satellite_roles:
       - resource_type: "Filter"
       - resource_type: "Host"
         permissions:
-          - view_hosts
+          - "view_hosts"
       - resource_type: "Hostgroup"
       - resource_type: "Image"
       - resource_type: "KeyPair"
