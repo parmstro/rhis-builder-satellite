@@ -32,11 +32,27 @@ product_plans:
     plan: "nightly_os"
     organization: "{{ satellite_organization }}"
 
+  - name: "convert2rhel"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
   - name: "EPEL8"
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"
 
+  - name: "EPEL9"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
+  - name: "CentOS79"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
   - name: "CentOS Stream 9"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
+  - name: "OEL79"
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"
 

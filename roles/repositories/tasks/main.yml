@@ -8,14 +8,13 @@
 # for RH-ISAM we do not use this for day0 operations
 
 - name: "Ensure the state of the specified repositories."
-  when: "repositories is defined"
-  ansible.builtin.include_tasks: ensure_repositories.yml
-  loop: "{{ repositories }}"
+  when: satellite_repositories is defined and (satellite_repositories | length ) > 0
+  ansible.builtin.include_tasks: "ensure_repository.yml"
+  loop: "{{ satellite_repositories }}"
   loop_control:
-    loop_var: repository
+    loop_var: satellite_repository
   no_log: true
   tags:
-    - tags_user
     - tags_rhisam
     - tags_content_management
     - tags_repositories

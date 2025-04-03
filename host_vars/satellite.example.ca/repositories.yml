@@ -1,0 +1,56 @@
+---
+
+# For all of our Red Hat Products and Custom products,
+# the repositories are created along with the repository set or custom product
+
+# In day 0 operations, we use this to Override download_policy defaults, set content_credentials, etc.. as an example
+# In day 2 operations, we can use this to add and remove repos from our products.
+
+# The following are some examples.
+# For custom products we can set these via the product definition as well
+
+satellite_repositories:
+  - name: "convert2rhel7"
+    product: "convert2rhel"
+    content_type: "yum"
+    gpg_key: "RedHatGPG"
+    ssl_ca_cert: "RedHatSSL"
+    download_policy: "immediate"
+    unprotected: false
+  - name: "convert2rhel8"
+    product: "convert2rhel"
+    content_type: "yum"
+    gpg_key: "RedHatGPG"
+    ssl_ca_cert: "RedHatSSL"
+    download_policy: "immediate"
+    unprotected: false
+  - name: "CentOS79"
+    product: "CentOS79"
+    content_type: "yum"
+    gpg_key: "CentOS7GPG"
+    download_policy: "on_demand"
+    unprotected: false
+  - name: "updates"
+    product: "CentOS79"
+    content_type: "yum"
+    gpg_key: "CentOS7GPG"
+    download_policy: "on_demand"
+    unprotected: false
+  - name: "centos-9-appstream"
+    product: "CentOS Stream 9"
+    content_type: "yum"
+    gpg_key: "CentOS9OfficialGPG"
+    download_policy: "on_demand"
+    unprotected: false
+  - name: "centos-9-baseos"
+    product: "CentOS Stream 9"
+    content_type: "yum"
+    gpg_key: "CentOS9OfficialGPG"
+    download_policy: "on_demand"
+    unprotected: false
+  - name: "OEL79"
+    product: "OEL79"
+    content_type: "yum"
+    gpg_key: "OracleLinux7GPG"
+    download_policy: "on_demand"
+    unprotected: false

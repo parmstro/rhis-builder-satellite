@@ -1,0 +1,23 @@
+---
+
+settings_provisioning:
+  - name: "safemode_render"
+    category: "provisioning"
+    settings_type: "boolean"
+    default: true
+    value: false
+  - name: "destroy_vm_on_host_delete"
+    category: "provisioning"
+    settings_type: "boolean"
+    default: false
+    value: true
+  - name: "update_ip_from_built_request"
+    category: "provisioning"
+    settings_type: "boolean"
+    default: false
+    value: false
+  - name: "default_pxe_item_global"
+    category: "provisioning"
+    settings_type: "string"
+    default: ""
+    value: "discovery"

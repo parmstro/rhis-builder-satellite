@@ -1,0 +1,14 @@
+---
+
+
+- name: "Ensure the state of the specified content_credentials"
+  when: "content_credentials is defined"
+  ansible.builtin.include_tasks: "ensure_content_credential.yml"
+  loop: "{{ content_credentials }}"
+  loop_control:
+    loop_var: content_credential
+  no_log: true
+  tags:
+    - tags_rhisam
+    - tags_content_management
+    - tags_content_credentials

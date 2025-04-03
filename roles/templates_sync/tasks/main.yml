@@ -1,0 +1,15 @@
+---
+
+# Sync partition tables, provisioning templates, job templates, report templates
+
+- name: "Ensure the state of the specified template repositories"
+  when: satellite_template_repos is defined and (satellite_template_repos | length) > 0
+  ansible.builtin.include_tasks: "ensure_template_repo_sync.yml"
+  loop: "{{ satellite_template_repos }}"
+  loop_control:
+    loop_var: satellite_template_repo
+  no_log: true
+  tags:
+    - tags_rhisam
+    - tags_content_management
+    - tags_satellite_template_repos

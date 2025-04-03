@@ -5,59 +5,9 @@
 
 operating_systems:
   - name: "RedHat"
-    major: 8
-    minor: 8
-    description: "RHEL 8.8"
-    family: "Redhat"
-    password_hash: "SHA256"
-    organization: "{{ satellite_organization }}"
-    location: "{{ satellite_location }}"
-    state: "present"
-    architectures:
-      - "x86_64"
-    provisioning_templates:
-      - "Kickstart default"
-      - "Kickstart default finish"
-      - "Kickstart default PXELinux"
-      - "Linux host_init_config default"
-      - "Kickstart default iPXE"
-      - "Discovery Red Hat kexec"
-      - "Kickstart default PXEGrub"
-      - "Kickstart default PXEGrub2"
-      - "Kickstart default user data"
-      - "SOE Kickstart Default"
-      - "SOE Kickstart Default Finish"
-      - "SOE Kickstart Default PXELinux"
-    ptables:
-      - "Kickstart default"
-      - "Kickstart default thin"
-      - "RHEL_Server_CIS1"
-      - "RHEL_Server_Compliance"
-      - "RHEL_Server_Compliance_Encrypted"
-    default_templates:
-      - name: "SOE Kickstart Default"
-        template_kind: "provision"
-      - name: "SOE Kickstart Default Finish"
-        template_kind: "finish"
-      - name: "SOE Kickstart Default PXELinux"
-        template_kind: "PXELinux"
-      - name: "Linux host_init_config default"
-        template_kind: "host_init_config"
-      - name: "Kickstart default iPXE"
-        template_kind: "iPXE"
-      - name: "Discovery Red Hat kexec"
-        template_kind: "kexec"
-      - name: "Kickstart default PXEGrub"
-        template_kind: "PXEGrub"
-      - name: "Kickstart default PXEGrub2"
-        template_kind: "PXEGrub2"
-      - name: "Kickstart default user data"
-        template_kind: "user_data"
-
-  - name: "RedHat"
-    major: 8
+    major: 7
     minor: 9
-    description: "RHEL 8.9"
+    description: "RHEL 7.9"
     family: "Redhat"
     password_hash: "SHA256"
     organization: "{{ satellite_organization }}"
@@ -156,8 +106,8 @@ operating_systems:
 
   - name: "RedHat"
     major: 9
-    minor: 3
-    description: "RHEL 9.3"
+    minor: 4
+    description: "RHEL 9.4"
     family: "Redhat"
     password_hash: "SHA256"
     organization: "{{ satellite_organization }}"
@@ -206,9 +156,9 @@ operating_systems:
         template_kind: "user_data"
 
   - name: "RedHat"
-    major: 7
-    minor: 9
-    description: "RHEL 7.9"
+    major: 9
+    minor: 5
+    description: "RHEL 9.5"
     family: "Redhat"
     password_hash: "SHA256"
     organization: "{{ satellite_organization }}"
@@ -216,6 +166,7 @@ operating_systems:
     state: "present"
     architectures:
       - "x86_64"
+      - "aarch64"
     provisioning_templates:
       - "Kickstart default"
       - "Kickstart default finish"

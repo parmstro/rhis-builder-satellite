@@ -32,7 +32,7 @@
   ansible.builtin.set_fact:
     must_sync_product: true
 
-- name: "Determine hours since last synchronization time"
+- name: "Determine hours since last synchronization time for {{ product_to_sync }}"
   when: last_sync_datetime
   ansible.builtin.set_fact:
     hours_since_sync: "{{ (now(utc=true) - (last_sync_datetime[:-4] | to_datetime)).seconds / 3600 | float }}"
@@ -54,7 +54,7 @@
   ansible.builtin.debug:
     msg: "We must sync the product {{ product_to_sync }}"
 
-- name: "Sync product"
+- name: "Sync product {{ product_to_sync }}"
   when:
     - must_sync_product
   redhat.satellite.repository_sync:

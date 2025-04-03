@@ -1,8 +1,11 @@
 ---
+
 # variables for a satellite installation
 
 ipa_server_fqdn: "{{ ipa_server_fqdn }}"
 foreman_proxy_realm_principal: "{{ foreman_proxy_realm_principal }}"
+dhcp_interface: "{{ ansible_facts.interfaces | select('match', '^(e)+') | list | first }}"
+
 
 sat_installer_verbose: true
 sat_installer_options:
@@ -41,21 +44,15 @@ sat_installer_options:
   - '--foreman-proxy-content-enable-file true'
   - '--foreman-proxy-content-enable-yum true'
   - '--foreman-proxy-plugin-discovery-install-images true'
-
-#  Currently this must be false - no plugin shipped in repos
+  - '--foreman-proxy-dhcp true'
+  - '--foreman-proxy-dhcp-interface "{{ dhcp_interface }}"'
+  - '--foreman-proxy-dhcp-range "192.168.140.100 192.168.140.254"'
+  - '--foreman-proxy-dhcp-gateway "192.168.140.1"'
+  - '--foreman-proxy-dhcp-nameservers "192.168.140.5"'
+  - '--foreman-proxy-dhcp-option-domain "[{{ satellite_domain }}]"'
+  - '--foreman-proxy-dhcp-pxeserver "192.168.140.12"'
+  - '--foreman-proxy-dhcp-network "192.168.140.0"'
+  - '--foreman-proxy-dhcp-netmask "255.255.252.0"'
 #  - '--foreman-proxy-content-enable-ostree false'
 #  - '--foreman-proxy-content-enable-python true'
-
 # when we are using Satellite as the dhcp server
-#  - '--foreman-proxy-dhcp: false'
-#  - '--foreman-proxy-dhcp-interface: "{{ ansible_facts.interfaces | select('match', '^(e)+') | list | first }}"'
-#  - '--foreman-proxy-dhcp-range: "192.168.140.1 192.168.140.254"'
-#  - '--foreman-proxy-dhcp-gateway: "192.168.140.1"'
-#  - '--foreman-proxy-dhcp-nameservers: "192.168.140.10"'
-#  - '--foreman-proxy-dhcp-option-domain: "[{{ satellite_domain }}]"'
-#  - '--foreman-proxy-dhcp-pxeserver: "{{ satellite_fqdn }}"'
-#  - '--foreman-proxy-dhcp-network: "192.168.140.0"'
-#  - '--foreman-proxy-dhcp-netmask: "255.255.252.0"'
-
-# when deploying Satellite < 6.15 add the following
-#  - '--foreman-proxy-content-enable-katello-agent false'

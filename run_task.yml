@@ -17,4 +17,4 @@
         file: "{{ vars_path }}"
 
     - name: "Run task - {{ task_name }}"
-      ansible.builtin.include_tasks: tasks/{{ test_task_name }}.yml
+      ansible.builtin.include_tasks: tasks/{{ task_name }}.yml

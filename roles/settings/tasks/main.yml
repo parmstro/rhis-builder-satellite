@@ -66,6 +66,19 @@
     - tags_satellite_settings
     - tags_satellite_settings_notification
 
+- name: "Configure the provisioning settings"
+  when: "settings_provisioning is defined"
+  ansible.builtin.include_tasks: "ensure_setting.yml"
+  loop: "{{ settings_provisioning }}"
+  loop_control:
+    loop_var: setting
+  no_log: true
+  tags:
+    - tags_rhisam
+    - tags_user
+    - tags_satellite_settings
+    - tags_satellite_settings_provisioning
+
 - name: "Configure the facts settings"
   when: "settings_facts is defined"
   ansible.builtin.include_tasks: "ensure_setting.yml"

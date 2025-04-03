@@ -65,15 +65,23 @@
         - tags_manifest
 
     - name: "Ensure Satellite manifest configuration"
-      ansible.builtin.import_role:
-        name: rex_kerberos
       when:
         - satellite_pre_use_idm
         - rex_kerberos_enabled
+      ansible.builtin.import_role:
+        name: rex_kerberos
       tags:
         - tags_rhisam
         - tags_basic_config
         - tags_rex_kerberos
+
+    - name: "Ensure content credentials configuration"
+      ansible.builtin.import_role:
+        name: content_credentials
+      tags:
+        - tags_content_config
+        - tags_redhat_repos
+        - tags_repository_sets
 
     - name: "Ensure repository sets configuration"
       ansible.builtin.import_role:
@@ -86,6 +94,14 @@
     - name: "Ensure custom products configuration"
       ansible.builtin.import_role:
         name: custom_products
+      tags:
+        - tags_content_config
+        - custom_repos
+        - tags_repositories
+
+    - name: "Ensure additional repository configuration"
+      ansible.builtin.import_role:
+        name: repositories
       tags:
         - tags_content_config
         - custom_repos
@@ -141,6 +157,13 @@
       tags:
         - tags_provisioning_config
         - tags_provisioning_templates
+
+    - name: "Synchronized satellite template repositories"
+      ansible.builtin.import_role:
+        name: templates_sync
+      tags:
+        - tags_provisioning_config
+        - tags_templates_sync
 
     - name: "Configure operating systems"
       ansible.builtin.import_role:

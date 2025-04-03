@@ -1,0 +1,17 @@
+satellite_template_repos:
+  - name: "rhis builder sample repo"
+    repo_url: "https://github.com/parmstro/rhis-builder-satellite-templates.git"
+    dirname: "satellite_templates"
+    branch: "main"
+    associate: "always"
+    force: "true"                    # force update of locked templates
+    locations: "['Default Location']"
+    organizations: "['Default Organization']"
+  - name: "theforeman offical report templates"
+    repo_url: "https://github.com/theforeman/foreman.git"
+    dirname: "app/views/unattended/report_templates"
+    branch: "3.14-stable"
+    associate: "new"
+    force: "false"                    # force update of locked templates
+    locations: "['Default Location']"
+    organizations: "['Default Organization']"
