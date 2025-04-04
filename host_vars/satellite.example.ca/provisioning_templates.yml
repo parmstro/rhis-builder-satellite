@@ -38,7 +38,7 @@ provisioning_templates:
     locations:
       - "{{ satellite_location }}"
 
-  - name: "soe_ifcfg_generic_interface"
+  - name: "soe_kickstart_ifcfg_generic_interface"
     type: "snippet"
     locked: false
     description: "Modified to support defined network zone"
