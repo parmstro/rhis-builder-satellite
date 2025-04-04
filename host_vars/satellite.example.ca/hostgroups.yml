@@ -3,7 +3,7 @@
 satellite_hostgroups:
   - name: "hg_x86_64_rhel8_vm"
     description: "RHEL 8 SOE vm hostgroup"
-    activation_keys: "SOE8"
+    activation_keys: "SOE8_dev"
     ansible_roles:
       - theforeman.foreman_scap_client
     architecture: "x86_64"
@@ -51,6 +51,7 @@ satellite_hostgroups:
   - name: "soe8_dev_wordpress"
     parent: "hg_x86_64_rhel8_vm/dev"
     description: "RHEL 8 SOE for WordPress site development vm"
+    activation_keys: "SOE8_dev_EPEL"
     content_view: "SOE8_EPEL"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -60,6 +61,7 @@ satellite_hostgroups:
   - name: "qa"
     parent: "hg_x86_64_rhel8_vm"
     description: "RHEL 8 SOE development vm hostgroup"
+    activation_keys: "SOE8_qa"
     content_view: "SOE8"
     operatingsystem: "RHEL 8.10"
     kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
@@ -70,6 +72,7 @@ satellite_hostgroups:
   - name: "soe8_qa_jboss"
     parent: "hg_x86_64_rhel8_vm/qa"
     description: "RHEL 8 SOE for JBoss development vm"
+    activation_keys: "SOE8_qa_JBoss"
     content_view: "SOE8_JBoss"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -88,6 +91,7 @@ satellite_hostgroups:
   - name: "soe8_qa_wordpress"
     parent: "hg_x86_64_rhel8_vm/qa"
     description: "RHEL 8 SOE for WordPress site development vm"
+    activation_keys: "SOE8_qa_EPEL"
     content_view: "SOE8_EPEL"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -96,7 +100,7 @@ satellite_hostgroups:
 
   - name: "hg_x86_64_rhel8_metal"
     description: "RHEL 8 SOE base hostgroup"
-    activation_keys: "SOE8"
+    activation_keys: "SOE8_dev"
     ansible_roles:
       - theforeman.foreman_scap_client
     architecture: "x86_64"
@@ -117,7 +121,7 @@ satellite_hostgroups:
 
   - name: "hg_x86_64_rhel9_vm"
     description: "RHEL 9 SOE vm hostgroup"
-    activation_keys: "SOE9"
+    activation_keys: "SOE9_dev"
     ansible_roles:
       - theforeman.foreman_scap_client
     architecture: "x86_64"
@@ -136,6 +140,7 @@ satellite_hostgroups:
   - name: "dev"
     parent: "hg_x86_64_rhel9_vm"
     description: "RHEL 9 SOE development vm hostgroup"
+    activation_keys: "SOE9_dev"
     content_view: "SOE9"
     operatingsystem: "RHEL 9.5"
     ptable: "RHEL_Server_CIS1"
@@ -147,6 +152,7 @@ satellite_hostgroups:
   - name: "soe9_dev_jboss"
     parent: "hg_x86_64_rhel9_vm/dev"
     description: "RHEL 9 SOE for JBoss development vm"
+    activation_keys: "SOE9_dev_JBoss"
     content_view: "SOE9_JBoss"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -165,6 +171,7 @@ satellite_hostgroups:
   - name: "soe9_dev_wordpress"
     parent: "hg_x86_64_rhel9_vm/dev"
     description: "RHEL 8 SOE for WordPress site development vm"
+    activation_keys: "SOE9_dev_EPEL"
     content_view: "SOE9_EPEL"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -174,6 +181,7 @@ satellite_hostgroups:
   - name: "qa"
     parent: "hg_x86_64_rhel9_vm"
     description: "RHEL 9 SOE qualification vm hostgroup"
+    activation_keys: "SOE9_qa"
     content_view: "SOE9"
     operatingsystem: "RHEL 9.5"
     ptable: "RHEL_Server_CIS1"
@@ -184,6 +192,7 @@ satellite_hostgroups:
   - name: "soe9_qa_jboss"
     parent: "hg_x86_64_rhel9_vm/qa"
     description: "RHEL 9 SOE for JBoss qualification vm"
+    activation_keys: "SOE9_qa_JBoss"
     content_view: "SOE9_JBoss"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -202,6 +211,7 @@ satellite_hostgroups:
   - name: "soe9_qa_wordpress"
     parent: "hg_x86_64_rhel9_vm/qa"
     description: "RHEL 8 SOE for WordPress site qualification vm"
+    activation_keys: "SOE9_qa_EPEL"
     content_view: "SOE9_EPEL"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -210,7 +220,7 @@ satellite_hostgroups:
 
   - name: "hg_x86_64_rhel9_metal"
     description: "RHEL 9 SOE baremetal hostgroup"
-    activation_keys: "SOE9"
+    activation_keys: "SOE9_dev"
     ansible_roles:
       - theforeman.foreman_scap_client
     architecture: "x86_64"
