@@ -10,23 +10,19 @@ os_family: Redhat
 
 zerombr
 clearpart --all
- 
-<% if @host.provider.downcase == 'vmware' %>
-part /boot --fstype ext4 --size=1024 --ondisk=sda
-part pv.01 --size=1 --grow --ondisk=sda
-<% end -%>
 
-<% if @host.provider.downcase == 'rhv' %>
-part /boot --fstype ext4 --size=1024 --ondisk=vda
-part pv.01 --size=1 --grow --ondisk=vda
+part /boot --fstype ext4 --size=1024 --ondisk=<%= host_param('boot_disk') %>
+part /boot/efi --fstype="efi" --size=2048 --ondisk=<%= host_param('boot_disk') %>
+part pv.01 --size=1 --grow --ondisk=<%= host_param('root_disk') %>
+<% pvs = [] -%>
+<% if host_param('additional_disks') -%>
+<% host_param('additional_disks').each do |disk| -%>
+part pv.<%= disk[-3,3] %> --size=1 --grow --ondisk=<%= disk %>
+<% pvs.push("pv." + disk[-3,3]) -%>
 <% end -%>
+<% end %>
 
-<% if @host.provider.downcase == 'baremetal' %>
-part /boot --fstype ext4 --size=1024 --ondisk=sda
-part pv.01 --size=1 --grow --ondisk=sda
-<% end -%>
-
-volgroup vg_root pv.01
+volgroup vg_root pv.01 <%= pvs.join(' ') %>
 logvol swap --recommended --vgname=vg_root --name=lv_swap
 logvol /tmp  --vgname=vg_root --size=4096 --name=lv_tmp --fstype=xfs
 logvol /  --vgname=vg_root --size=32768 --name=lv_root --fstype=xfs

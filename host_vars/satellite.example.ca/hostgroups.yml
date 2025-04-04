@@ -19,6 +19,15 @@ satellite_hostgroups:
     realm: "{{ satellite_domain | upper }}"
     subnet: "example.ca"
     root_pass: "{{ satellite_admin_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/sda"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/sda"
 
   - name: "dev"
     parent: "hg_x86_64_rhel8_vm"
@@ -118,6 +127,15 @@ satellite_hostgroups:
     realm: "{{ satellite_domain | upper }}"
     subnet: "example.ca"
     root_pass: "{{ satellite_admin_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
 
   - name: "hg_x86_64_rhel9_vm"
     description: "RHEL 9 SOE vm hostgroup"
@@ -136,6 +154,15 @@ satellite_hostgroups:
     realm: "{{ satellite_domain | upper }}"
     subnet: "example.ca"
     root_pass: "{{ satellite_admin_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/sda"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/sda"
 
   - name: "dev"
     parent: "hg_x86_64_rhel9_vm"
@@ -238,6 +265,15 @@ satellite_hostgroups:
     realm: "{{ satellite_domain | upper }}"
     subnet: "example.ca"
     root_pass: "{{ satellite_admin_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
 
   - name: "soe8_dev_cis2"
     parent: "hg_x86_64_rhel8_vm/dev"

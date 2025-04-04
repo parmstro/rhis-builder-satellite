@@ -46,16 +46,16 @@ part raid.22 --fstype="mdmember"  --size=1 --grow --ondisk=vdb
 
 <% if @host.provider.downcase == 'baremetal' %>
 
-ignoredisk --only-use=sda,sdb
+ignoredisk --only-use={{ host.boot_disk }},{{ host.boot_disk_mirror }}
 ## partitions for /boot
-part raid.01 --fstype="mdmember" --size=1024 --ondisk=sda
-part raid.02 --fstype="mdmember" --size=1024 --ondisk=sdb
+part raid.01 --fstype="mdmember" --size=1024 --ondisk={{ host.boot_disk }}
+part raid.02 --fstype="mdmember" --size=1024 --ondisk={{ host.boot_disk_mirror }}
 ## partitions for /boot/efi
-part raid.11 --fstype="mdmember" --size=1024 --ondisk=sda
-part raid.12 --fstype="mdmember"  --size=1024 --ondisk=sdb
+part raid.11 --fstype="mdmember" --size=1024 --ondisk={{ host.boot_disk }}
+part raid.12 --fstype="mdmember"  --size=1024 --ondisk={{ host.boot_disk_mirror }}
 ## partitions for /
-part raid.21 --fstype="mdmember"  --size=1 --grow --ondisk=sda
-part raid.22 --fstype="mdmember"  --size=1 --grow --ondisk=sdb
+part raid.21 --fstype="mdmember"  --size=1 --grow --ondisk={{ host.root_disk }}
+part raid.22 --fstype="mdmember"  --size=1 --grow --ondisk={{ host.root_disk_mirror }}
 
 <% end -%>
 
@@ -64,11 +64,21 @@ raid /boot --level=RAID1 --fstype="xfs" --device=boot --label=rhel8-boot raid.01
 raid /boot/efi --level=RAID1 --device=boot-efi --label=gpt --fstype="efi" --fsoptions="umask=0077,shortname=winnt" raid.11 raid.12
 ## create encrypted device for root disk
 raid pv.42 --level=RAID1 --fstype="lvmpv" --device=root --label=rhel8-root raid.21 raid.22 --encrypted --passphrase <%= host_param('default_passphrase') %>
+<% pvs = [] -%>
+<% if host_param('additional_disks') -%>
+<% host_param('additional_disks').each do |disk| -%>
+part pv.<%= disk[-3,3] %> --size=1 --grow --ondisk=<%= disk %> --encrypted --passphrase <%= host_param('default_passphrase') %>
+<% pvs.push("pv." + disk[-3,3]) -%>
+<% end -%>
+<% end %>
 
 ## create a CIS2 (or similar) volume layout
 ## the CIS2 layout is created for required volumes and sizes
 ## var is allowed to consume the remaining space up to 400GB, this can be extend further post deployment
-volgroup vg_root --pesize=4096 pv.42
+
+volgroup vg_root --pesize=4096 pv.42 
+volgroup vg_data --pesize=4096 <%= pvs.join(' ') %>
+
 logvol swap           --vgname=vg_root --name=lv_swap --recommended
 logvol /tmp           --vgname=vg_root --fstype=xfs --name=lv_tmp       --size=2048
 logvol /var/tmp       --vgname=vg_root --fstype=xfs --name=lv_var_tmp   --size=2048
