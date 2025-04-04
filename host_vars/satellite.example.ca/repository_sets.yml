@@ -77,11 +77,18 @@ repository_sets:
   - name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
 
-
-# Ansible Automation Platform 2.4
-  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 8 x86_64 (Files)"
+# Ansible Automation Platform 2.4 and 2.5
+  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (Files)"
     product: "Red Hat Ansible Automation Platform"
 
+  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Ansible Automation Platform"
+
+  - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 (Files)"
+    product: "Red Hat Ansible Automation Platform"
+
+  - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Ansible Automation Platform"
 
 # Satellite 6.16
   - name: "Red Hat Satellite Capsule 6.16 for RHEL 8 x86_64 (RPMs)"
@@ -93,6 +100,9 @@ repository_sets:
 
 # JBoss Repos Needed for the JBoss server pipeline
   - name: "JBoss Enterprise Application Platform 7.4 (RHEL 8) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+  - name: "JBoss Enterprise Application Platform 7.4 (RHEL 9) (RPMs)"
     product: "JBoss Enterprise Application Platform"
 
 # These repos are not necessarily needed for the default SOE test-destroy pipeline,
@@ -140,7 +150,7 @@ repository_sets:
   - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
     product: "Red Hat Ansible Engine"
 
-# RHEL 8.8 repos for LEAPP
+# RHEL 8.10 repos for LEAPP
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
@@ -156,7 +166,7 @@ repository_sets:
     repository_list:
       - releasever: "8.10"
 
-# RHEL9.2 repos for LEAPP_8_2_9
+# RHEL9.4 repos for LEAPP_8_2_9
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
@@ -214,3 +224,10 @@ repository_sets:
     product: "Red Hat Enterprise Linux High Availability for x86_64"
     repository_list:
       - releasever: "9"
+
+# Please see custom products for:
+# CentOS79
+# CentOS9
+# OEL79
+# convert2rhel
+# mssqlserver2022

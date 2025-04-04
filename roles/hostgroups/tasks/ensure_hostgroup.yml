@@ -27,7 +27,7 @@
     medium: "{{ satellite_hostgroup.medium | default(omit) }}"
     openscap_proxy: "{{ satellite_hostgroup.openscap_capsule | default(omit) }}"
     operatingsystem: "{{ satellite_hostgroup.operatingsystem | default(omit) }}"
-    organization: "{{ satellite_hostgroup.organization }}"
+    organization: "{{ satellite_hostgroup.organization | default(omit) }}"
     organizations: "{{ satellite_hostgroup.organizations | default(omit) }}"
     parameters: "{{ satellite_hostgroup.parameters | default(omit) }}"
     ptable: "{{ satellite_hostgroup.ptable | default(omit) }}"
