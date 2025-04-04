@@ -27,13 +27,13 @@ satellite_repositories:
   - name: "CentOS79"
     product: "CentOS79"
     content_type: "yum"
-    gpg_key: "CentOS7GPG"
+    gpg_key: "CentOS79GPG"
     download_policy: "on_demand"
     unprotected: false
   - name: "updates"
     product: "CentOS79"
     content_type: "yum"
-    gpg_key: "CentOS7GPG"
+    gpg_key: "CentOS79GPG"
     download_policy: "on_demand"
     unprotected: false
   - name: "centos-9-appstream"
