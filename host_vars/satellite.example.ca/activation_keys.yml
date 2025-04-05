@@ -188,6 +188,48 @@ activation_keys:
     lifecycle_environment: "Production"
     unlimited_hosts: true
 
+  - name: "SOE9_dev_JBoss"
+    state: "present"
+    description: "Activate a RHEL9 SOE9_JBoss system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_JBoss"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "SOE9_qa_JBoss"
+    state: "present"
+    description: "Activate a RHEL9 SOE9_JBoss system in qualification"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_JBoss"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE9_prod_JBoss"
+    state: "present"
+    description: "Activate a RHEL9 SOE9_JBoss system in production"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_JBoss"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
   - name: "SOE7"
     state: "present"
     description: "Activate a RHEL 7 system in development"
