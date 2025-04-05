@@ -764,7 +764,7 @@ composite_content_views:
     components:
       - content_view: "SOE8"
         latest: true
-      - content_view: "JBossEAP74"
+      - content_view: "JBoss8EAP74"
         latest: true
     environments:
       - "Library"
@@ -780,7 +780,7 @@ composite_content_views:
     components:
       - content_view: "SOE9"
         latest: true
-      - content_view: "JBossEAP74"
+      - content_view: "JBoss9EAP74"
         latest: true
     environments:
       - "Library"
