@@ -10,4 +10,4 @@ discovery_rules:
     locations: "{{ satellite_location }}"
     search: 'disk_count = 2 and memory > 32000 and facts.interfaces ~ "*,*,*,*"'
     priority: 20
-    hostgroup: "RHEL9base/RHEL9_CIS2"
+    hostgroup: "hg_x86_64_rhel9_metal"
