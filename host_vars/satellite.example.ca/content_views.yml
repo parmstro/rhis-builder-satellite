@@ -676,6 +676,7 @@ composite_content_views:
       - "Library"
       - "Development"
       - "Qualification"
+      - "Production"
 
   - name: "SOE9_EPEL"
     desc: "SOE for RHEL9 with EPEL9"
@@ -691,6 +692,7 @@ composite_content_views:
       - "Library"
       - "Development"
       - "Qualification"
+      - "Production"
 
   - name: "convert_CentOS2RHEL7"
     desc: "convert2RHEL content for CentOS 7.9 to RHEL 7.9"
