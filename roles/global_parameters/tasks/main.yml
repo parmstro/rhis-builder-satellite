@@ -3,7 +3,7 @@
 # Optional parameters can be added for your usecases
 
 - name: "Configuring the global parameters"
-  when: "global_parameters is defined"
+  when: global_parameters is defined and (global_parameters | length) > 0
   ansible.builtin.include_tasks: "ensure_global_parameter.yml"
   loop: "{{ global_parameters }}"
   loop_control:

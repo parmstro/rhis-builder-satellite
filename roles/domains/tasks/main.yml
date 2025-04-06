@@ -1,7 +1,7 @@
 ---
 
 - name: "Configure the rhisam domains"
-  when: "satellite_domains is defined"
+  when: satellite_domains is defined and (satellite_domains | length) > 0
   ansible.builtin.include_tasks: "ensure_domain.yml"
   loop: "{{ satellite_domains }}"
   loop_control:

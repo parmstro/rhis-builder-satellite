@@ -2,7 +2,7 @@
 # Configure the rhisam and user identity management or AD realms
 
 - name: "Ensure the configuration for realms"
-  when: "satellite_realms is defined"
+  when: satellite_realms is defined and (satellite_realms | length) > 0
   ansible.builtin.include_tasks: "ensure_realm.yml"
   loop: "{{ satellite_realms }}"
   loop_control:

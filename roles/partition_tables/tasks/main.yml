@@ -2,7 +2,7 @@
 
 # This task configures the rhisam partition tables
 - name: "Ensure the state of the specified partition tables."
-  when: "partition_tables is defined"
+  when: partition_tables is defined and (partition_tables | length) > 0
   ansible.builtin.include_tasks: "ensure_ptable.yml"
   loop: "{{ partition_tables }}"
   loop_control:

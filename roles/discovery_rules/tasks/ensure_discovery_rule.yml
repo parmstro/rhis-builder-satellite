@@ -4,8 +4,9 @@
 
 - name: "Ensure discovery rule state for - {{ discovery_rule.name }}"
   redhat.satellite.discovery_rule:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     organizations: "{{ discovery_rule.organizations | default(omit) }}"

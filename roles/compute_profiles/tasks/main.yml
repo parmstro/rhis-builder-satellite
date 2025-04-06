@@ -2,7 +2,7 @@
 # Configure the rhisam and user compute profiles
 
 - name: "Configure the compute profiles"
-  when: "compute_profiles is defined"
+  when: compute_profiles is defined and (compute_profiles | length) > 0
   ansible.builtin.include_tasks: "ensure_compute_profile.yml"
   loop: "{{ compute_profiles }}"
   loop_control:

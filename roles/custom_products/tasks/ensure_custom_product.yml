@@ -5,8 +5,9 @@
 
 - name: "Ensure custom product - {{ custom_product.name }}"
   redhat.satellite.product:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
@@ -15,9 +16,9 @@
 
 
 - name: "Ensure the state the repositories required for the custom product."
+  when: custom_product.repositories is defined and (custom_product.repositories | length) > 0
   ansible.builtin.include_tasks: "ensure_custom_product_repo.yml"
   loop: "{{ custom_product.repositories }}"
   loop_control:
     loop_var: custom_product_repository
   no_log: true
-  when: "custom_product.repositories is defined"

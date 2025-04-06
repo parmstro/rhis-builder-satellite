@@ -9,8 +9,9 @@
 
 - name: "Get the product info"
   redhat.satellite.resource_info:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
@@ -58,8 +59,9 @@
   when:
     - must_sync_product
   redhat.satellite.repository_sync:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"

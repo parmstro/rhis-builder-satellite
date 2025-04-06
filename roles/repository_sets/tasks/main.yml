@@ -2,7 +2,7 @@
 # Configure the rhisam and user repositories
 
 - name: "Ensure the state of repository sets"
-  when: "repository_sets is defined"
+  when: repository_sets is defined and (repository_sets | length) > 0
   ansible.builtin.include_tasks: "ensure_repository_set.yml"
   loop: "{{ repository_sets }}"
   loop_control:

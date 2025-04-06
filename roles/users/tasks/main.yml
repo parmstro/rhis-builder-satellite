@@ -1,7 +1,7 @@
 ---
 
 - name: "Ensure the users for the rhisam configuration"
-  when: "satellite_users is defined"
+  when: satellite_users is defined and (satellite_users | length) > 0
   ansible.builtin.include_tasks: "ensure_user.yml"
   loop: "{{ satellite_users }}"
   loop_control:

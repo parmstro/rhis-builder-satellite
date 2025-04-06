@@ -1,7 +1,7 @@
 ---
 
 - name: "Ensure the user groups configuration"
-  when: "satellite_user_groups is defined"
+  when: satellite_user_groups is defined and (satellite_user_groups | length) > 0
   ansible.builtin.include_tasks: "ensure_user_group.yml"
   loop: "{{ satellite_user_groups }}"
   loop_control:

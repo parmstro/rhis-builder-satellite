@@ -7,7 +7,7 @@
 # these occurences should be rare.
 
 - name: "Ensure the state of the provisioning templates"
-  when: "provisioning_templates is defined"
+  when: provisioning_templates is defined and (provisioning_templates | length) > 0
   ansible.builtin.include_tasks: "ensure_provisioning_template.yml"
   loop: "{{ provisioning_templates }}"
   loop_control:

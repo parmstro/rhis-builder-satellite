@@ -5,11 +5,12 @@
 
 - name: "Get the organization_id for: {{ virtwho_config.foreman_virt_who_configure_config.organization_name }}"
   redhat.satellite.organization_info:
-    name: "{{ virtwho_config.foreman_virt_who_configure_config.organization_name }}"
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    name: "{{ virtwho_config.foreman_virt_who_configure_config.organization_name }}"
   register: org_info
   no_log: true
 

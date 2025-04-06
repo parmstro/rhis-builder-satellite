@@ -2,7 +2,7 @@
 # Configure the rhisam and user compute resources
 
 - name: "Configure the compute resources."
-  when: "compute_resources is defined"
+  when: compute_resources is defined and (compute_resources | length) > 0
   ansible.builtin.include_tasks: "ensure_compute_resource.yml"
   loop: "{{ compute_resources }}"
   loop_control:

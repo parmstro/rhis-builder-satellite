@@ -1,9 +1,11 @@
 ---
+
 # This play creates an individual content view from specified paramters
 - name: "Ensure the state of content view - {{ content_view.name }}"
   redhat.satellite.content_view:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
@@ -14,7 +16,7 @@
 
 # Add the filters
 - name: "Configure the filters for the Content View - {{ content_view.name }}"
-  when: "content_view.filters is defined"
+  when: content_view.filters is defined and (content_view.filters | length) > 0
   ansible.builtin.include_tasks: "create_cv_filter.yml"
   loop: "{{ content_view.filters }}"
   loop_control:

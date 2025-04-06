@@ -1,17 +1,18 @@
 ---
 # This task ensures the operating_system state
 
-- name: "Ensure existence of Operating System - {{ operating_system.name }}"
+- name: "Ensure existence of Operating System - {{ operating_system.description }}"
   redhat.satellite.operatingsystem:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     name: "{{ operating_system.name }}"
-    description: "{{ operating_system.description }}"
+    description: "{{ operating_system.description | default(omit) }}"
     family: "{{ operating_system.family }}"
     major: "{{ operating_system.major }}"
-    minor: "{{ operating_system.minor }}"
+    minor: "{{ operating_system.minor | default(omit) }}"
     media: "{{ operating_system.media | default(omit) }}"
     password_hash: "{{ operating_system.password_hash }}"
     parameters: "{{ operating_system.parameters | default(omit) }}"
@@ -21,8 +22,9 @@
     state: "{{ operating_system.state | default(omit) }}"
 
 - name: "Set the default templates"
+  when: operating_system.default_templates is defined and (operating_system.default_templates | length) > 0
   ansible.builtin.include_tasks: "ensure_operating_system_default_template.yml"
   loop: "{{ operating_system.default_templates }}"
   loop_control:
     loop_var: "default_template"
-  when: "operating_system.default_templates is defined"
+  no_log: false

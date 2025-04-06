@@ -4,10 +4,11 @@
 # it can be used to change the location of where the system gets content. e.g. alternate content source
 # see: repository_url
 
-- name: "Ensure state of the subscription manifest"
+- name: "Ensure state of the subscription manifest - {{ subscription_manifest.organization }}"
   redhat.satellite.subscription_manifest:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     organization: "{{ subscription_manifest.organization }}"

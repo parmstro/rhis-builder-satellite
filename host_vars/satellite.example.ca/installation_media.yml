@@ -6,9 +6,16 @@
 # This is an example of web based media.
 # a server installing with this media needs internet access to the specified path/url
 
-media:
+installation_media:
   - name: "CentOS 7 mirror"
     os_family: "Redhat"
     path: "http://vault.centos.org/7.9.2009/os/x86_64/"
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+
+# for demo only - there is not publicly available kickstart tree - copy dvd locally and extract
+  - name: "OEL79"
+    os_family: "Redhat"
+    path: "http://sat6.parmstrong.ca/pub/.oel79"
     organization: "{{ satellite_organization }}"
     location: "{{ satellite_location }}"

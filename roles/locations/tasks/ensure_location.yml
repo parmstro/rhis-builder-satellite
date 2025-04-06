@@ -1,9 +1,10 @@
 ---
 
-- name: "Ensure the location configuration"
+- name: "Ensure the location configuration for location - {{ satellite_location.name }}"
   redhat.satellite.location:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     state: "{{ satellite_location.state | default(omit) }}"

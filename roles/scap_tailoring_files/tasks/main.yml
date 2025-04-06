@@ -1,7 +1,7 @@
 ---
 
 - name: "Ensure the SCAP tailoring files are configured"
-  when: "scap_tailoring_files is defined"
+  when: scap_tailoring_files is defined and (scap_tailoring_files | length) > 0
   ansible.builtin.include_tasks: "ensure_scap_tailoring_file.yml"
   loop: "{{ scap_tailoring_files }}"
   loop_control:

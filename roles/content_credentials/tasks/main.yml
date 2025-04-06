@@ -2,7 +2,7 @@
 
 
 - name: "Ensure the state of the specified content_credentials"
-  when: "content_credentials is defined"
+  when: content_credentials is defined and (content_credentials | length) > 0
   ansible.builtin.include_tasks: "ensure_content_credential.yml"
   loop: "{{ content_credentials }}"
   loop_control:

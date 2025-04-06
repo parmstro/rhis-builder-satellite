@@ -1,9 +1,10 @@
 ---
 
-- name: "Ensure the satellite_subnet configuration"
+- name: "Ensure the satellite_subnet configuration for - {{ satellite_subnet.name }}"
   redhat.satellite.subnet:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     organizations: "{{ satellite_subnet.organizations }}"

@@ -2,7 +2,7 @@
 # Configure the list of settings.
 
 - name: "Configure the general settings"
-  when: "settings_general is defined"
+  when: settings_general is defined and (settings_general | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_general }}"
   loop_control:
@@ -10,12 +10,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_general
 
 - name: "Configure the rhcloud settings"
-  when: "settings_rhcloud is defined"
+  when: settings_rhcloud is defined and (settings_rhcloud | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_rhcloud }}"
   loop_control:
@@ -23,12 +22,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_rhcloud
 
 - name: "Configure the authentication settings"
-  when: "settings_authentication is defined"
+  when: settings_authentication is defined and (settings_authentication | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_authentication }}"
   loop_control:
@@ -36,12 +34,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_authentication
 
 - name: "Configure the email settings"
-  when: "settings_email is defined"
+  when: settings_email is defined and (settings_email | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_email }}"
   loop_control:
@@ -49,12 +46,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_email
 
 - name: "Configure the notification settings"
-  when: "settings_notification is defined"
+  when: settings_notification is defined and (settings_notification | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_notification }}"
   loop_control:
@@ -62,12 +58,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_notification
 
 - name: "Configure the provisioning settings"
-  when: "settings_provisioning is defined"
+  when: settings_provisioning is defined and (settings_provisioning | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_provisioning }}"
   loop_control:
@@ -75,12 +70,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_provisioning
 
 - name: "Configure the facts settings"
-  when: "settings_facts is defined"
+  when: settings_facts is defined and (settings_facts | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_facts }}"
   loop_control:
@@ -88,12 +82,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_facts
 
 - name: "Configure the config_management settings"
-  when: "settings_config_management is defined"
+  when: settings_config_management is defined and (settings_config_management | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_config_management }}"
   loop_control:
@@ -101,12 +94,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_config_management
 
 - name: "Configure the tasks settings"
-  when: "settings_tasks is defined"
+  when: settings_tasks is defined and (settings_tasks | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_tasks }}"
   loop_control:
@@ -114,12 +106,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_tasks
 
 - name: "Configure the remote_execution settings"
-  when: "settings_remote_execution is defined"
+  when: settings_remote_execution is defined and (settings_remote_execution | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_remote_execution }}"
   loop_control:
@@ -127,12 +118,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_remote_execution
 
 - name: "Configure the ansible settings"
-  when: "settings_ansible is defined"
+  when: settings_ansible is defined and (settings_ansible | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_ansible }}"
   loop_control:
@@ -140,12 +130,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_ansible
 
 - name: "Configure the content settings"
-  when: "settings_content is defined"
+  when: settings_content is defined and (settings_content | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_content }}"
   loop_control:
@@ -153,12 +142,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_content
 
 - name: "Configure the boot_disk settings"
-  when: "settings_boot_disk is defined"
+  when: settings_boot_disk is defined and (settings_boot_disk | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_boot_disk }}"
   loop_control:
@@ -166,12 +154,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_boot_disk
 
 - name: "Configure the discovery settings"
-  when: "settings_discovery is defined"
+  when: settings_discovery is defined and (settings_discovery | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_discovery }}"
   loop_control:
@@ -179,12 +166,11 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_discovery
 
 - name: "Configure the template_sync settings"
-  when: "settings_template_sync is defined"
+  when: settings_template_sync is defined and (settings_template_sync | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
   loop: "{{ settings_template_sync }}"
   loop_control:
@@ -192,6 +178,5 @@
   no_log: true
   tags:
     - tags_rhisam
-    - tags_user
     - tags_satellite_settings
     - tags_satellite_settings_template_sync

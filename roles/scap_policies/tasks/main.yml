@@ -2,7 +2,7 @@
 # Ensure the SCAP policy configuation
 
 - name: "Ensure the scap policies configuration"
-  when: "scap_policies is defined"
+  when: scap_policies is defined and (scap_policies | length) > 0
   ansible.builtin.include_tasks: "ensure_scap_policy.yml"
   loop: "{{ scap_policies }}"
   loop_control:

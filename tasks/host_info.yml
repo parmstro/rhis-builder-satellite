@@ -2,8 +2,9 @@
 # Get host info
 - name: "Show a host"
   redhat.satellite.host_info:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     name: "{{ host.fqdn }}"
   register: host_info

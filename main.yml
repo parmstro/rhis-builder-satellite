@@ -137,12 +137,12 @@
 
 #    We are currently ensuring sync'd content for media
 #    Satellite automatically creates the media when kickstart trees are added.
-    # - name: "Configure OS media"
-    #   ansible.builtin.import_role:
-    #     name: "media"
-    #   tags:
-    #     - tags_provisioning_config
-    #     - tags_media
+    - name: "Configure OS media"
+      ansible.builtin.import_role:
+        name: "installation_media"
+      tags:
+        - tags_provisioning_config
+        - tags_media
 
     - name: "Configure partition tables"
       ansible.builtin.import_role:

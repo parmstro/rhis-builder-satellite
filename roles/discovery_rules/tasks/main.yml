@@ -2,7 +2,7 @@
 # This task configures the rhisam discovery rules
 #
 - name: "Ensure the state of discovery rules"
-  when: "discovery_rules is defined"
+  when: discovery_rules is defined and (discovery_rules | length) > 0
   ansible.builtin.include_tasks: "ensure_discovery_rule.yml"
   loop: "{{ discovery_rules }}"
   loop_control:

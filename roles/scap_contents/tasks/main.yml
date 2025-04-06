@@ -1,7 +1,7 @@
 ---
 
 - name: "Ensure the configuration of SCAP content"
-  when: "scap_contents is defined"
+  when: scap_contents is defined and (scap_contents | length) > 0
   ansible.builtin.include_tasks: "ensure_scap_content.yml"
   loop: "{{ scap_contents }}"
   loop_control:

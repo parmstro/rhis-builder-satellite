@@ -8,10 +8,11 @@
     group: root
     mode: "0644"
 
-- name: "Ensure the scap tailoring file is loaded"
+- name: "Ensure the scap tailoring file state for - {{ scap_tailoring_file.name }}"
   redhat.satellite.scap_tailoring_file:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     name: "{{ scap_tailoring_file.name }}"

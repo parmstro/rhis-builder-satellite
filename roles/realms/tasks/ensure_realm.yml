@@ -3,8 +3,9 @@
 
 - name: "Ensure the state of the realm - {{ satellite_realm.name }}"
   redhat.satellite.realm:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     organizations: "{{ satellite_realm.organizations }}"

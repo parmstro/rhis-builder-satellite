@@ -1,0 +1,15 @@
+---
+
+# Ensure the state of the defined media .
+
+- name: "Ensure the state of installation media"
+  when: installation_media is defined and (installation_media | length) > 0
+  ansible.builtin.include_tasks: "ensure_installation_medium.yml"
+  loop: "{{ installation_media }}"
+  loop_control:
+    loop_var: "installation_medium"
+  no_log: true
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_installation_media

@@ -3,7 +3,7 @@
 # Configure the satellite hostgroup specs
 
 - name: "Ensure the state of the rhisam hostgroups"
-  when: "satellite_hostgroups is defined"
+  when: satellite_hostgroups is defined and (satellite_hostgroups | length) > 0
   ansible.builtin.include_tasks: "ensure_hostgroup.yml"
   loop: "{{ satellite_hostgroups }}"
   loop_control:

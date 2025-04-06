@@ -1,7 +1,7 @@
 ---
 
 - name: "Ensure the external user groups for the rhisam configuration"
-  when: "satellite_user_groups_external is defined"
+  when: satellite_user_groups_external is defined and (satellite_user_groups_external | length) > 0
   ansible.builtin.include_tasks: "ensure_user_group_external.yml"
   loop: "{{ satellite_user_groups_external }}"
   loop_control:

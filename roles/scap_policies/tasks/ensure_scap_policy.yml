@@ -7,10 +7,11 @@
     msg: "Not implemented"
 
 
-# - name: "Ensure the scap policy is mapped"
+# - name: "Ensure the scap policy state for - {{ scap_policy.name }}"
 #  redhat.satellite.scap_policy:
-#    username: "{{ satellite_admin_username }}"
-#    password: "{{ satellite_admin_password }}"
+#    username: "{{ satellite_admin_username | default(omit) }}"
+#    password: "{{ satellite_admin_password | default(omit) }}"
+#    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
 #    server_url: "{{ satellite_url }}"
 #    validate_certs: "{{ satellite_validate_certs }}"
 #    name: "{{ scap_policy.name }}"

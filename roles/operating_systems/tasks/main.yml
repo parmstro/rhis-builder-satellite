@@ -3,7 +3,7 @@
 # Ensure the state of the defined rhisam and user operating systems.
 
 - name: "Ensure the state of operating systems."
-  when: "operating_systems is defined"
+  when: operating_systems is defined and (operating_systems | length) > 0
   ansible.builtin.include_tasks: "ensure_operating_system.yml"
   loop: "{{ operating_systems }}"
   loop_control:

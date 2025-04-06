@@ -9,14 +9,13 @@
 # your server
 
 - name: "Ensure the state of the specified custom products."
-  when: "custom_products is defined"
+  when: custom_products is defined and (custom_products | length) > 0
   ansible.builtin.include_tasks: "ensure_custom_product.yml"
   loop: "{{ custom_products }}"
   loop_control:
     loop_var: custom_product
   no_log: true
   tags:
-    - tags_user
     - tags_rhisam
     - tags_content_management
     - tags_custom_products
