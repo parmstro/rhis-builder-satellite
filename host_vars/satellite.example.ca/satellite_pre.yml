@@ -1,7 +1,13 @@
 ---
 
-async_timeout: 3600
+async_timeout: 14400
 async_delay: 60
+
+# disable transparent huge pages
+# install tuned, create a tuned profile
+
+apply_standard_tuning: true
+
 
 # prerequisites
 cdn_organization_id: "{{ cdn_organization_id_vault }}"

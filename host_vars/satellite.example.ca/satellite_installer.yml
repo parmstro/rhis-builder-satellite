@@ -5,11 +5,19 @@
 ipa_server_fqdn: "{{ ipa_server_fqdn }}"
 foreman_proxy_realm_principal: "{{ foreman_proxy_realm_principal }}"
 dhcp_interface: "{{ ansible_facts.interfaces | select('match', '^(e)+') | list | first }}"
-
+satellite_tuning_size: "default"  # up to 5000 hosts   20 GiB RAM   4 Cores
+# satellite_tuning_size: "medium"   # up to 10000 hosts   32 GiB RAM   requires minimum 8 Cores
+# satellite_tuning_size: "large"     # up to 20000 hosts   64 GiB RAM  requires minimum  16 Cores
+# satellite_tuning_size: "extra-large"   # up to 60000 hosts   128 GiB RAM  requires minimum  32 Cores
+# satellite_tuning_size: "extra-extra-large"   # 60000+ hosts   256 GiB+ RAM  requires minimum 64+ Cores
 
 sat_installer_verbose: true
 sat_installer_options:
   - '--skip-checks-i-know-better'
+  - '--foreman-foreman-service-puma-threads-min=16'  # recommended for every performance profile
+  - '--foreman-foreman-service-puma-threads-max=16'  # recommended for every performance profile
+  - '--foreman-foreman-service-puma-workers=4'       # recommended for minimum add 4 workers for each tuning size increase
+  - '--foreman-dynflow-worker-instances 3'           # this is good for initial build as we want sync performance
   - '--foreman-initial-organization "{{ satellite_initial_organization }}"'
   - '--foreman-initial-location "{{ satellite_initial_location }}"'
   - '--foreman-initial-admin-username "{{ satellite_admin_username }}"'
@@ -17,6 +25,7 @@ sat_installer_options:
   - '--foreman-initial-admin-email "{{ satellite_admin_email }}"'
   - '--foreman-initial-admin-first-name  "Satellite"'
   - '--foreman-initial-admin-last-name  "Administrator"'
+  - '--tuning "{{ satellite_tuning_size }}"'
   - '--foreman-ipa-authentication true'
   - '--certs-server-ca-cert "/etc/ipa/ca.crt"'
   - '--certs-server-cert "/etc/ipa/private/{{ satellite_fqdn }}/{{ satellite_fqdn }}.crt"'

@@ -41,6 +41,13 @@
         - tags_phase_3
         - tags_satellite_install
 
+    - name: "Apply role of satellite_post to {{ ansible_fqdn }}"
+      ansible.builtin.include_role:
+        name: satellite_post
+      tags:
+        - tags_phase_3
+        - tags_satellite_post
+
     - name: "Ensure hammer configuration"
       ansible.builtin.import_tasks: "tasks/configure_hammer.yml"
       tags:
