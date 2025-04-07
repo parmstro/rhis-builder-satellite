@@ -1,0 +1,48 @@
+---
+
+- name: "Set the base url for status"
+  ansible.builtin.set_fact:
+    sync_status_base_url: "{{ satellite_url }}katello/api/repositories"
+
+- name: "Get the repository info"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    resource: repositories
+    search: 'name = "{{ repo_name }}"'
+  register: repo_info
+
+- name: "Build the url for getting the sync status"
+  ansible.builtin.set_fact:
+    sync_status_url: "{{ sync_status_base_url }}/{{ repo_info.resources[0].id }}/sync"
+
+- name: "Get the status"
+  ansible.builtin.uri:
+    url: "{{ sync_status_url }}"
+    user: "{{ satellite_admin_username | default(omit) }}"
+    password: "{{ satellite_admin_password | default(omit) }}"
+    method: "GET"
+    status_code:
+      - 202
+    force_basic_auth: true
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+  register: sync_status
+
+- name: "Create a status object"
+  ansible.builtin.set_fact:
+    repo_sync_status: "{{ repo_sync_status | default({}) | combine({item.key: item.value}) }}"
+  loop:
+    - { key: 'pending', value: "{{ sync_status.json.pending }}" }
+    - { key: 'progress', value: "{{ sync_status.json.progress }}" }
+    - { key: 'result', value: "{{ sync_status.json.result }}" }
+    - { key: 'state', value: "{{ sync_status.json.state }}" }
+
+- name: "Log the result"
+  ansible.builtin.debug:
+    var: repo_sync_status
+
+# if the sync is still running
