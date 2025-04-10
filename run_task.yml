@@ -16,5 +16,15 @@
       ansible.builtin.include_vars:
         file: "{{ vars_path }}"
 
+    - name: "Load the vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+
+    - name: "Load the other variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
+
     - name: "Run task - {{ task_name }}"
       ansible.builtin.include_tasks: tasks/{{ task_name }}.yml
