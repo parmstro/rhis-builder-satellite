@@ -1,7 +1,7 @@
 ---
 
 async_timeout: 14400
-async_delay: 60
+async_delay: 30
 
 # disable transparent huge pages
 # install tuned, create a tuned profile
@@ -76,6 +76,7 @@ ipaclient_force_join: true # force rejoin of realm if we are rebuilding satellit
 ipa_generate_certs: true
 
 # this is the name of the user being passed to prepare realm
+foreman_proxy_realm_role_name: "Smart Proxy Host Manager"
 foreman_proxy_realm_principal: "realm-capsule"
 foreman_proxy_dns_update_policy: "grant {{ foreman_proxy_realm_principal }}\\@{{ ipa_server_realm }} wildcard * ANY;"
 foreman_proxy_bind_update_policy: "{{ ipa_default_bind_policy }}{{ foreman_proxy_dns_update_policy }}"
