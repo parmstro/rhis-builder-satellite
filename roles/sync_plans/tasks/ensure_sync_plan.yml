@@ -3,8 +3,8 @@
 
 - name: "Ensure the state of the sync plan - {{ sync_plan.name }}"
   redhat.satellite.sync_plan:
-    username: "{{ satellite_admin_username | default(omit) }}"
-    password: "{{ satellite_admin_password | default(omit) }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"

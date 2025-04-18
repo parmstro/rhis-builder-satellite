@@ -15,8 +15,8 @@
 
 - name: "Get content view info: {{ content_view.name }}"
   redhat.satellite.content_view_info:
-    username: "{{ satellite_admin_username | default(omit) }}"
-    password: "{{ satellite_admin_password | default(omit) }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
@@ -57,8 +57,8 @@
 - name: "Publishing content view - {{ content_view.name }}"
   when: publish_content
   redhat.satellite.content_view_version:
-    username: "{{ satellite_admin_username | default(omit) }}"
-    password: "{{ satellite_admin_password | default(omit) }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"

@@ -4,8 +4,8 @@ use_completion_logic: true
 
 
 satellite_fqdn: satellite.example.ca
-satellite_admin_username: "{{ satellite_admin_username_vault }}"
-satellite_admin_password: "{{ satellite_admin_password_vault }}"
+satellite_username: "{{ satellite_username_vault }}"
+satellite_password: "{{ satellite_password_vault }}"
 satellite_admin_email: "admin@example.ca"
 satellite_initial_location: "Default Location"
 satellite_initial_organization: "Default Organization"

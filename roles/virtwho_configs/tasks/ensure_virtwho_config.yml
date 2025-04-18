@@ -5,8 +5,8 @@
 
 - name: "Get the organization_id for: {{ virtwho_config.foreman_virt_who_configure_config.organization_name }}"
   redhat.satellite.organization_info:
-    username: "{{ satellite_admin_username | default(omit) }}"
-    password: "{{ satellite_admin_password | default(omit) }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
@@ -34,8 +34,8 @@
     url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs"
     method: "GET"
     body_format: "json"
-    user: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
     force_basic_auth: "true"
     body: "{{ json_data }}"
     status_code: 200
@@ -72,8 +72,8 @@
         url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs"
         method: "POST"
         body_format: "json"
-        user: "{{ satellite_admin_username }}"
-        password: "{{ satellite_admin_password }}"
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
         force_basic_auth: "true"
         body: "{{ json_data }}"
         status_code: 201
@@ -91,8 +91,8 @@
       ansible.builtin.uri:
         url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs/{{ config_id }}/"
         method: "PUT"
-        user: "{{ satellite_admin_username }}"
-        password: "{{ satellite_admin_password }}"
+        user: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
         force_basic_auth: "true"
         body_format: "json"
         body: "{{ json_data }}"
@@ -109,8 +109,8 @@
   ansible.builtin.uri:
     url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs/{{ config_id }}/deploy_script/"
     method: "GET"
-    user: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
     force_basic_auth: "true"
   register: result
   no_log: true

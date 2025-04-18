@@ -20,8 +20,8 @@ sat_installer_options:
   - '--foreman-dynflow-worker-instances 3'           # this is good for initial build as we want sync performance
   - '--foreman-initial-organization "{{ satellite_initial_organization }}"'
   - '--foreman-initial-location "{{ satellite_initial_location }}"'
-  - '--foreman-initial-admin-username "{{ satellite_admin_username }}"'
-  - '--foreman-initial-admin-password "{{ satellite_admin_password }}"'
+  - '--foreman-initial-admin-username "{{ satellite_username }}"'
+  - '--foreman-initial-admin-password "{{ satellite_password }}"'
   - '--foreman-initial-admin-email "{{ satellite_admin_email }}"'
   - '--foreman-initial-admin-first-name  "Satellite"'
   - '--foreman-initial-admin-last-name  "Administrator"'

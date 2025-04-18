@@ -29,3 +29,22 @@ satellite_subnets:
       - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
+
+  - name: "bond_subnet"
+    description: "example.ca bond network"
+    network_type: "IPv4"
+    network: 192.168.142.0
+    prefix: 22
+    mask: 255.255.252.0
+    gateway: 192.168.140.1
+    dns_primary: 192.168.140.5
+    dns_secondary: 192.168.140.6
+    ipam: "None"
+    boot_mode: "Static"
+    dns_capsule: "{{ satellite_fqdn }}"
+    domains:
+      - "{{ satellite_domain }}"
+    locations:
+      - "{{ satellite_location }}"
+    organizations:
+      - "{{ satellite_organization }}"

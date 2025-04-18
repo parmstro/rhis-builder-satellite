@@ -19,7 +19,7 @@ satellite_hostgroups:
     media: "CentOS 7 mirror"
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
     parameters:
       - name: "boot_disk"
         hidden_value: false
@@ -48,7 +48,7 @@ satellite_hostgroups:
     operatingsystem: "OracleLinux 7.9"
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
     parameters:
       - name: "boot_disk"
         hidden_value: false
@@ -78,7 +78,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
     parameters:
       - name: "boot_disk"
         hidden_value: false
@@ -110,7 +110,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
     ptable: "RHEL_Server_CIS1"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
     parameters:
       - name: "boot_disk"
         hidden_value: false
@@ -137,7 +137,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
     ptable: "RHEL_Server_CIS1"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_dev_jboss"
     parent: "hg_x86_64_rhel8_vm/dev"
@@ -153,7 +153,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_dev_lamp"
     parent: "hg_x86_64_rhel8_vm/dev"
@@ -169,7 +169,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_dev_wordpress"
     parent: "hg_x86_64_rhel8_vm/dev"
@@ -185,7 +185,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "qa"
     parent: "hg_x86_64_rhel8_vm"
@@ -202,7 +202,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
     ptable: "RHEL_Server_CIS1"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_qa_jboss"
     parent: "hg_x86_64_rhel8_vm/qa"
@@ -219,7 +219,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_qa_lamp"
     parent: "hg_x86_64_rhel8_vm/qa"
@@ -236,7 +236,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_qa_wordpress"
     parent: "hg_x86_64_rhel8_vm/qa"
@@ -251,7 +251,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe8_dev_cis2"
     parent: "hg_x86_64_rhel8_vm/dev"
@@ -266,7 +266,7 @@ satellite_hostgroups:
       - ansible-role-rhel8-cis
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
 # RHEL9
 
@@ -289,7 +289,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
     parameters:
       - name: "boot_disk"
         hidden_value: false
@@ -321,7 +321,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
     parameters:
       - name: "boot_disk"
         hidden_value: false
@@ -348,7 +348,7 @@ satellite_hostgroups:
     ptable: "RHEL_Server_CIS1"
     kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
 
   - name: "soe9_dev_jboss"
@@ -366,7 +366,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_dev_lamp"
     parent: "hg_x86_64_rhel9_vm/dev"
@@ -381,7 +381,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_dev_wordpress"
     parent: "hg_x86_64_rhel9_vm/dev"
@@ -396,7 +396,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "qa"
     parent: "hg_x86_64_rhel9_vm"
@@ -413,7 +413,7 @@ satellite_hostgroups:
     kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
     ptable: "RHEL_Server_CIS1"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_qa_jboss"
     parent: "hg_x86_64_rhel9_vm/qa"
@@ -428,7 +428,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_qa_lamp"
     parent: "hg_x86_64_rhel9_vm/qa"
@@ -443,7 +443,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_qa_wordpress"
     parent: "hg_x86_64_rhel9_vm/qa"
@@ -458,7 +458,7 @@ satellite_hostgroups:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_dev_cis2"
     parent: "hg_x86_64_rhel9_vm/dev"
@@ -473,4 +473,4 @@ satellite_hostgroups:
       - ansible-role-rhel9-cis
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
-    root_pass: "{{ satellite_admin_password }}"
+    root_pass: "{{ satellite_password }}"

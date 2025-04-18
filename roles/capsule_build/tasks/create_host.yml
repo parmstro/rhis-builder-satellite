@@ -16,8 +16,8 @@
     - name: "Get info on discovered hosts that meet criteria"
       ansible.builtin.include_tasks: "get_foreman_list.yml"
       vars:
-        gfl_sat_username: "{{ satellite_admin_username }}"
-        gfl_sat_password: "{{ satellite_admin_password }}"
+        gfl_sat_username: "{{ satellite_username }}"
+        gfl_sat_password: "{{ satellite_password }}"
         gfl_sat_server_url: "{{ satellite_server_url }}"
         gfl_sat_validate_certs: "{{ satellite_validate_certs }}"
         gfl_sat_organization: "{{ host.organization | default(omit) }}"
@@ -76,8 +76,8 @@
 - name: "Deploy the host"
   connection: local
   redhat.satellite.host:
-    username: "{{ satellite_admin_username | default(omit) }}"
-    password: "{{ satellite_admin_password | default(omit) }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_server_url }}"
     organization: "{{ host.organization }}"
@@ -107,8 +107,8 @@
   ansible.builtin.uri:
     url: "{{ satellite_server_url }}/api/v2/discovered_hosts/{{ target_name }}/reboot"
     method: PUT
-    user: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
     force_basic_auth: true
     validate_certs: "{{ satellite_validate_certs }}"
     status_code: 200
@@ -129,8 +129,8 @@
   ansible.builtin.uri:
     url: "{{ satellite_server_url }}/api/v2/discovered_hosts/{{ target_name }}"
     method: DELETE
-    user: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
     force_basic_auth: true
     validate_certs: "{{ satellite_validate_certs }}"
     status_code: 200

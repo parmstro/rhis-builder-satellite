@@ -3,8 +3,8 @@
 
 - name: "Ensure the state of the compute resource - {{ compute_resource.name }}"
   redhat.satellite.compute_resource:
-    username: "{{ satellite_admin_username | default(omit) }}"
-    password: "{{ satellite_admin_password | default(omit) }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
@@ -18,8 +18,8 @@
 
 - name: "Ensure the state of the compute resource images"
   redhat.satellite.image:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
