@@ -1,0 +1,101 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_authentication:
+
+# Oauth configuration is set during installation. The values are readonly
+# See installer documentation
+
+  - name: "failed_login_attempts_limit"
+    full_name: "Failed login attempts limit"
+    value: 30
+    settings_type: "integer"
+    description: "Satellite will block user logins from an IP address after this number of failed login attempts for 5 minutes. Set to 0 to disable bruteforce protection"
+
+  - name: "restrict_registered_smart_proxies"
+    full_name: "Restrict registered capsules"
+    value: "true"
+    settings_type: "boolean"
+    description: "Only known Capsules may access features that use Capsule authentication"
+
+  - name: "trusted_hosts"
+    full_name: "Trusted hosts"
+    value: "[]"
+    settings_type: "array"
+    description: "List of hostnames, IPv4, IPv6 addresses or subnets to be trusted in addition to Capsules for access to fact/report importers and ENC output"
+
+ # SSL Certificate configuration is set on installation. The settings are readonly
+ # See installer documentation
+
+  - name: "server_ca_file"
+    full_name: "Server CA file"
+    value: ""
+    settings_type: "string"
+    description: "SSL CA file path that will be used in templates (to verify the connection to Satellite)"
+
+# Websockets are set in config file and are read only
+# See installer documentation
+
+  - name: "login_delegation_logout_url"
+    full_name: "Login delegation logout URL"
+    value: ""
+    settings_type: "string"
+    description: "Redirect your users to this url on logout (authorize_login_delegation should also be enabled)"
+
+# Authorize user delegation and autocreate is set at installation.
+# See installer documentation
+
+  - name: "idle_timeout"
+    full_name: "Idle timeout"
+    value: 60
+    settings_type: "integer"
+    description: "Log out idle users after a certain number of minutes"
+
+  - name: "password_hash"
+    full_name: "Password hashing algorithm"
+    value: "BCrypt"
+    settings_type: "string"
+    description: "Password hashing algorithm. A password change is needed effect existing passwords."
+
+  - name: "bcrypt_cost"
+    full_name: "BCrypt password cost"
+    value: 10
+    settings_type: "integer"
+    description: "Cost value of bcrypt password hash function for internal auth-sources (4-30). A higher value is safer but verification is slower, particularly for stateless API calls and UI logins. A password change is needed effect existing passwords."
+
+  - name: "pbkdf2_cost"
+    full_name: "PBKDF2 password cost"
+    value: 50000
+    settings_type: "integer"
+    description: "Cost value of PBKDF2 password hash function for internal auth-sources. A higher value is safer but verification is slower, particularly for stateless API calls and UI logins. A password change is needed effect existing passwords."
+
+  - name: "bmc_credentials_accessible"
+    full_name: "BMC credentials access"
+    value: "false"
+    settings_type: "boolean"
+    description: "Permits access to BMC interface passwords through ENC YAML output and in templates"
+
+  - name: "oidc_jwks_url"
+    full_name: "OIDC JWKs URL"
+    value: ""
+    settings_type: "string"
+    description: "OpenID Connect JSON Web Key Set(JWKS) URL. Typically https://keycloak.example.com/auth/realms/<realm name>/protocol/openid-connect/certs when using Keycloak as an OpenID provider"
+
+  - name: "oidc_audience"
+    full_name: "OIDC Audience"
+    value: "[]"
+    settings_type: "array"
+    description: "Name of the OpenID Connect Audience that is being used for Authentication. In case of Keycloak this is the Client ID."
+
+  - name: "oidc_issuer"
+    full_name: "OIDC Issuer"
+    value: ""
+    settings_type: "string"
+    description: "The iss (issuer) claim identifies the principal that issued the JWT, which exists at a `/.well-known/openid-configuration` in case of most of the OpenID providers."
+
+  - name: "oidc_algorithm"
+    full_name: "OIDC Algorithm"
+    value: ""
+    settings_type: "string"
+    description: "The algorithm used to encode the JWT in the OpenID provider."

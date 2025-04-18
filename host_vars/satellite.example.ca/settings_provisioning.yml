@@ -1,23 +1,257 @@
 ---
 
+# yamllint disable rule:line-length
+
 settings_provisioning:
+  - name: "host_owner"
+    full_name: "Host owner"
+    description: "Default owner on provisioned hosts, if empty Satellite will use current user"
+    settings_type: "string"
+    default: ""
+    value: "admin"
+
+  - name: "root_pass"
+    full_name: "Root password"
+    description: "Default encrypted root password on provisioned hosts"
+    settings_type: "string"
+    default: ""
+    encrypted: true
+    value: "{{ default_provisioning_root_password_vault }}"
+
+  - name: "unattended_url"
+    full_name: "Unattended URL"
+    description: "URL hosts will retrieve templates from during build, when it starts with https unattended/userdata controllers cannot be accessed via HTTP"
+    settings_type: "string"
+    default: "http://satellite.example.ca"
+    value: "http://satellite.example.ca"
+
   - name: "safemode_render"
-    category: "provisioning"
+    full_name: "Safemode rendering"
+    description: "Enable safe mode config templates rendering (recommended)"
     settings_type: "boolean"
     default: true
     value: false
-  - name: "destroy_vm_on_host_delete"
-    category: "provisioning"
-    settings_type: "boolean"
-    default: false
-    value: true
-  - name: "update_ip_from_built_request"
-    category: "provisioning"
+
+  - name: "access_unattended_without_build"
+    full_name: "Access unattended without build"
+    description: "Allow access to unattended URLs without build mode being used"
     settings_type: "boolean"
     default: false
     value: false
+
+  - name: "query_local_nameservers"
+    full_name: "Query local nameservers"
+    description: "Satellite will query the locally configured resolver instead of the SOA/NS authorities"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "token_duration"
+    full_name: "Installation token lifetime"
+    description: "Time in minutes installation tokens should be valid for, 0 to disable token generation"
+    settings_type: "integer"
+    default: 360
+    value: 360
+
+  - name: "ssh_timeout"
+    full_name: "SSH timeout"
+    description: "Time in seconds before SSH provisioning times out"
+    settings_type: "integer"
+    default: 120
+    value: 120
+
+  - name: "libvirt_default_console_address"
+    full_name: "Libvirt default console address"
+    description: "The IP address that should be used for the console listen address when provisioning new virtual machines via Libvirt"
+    settings_type: "string"
+    default: "0.0.0.0"
+    value: ""
+
+  - name: "update_ip_from_built_request"
+    full_name: "Update IP from built request"
+    description: "Satellite will update the host IP with the IP that made the built request"
+    settings_type: "boolean"
+    default: false
+    value: true
+
+  - name: "use_shortname_for_vms"
+    full_name: "Use short name for VMs"
+    description: "Satellite will use the short hostname instead of the FQDN for creating new virtual machines"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "dns_timeout"
+    full_name: "DNS timeout"
+    description: "List of timeouts (in seconds) for DNS lookup attempts such as the dns_lookup macro and DNS record conflict validation"
+    settings_type: "array"
+    default: "[5, 10, 15, 20]"
+    value: "[5, 10, 15, 20]"
+
+  - name: "clean_up_failed_deployment"
+    full_name: "Clean up failed deployment"
+    description: "Satellite will delete virtual machine if provisioning script ends with non zero exit code"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "name_generator_type"
+    full_name: "Type of name generator"
+    description: "Random gives unique names, MAC-based are longer but stable (and only works with bare-metal)"
+    settings_type: "string"
+    default: "Random-based"
+    value: "MAC-based"
+
   - name: "default_pxe_item_global"
-    category: "provisioning"
+    full_name: "Default PXE global template entry"
+    description: "Default PXE menu item in global template - 'local', 'discovery' or custom, use blank for template default"
     settings_type: "string"
     default: ""
     value: "discovery"
+
+  - name: "default_pxe_item_local"
+    full_name: "Default PXE local template entry"
+    description: "Default PXE menu item in local template - 'local', 'force_local_chain_hd0' or custom, use blank for template default"
+    settings_type: "string"
+    default: ""
+    value: "discovery"
+
+  - name: "intermediate_ipxe_script"
+    full_name: "iPXE intermediate script"
+    description: "Intermediate iPXE script for unattended installations"
+    settings_type: "string"
+    default: "iPXE intermediate script"
+    value: ""
+
+  - name: "destroy_vm_on_host_delete"
+    full_name: "Destroy associated VM on host delete"
+    description: "Destroy associated VM on host delete. When enabled, VMs linked to Hosts will be deleted on Compute Resource. When disabled, VMs are unlinked when the host is deleted, meaning they remain on Compute Resource and can be re-associated or imported back to Satellite again. This does not automatically power off the VM"
+    settings_type: "boolean"
+    default: false
+    value: true
+
+  - name: "maximum_structured_facts"
+    full_name: "Maximum structured facts"
+    description: "Maximum amount of keys in structured subtree, statistics stored in satellite::dropped_subtree_facts"
+    settings_type: "integer"
+    default: 100
+    value: 120
+
+  - name: "default_global_registration_item"
+    full_name: "Default Global registration template"
+    description: "Global Registration template"
+    settings_type: "string"
+    default: "Global Registration"
+    value: ""
+
+  - name: "default_host_init_config_template"
+    full_name: "Default 'Host initial configuration' template"
+    description: "Default 'Host initial configuration' template, automatically assigned when a new operating system is created"
+    settings_type: "string"
+    default: "Linux host_init_config default"
+    value: ""
+
+  - name: "ct_location"
+    full_name: "CoreOS Transpiler Command"
+    description: "Full path to CoreOS transpiler (ct)"
+    settings_type: "string"
+    default: "/usr/bin/ct"
+    value: ""
+
+  - name: "ct_arguments"
+    full_name: "CoreOS Transpiler Command Arguments"
+    description: "CoreOS transpiler (ct) arguments as an comma-separated array"
+    settings_type: "string"
+    default: "[--pretty, --files-dir, /usr/share/foreman/config/ct]"
+    value: ""
+
+  - name: "fcct_location"
+    full_name: "Fedora CoreOS Transpiler Command"
+    description: "Full path to Fedora CoreOS transpiler (fcct)"
+    settings_type: "string"
+    default: "/usr/bin/fcct"
+    value: ""
+
+  - name: "fcct_arguments"
+    full_name: "Fedora CoreOS Transpiler Command Arguments"
+    description: "Fedora CoreOS transpiler (fcct) arguments as an comma-separated array"
+    settings_type: "string"
+    default: "[--pretty, --files-dir, /usr/share/foreman/config/ct]"
+    value: ""
+
+  - name: "global_PXEGrub2"
+    full_name: "Global default PXEGrub2 template"
+    description: "Global default PXEGrub2 template. This template gets deployed to all configured TFTP servers. It will not be affected by upgrades."
+    settings_type: "string"
+    default: "PXEGrub2 global default"
+    value: ""
+
+  - name: "global_PXELinux"
+    full_name: "Global default PXELinux template"
+    description: "Global default PXELinux template. This template gets deployed to all configured TFTP servers. It will not be affected by upgrades."
+    settings_type: "string"
+    default: "PXELinux global default"
+    value: ""
+
+  - name: "global_PXEGrub"
+    full_name: "Global default PXEGrub template"
+    description: "Global default PXEGrub template. This template gets deployed to all configured TFTP servers. It will not be affected by upgrades."
+    settings_type: "string"
+    default: "PXEGrub global default"
+    value: ""
+
+  - name: "global_iPXE"
+    full_name: "Global default iPXE template"
+    description: "Global default iPXE template. This template gets deployed to all configured TFTP servers. It will not be affected by upgrades."
+    settings_type: "string"
+    default: "iPXE global default"
+    value: ""
+
+  - name: "local_boot_PXEGrub2"
+    full_name: "Local boot PXEGrub2 template"
+    description: "Template that will be selected as PXEGrub2 default for local boot."
+    settings_type: "string"
+    default: "PXEGrub2 default local boot"
+    value: ""
+
+  - name: "local_boot_PXELinux"
+    full_name: "Local boot PXELinux template"
+    description: "Template that will be selected as PXELinux default for local boot."
+    settings_type: "string"
+    default: "PXELinux default local boot"
+    value: ""
+
+  - name: "local_boot_PXEGrub"
+    full_name: "Local boot PXEGrub template"
+    description: "Template that will be selected as PXEGrub default for local boot."
+    settings_type: "string"
+    default: "PXEGrub default local boot"
+    value: ""
+
+  - name: "local_boot_iPXE"
+    full_name: "Local boot iPXE template"
+    description: "Template that will be selected as iPXE default for local boot."
+    settings_type: "string"
+    default: "iPXE default local boot"
+    value: ""
+
+  - name: "manage_puppetca"
+    full_name: "Manage PuppetCA"
+    description: "Satellite will automate certificate signing upon provision of new host"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "use_uuid_for_certificates"
+    full_name: "Use UUID for certificates"
+    description: "Satellite will use random UUIDs for certificate signing instead of hostnames"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "show_unsupported_templates"
+    full_name: "Show unsupported provisioning templates"
+    description: "Show unsupported provisioning templates. When enabled, all the avaiable templates will be shown. When disabled, Red Hat supported templates will be shown only"
+    settings_type: "boolean"
+    default: true
+    value: true

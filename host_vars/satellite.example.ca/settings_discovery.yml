@@ -1,0 +1,173 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_discovery:
+
+  - name: "discovery_location"
+    full_name: "Discovery location"
+    settings_type: "string"
+    default: ""
+    value: "Default Location"
+    description: "The default location to place discovered hosts in"
+
+  - name: "discovery_organization"
+    full_name: "Discovery organization"
+    settings_type: "string"
+    default: ""
+    value: "Default Organization"
+    description: "The default organization to place discovered hosts in"
+
+  - name: "discovery_fact"
+    full_name: "Interface fact"
+    settings_type: "string"
+    default: "discovery_bootif"
+    value: "discovery_bootif"
+    description: "Fact name to use for primary interface detection"
+
+  - name: "discovery_auto_bond"
+    full_name: "Create bond interfaces"
+    settings_type: "boolean"
+    default: false
+    value: false
+    description: "Automatic bond interface (if another interface is detected on the same VLAN via LLDP)"
+
+  - name: "discovery_clean_facts"
+    full_name: "Clean all facts"
+    settings_type: "boolean"
+    default: false
+    value: false
+    description: "Clean all reported facts during provisioning (except discovery facts)"
+
+  - name: "discovery_hostname"
+    full_name: "Hostname facts"
+    settings_type: "array"
+    default: "[discovery_bootif]"
+    value: "[chassis_position, discovery_bootif]"
+    description: "List of facts to use for the hostname (first wins)"
+
+  - name: "discovery_auto"
+    full_name: "Auto provisioning"
+    settings_type: "boolean"
+    default: true
+    value: true
+    description: "Automatically provision newly discovered hosts, according to the provisioning rules"
+
+  - name: "discovery_reboot"
+    full_name: "Reboot"
+    settings_type: "boolean"
+    default: true
+    value: true
+    description: "Automatically reboot or kexec discovered host during provisioning"
+
+  - name: "discovery_prefix"
+    full_name: "Hostname prefix"
+    settings_type: "string"
+    default: "mac"
+    value: "lab-"
+    description: "The default prefix to use for the host name, must start with a letter"
+
+  - name: "discovery_fact_column"
+    full_name: "Fact columns"
+    settings_type: "array"
+    default: "[]"
+    value: "[]"
+    description: "Extra facter columns to show in host lists"
+
+  - name: "discovery_facts_highlights"
+    full_name: "Highlighted facts"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Regex to organize facts for highlights section - e.g. ^(abc|cde)$"
+
+  - name: "discovery_facts_storage"
+    full_name: "Storage facts"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Regex to organize facts for storage section"
+
+  - name: "discovery_facts_software"
+    full_name: "Software facts"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Regex to organize facts for software section"
+
+  - name: "discovery_facts_hardware"
+    full_name: "Hardware facts"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Regex to organize facts for hardware section"
+
+  - name: "discovery_facts_network"
+    full_name: "Network facts"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Regex to organize facts for network section"
+
+  - name: "discovery_facts_ipmi"
+    full_name: "IPMI facts"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Regex to organize facts for ipmi section"
+
+  - name: "discovery_lock"
+    full_name: "Lock PXE"
+    settings_type: "boolean"
+    default: false
+    value: false
+    description: "Automatically generate PXE configuration to pin a newly discovered host to discovery"
+
+  - name: "discovery_pxelinux_lock_template"
+    full_name: "Locked PXELinux template name"
+    settings_type: "string"
+    default: "pxelinux_discovery"
+    value: "pxelinux_discovery"
+    description: "PXELinux template to be used when pinning a host to discovery"
+
+  - name: "discovery_pxegrub_lock_template"
+    full_name: "Locked PXEGrub template name"
+    settings_type: "string"
+    default: "pxegrub_discovery"
+    value: "pxegrub_discovery"
+    description: "PXEGrub template to be used when pinning a host to discovery"
+
+  - name: "discovery_pxegrub2_lock_template"
+    full_name: "Locked PXEGrub2 template name"
+    settings_type: "string"
+    default: "pxegrub2_discovery"
+    value: "pxegrub2_discovery"
+    description: "PXEGrub2 template to be used when pinning a host to discovery"
+
+  - name: "discovery_always_rebuild_dns"
+    full_name: "Force DNS"
+    settings_type: "boolean"
+    default: true
+    value: true
+    description: "Force DNS entries creation when provisioning discovered host"
+
+  - name: "discovery_error_on_existing"
+    full_name: "Error on existing NIC"
+    settings_type: "boolean"
+    default: false
+    value: false
+    description: "Do not allow to discover existing managed host matching MAC of a provisioning NIC (errors out early)"
+
+  - name: "discovery_naming"
+    full_name: "Type of name generator"
+    settings_type: "string"
+    default: "Fact + prefix"
+    value: "Fact + prefix"
+    description: "Discovery hostname naming pattern"
+
+  - name: "discovery_prefer_ipv6"
+    full_name: "Prefer IPv6"
+    settings_type: "boolean"
+    default: false
+    value: false
+    description: "Prefer IPv6 to IPv4 when calling discovered nodes"

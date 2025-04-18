@@ -1,0 +1,89 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_template_sync:
+
+  - name: "template_sync_verbose"
+    full_name: "Verbosity"
+    description: "Choose verbosity for Rake task importing templates"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "template_sync_associate"
+    full_name: "Associate"
+    description: "Associate templates to OS, organization and location"
+    settings_type: "string"
+    default: "New"  # New | Always | Never
+    value: "New"
+
+  - name: "template_sync_prefix"
+    full_name: "Prefix"
+    description: "The string that will be added as prefix to imported templates"
+    settings_type: "string"
+    default: ""
+    value: ""
+
+  - name: "template_sync_dirname"
+    full_name: "Dirname"
+    description: "The directory within the Git repo containing the templates"
+    settings_type: "string"
+    default: ""
+    value: "/"
+
+  - name: "template_sync_filter"
+    full_name: "Filter"
+    description: "Import/export names matching this regex (case-insensitive; snippets are not filtered)"
+    settings_type: "string"
+    default: ""
+    value: ""
+
+  - name: "template_sync_repo"
+    full_name: "Repo"
+    description: "Target path to import/export. Different protocols can be used, for example /tmp/dir, git://example.com, https://example.com, ssh://example.com. When exporting to /tmp, note that production deployments may be configured to use private tmp."
+    settings_type: "string"
+    default: ""
+    value: "https://github.com/theforeman/community-templates.git"
+
+  - name: "template_sync_negate"
+    full_name: "Negate"
+    description: "Negate the filter for import/export"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "template_sync_branch"
+    full_name: "Branch"
+    description: "Default branch in Git repo"
+    settings_type: "string"
+    default: ""
+    value: ""
+
+  - name: "template_sync_metadata_export_mode"
+    full_name: "Metadata export mode"
+    description: "Default metadata export mode, refresh re-renders metadata, keep will keep existing metadata, remove exports template without metadata"
+    settings_type: "string"
+    default: "Refresh"  # Refresh | Keep | Remove
+    value: "Refresh"
+
+  - name: "template_sync_force"
+    full_name: "Force import"
+    description: "Should importing overwrite locked templates?"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "template_sync_lock"
+    full_name: "Lock templates"
+    description: "How to handle lock for imported templates?"
+    settings_type: "string"
+    default: "Keep, do not lock new"  # Lock | Keep, lock new | Keep, do not lock new | Unlock
+    value: "Keep, do not lock new"
+
+  - name: "template_sync_commit_msg"
+    full_name: "Commit message"
+    description: "Custom commit message for templates export"
+    settings_type: "string"
+    default: "Templates export made by a Satellite user"
+    value: "Templates export made by a Canada"

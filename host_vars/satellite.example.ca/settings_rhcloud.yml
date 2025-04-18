@@ -5,119 +5,77 @@ settings_rhcloud:
   - description: "Enable automatic upload of your host inventory to the Red Hat cloud"
     settings_type: "boolean"
     default: true
-    updated_at: "2023-09-18 22:50:47 UTC"
-    id: "allow_auto_inventory_upload"
     name: "allow_auto_inventory_upload"
     full_name: "Automatic inventory upload"
     value: true
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
 
   - description: "Enable automatic synchronization of Insights recommendations from the Red Hat cloud"
     settings_type: "boolean"
     default: false
-    updated_at: "2022-11-29 19:15:44 UTC"
     id: "allow_auto_insights_sync"
     name: "allow_auto_insights_sync"
     full_name: "Synchronize recommendations Automatically"
     value: true
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
 
   - description: "Enable automatic deletion of mismatched host records from the Red Hat cloud"
     settings_type: "boolean"
     default: false
-    updated_at: null
     id: "allow_auto_insights_mismatch_delete"
     name: "allow_auto_insights_mismatch_delete"
     full_name: "Automatic mismatch deletion"
-    value: false
-    category: "rh_cloud"
-    category_name: "RHCloud"
+    value: true
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
 
   - description: "Obfuscate host names sent to the Red Hat cloud"
     settings_type: "boolean"
     default: false
-    updated_at: null
     id: "obfuscate_inventory_hostnames"
     name: "obfuscate_inventory_hostnames"
     full_name: "Obfuscate host names"
     value: false
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
 
   - description: "Obfuscate ipv4 addresses sent to the Red Hat cloud"
     settings_type: "boolean"
     default: false
-    updated_at: null
     id: "obfuscate_inventory_ips"
     name: "obfuscate_inventory_ips"
     full_name: "Obfuscate host ipv4 addresses"
     value: false
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
 
   - description: "Exclude installed packages from being uploaded to the Red Hat cloud"
     settings_type: "boolean"
     default: false
-    updated_at: null
     id: "exclude_installed_packages"
     name: "exclude_installed_packages"
     full_name: "Exclude installed Packages"
     value: false
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
 
   - description: "Should import include parameter tags from Foreman?"
     settings_type: "boolean"
     default: false
-    updated_at: null
     id: "include_parameter_tags"
     name: "include_parameter_tags"
     full_name: "Include parameters in insights-client reports"
     value: false
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
-    encrypted: false
-    select_values: null
 
   - description: "RHC daemon id"
     settings_type: null
     default: null
-    updated_at: "2022-11-29 19:10:36 UTC"
     id: "rhc_instance_id"
     name: "rhc_instance_id"
     full_name: "ID of the RHC(Yggdrasil) daemon"
     value: "86217994-2945-4dc0-8f9f-deaa2acfefe5"
-    category: "rh_cloud"
-    category_name: "RHCloud"
     readonly: false
-    config_file: null
     encrypted: false
-    select_values: null
