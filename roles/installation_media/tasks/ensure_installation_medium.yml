@@ -1,0 +1,18 @@
+---
+
+- name: "Ensure state of installation medium - {{ installation_medium.name }}"
+  redhat.satellite.installation_medium:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    name: "{{ installation_medium.name }}"
+    ca_path: "{{ installation_medium.ca_path | default(omit) }}"
+    locations: "{{ installation_medium.locations | default(omit) }}"
+    operatingsystems: "{{ installation_medium.operatingsystems | default(omit) }}"
+    organizations: "{{ installation_medium.organizations | default(omit) }}"
+    os_family: "{{ installation_medium.os_family | default(omit) }}"
+    path: "{{ installation_medium.path | default(omit) }}"
+    state: "{{ installation_medium.ca_path | default(omit) }}"
+    updated_name: "{{ installation_medium.updated | default(omit) }}"

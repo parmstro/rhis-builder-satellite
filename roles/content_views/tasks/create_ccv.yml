@@ -1,17 +1,18 @@
 ---
-# This play creates an individual composite content view from specified cvs
+# This play creates an individual composite content view from specified content_views
 
-- name: "Configure the composite content view - {{ ccv.name }}"
+- name: "Configure the composite content view - {{ composite_content_view.name }}"
   redhat.satellite.content_view:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    name: "{{ ccv.name }}"
-    description: "{{ ccv.desc }}"
+    name: "{{ composite_content_view.name }}"
+    description: "{{ composite_content_view.desc }}"
     composite: true
-    components: "{{ ccv.components }}"
-    auto_publish: "{{ ccv.auto_publish | default(omit) }}"
-    solve_dependencies: "{{ ccv.solve_dependencies | default(omit) }}"
-    state: "{{ ccv.state | default(omit) }}"
+    components: "{{ composite_content_view.components }}"
+    auto_publish: "{{ composite_content_view.auto_publish | default(omit) }}"
+    solve_dependencies: "{{ composite_content_view.solve_dependencies | default(omit) }}"
+    state: "{{ composite_content_view.state | default(omit) }}"

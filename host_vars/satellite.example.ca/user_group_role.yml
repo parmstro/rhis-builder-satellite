@@ -1,9 +1,16 @@
 ---
-# This file describes the users groups and roles an environment.
-# As with all the files there are users, groups and roles for the RH-ISAM and users, groups and roles for your custom deployment
 
-# Users required for the RH-ISAM deployment
-users_rhisam:
+# Currently this is not behaving as documented.
+# Users are added.
+# Groups are added.
+# Roles are added.
+# Users are not added to groups
+# Roles are not added to groups
+# Role implementation is not documented clearly
+# Diagnosing issues... please stand by...
+
+# test users
+satellite_users:
   - name: "bobsurunkle"
     firstname: "Bob"
     lastname: "Surunkle"
@@ -13,18 +20,14 @@ users_rhisam:
     user_password: "random_password"  # not_a_secret
     default_location: "Default Location"
     default_organization: "Default Organization"
-    auth_source: "INTERNAL"  # or "EXTERNAL"
+    auth_source: "Internal"  # or "External"
     timezone: "Toronto"
-    locale: "en-CA"
-    roles: "Operator" # pass a list object
+    locale: "en_GB"
     locations:
       - "Default Location"
     organizations:
       - "Default Organization"
     state: "present"  # not Ontario
-
-# Uncomment below - Add your custom users here - use the above as a pattern
-# users_user:
 
 # satgroup-administrator will map to the Satellite admins group and administrator (all privileges) role
 # satgroup-compliance-auditor will need to view OSCAP Policy and Reports maps to Compliance Viewer
@@ -33,28 +36,20 @@ users_rhisam:
 # satgroup-org-administrator maps to Manager role
 # satgroup-site-administrator maps to Site Manager role
 # satgroup-sub-manager needs to see Red Hat Subscriptions and Manifests
-#
 # satgroup-operator - combines a number of roles - BootStrap_User, Remote Execution User, Task Manager, Edit Hosts, Discovery Manager, Viewer
-# For the POC we only need to create the Operator Role
 
-# User groups required for the RH-ISAM deployment
-user_groups_rhisam:
+# test user groups
+satellite_user_groups:
   - name: "Operators"
     admin: "false"
     roles:
       - "Operator"
     users:
       - "bobsurunkle"
-#    usergroups:
-#      - "None"
-#    updated_name: "New_Operators"
     state: "present"
 
-# Uncomment below - Add your custom groups here - use the above as a pattern
-# user_groups_user:
-
-# Roles required for the RH-ISAM deployment
-roles_rhisam:
+# test roles
+satellite_roles:
   - name: "Operator"
     state: present
     description: "A default operator"
@@ -63,91 +58,92 @@ roles_rhisam:
     organizations:
       - "{{ satellite_organization }}"
     filters:
-      - permissions:
-          - "view_hosts"
-          - "view_statistics"
-          - "view_tasks"
-          - "view_search"
-          - "view_cases"
-          - "view_log_viewer"
+      - resource_type: "AnsibleRole"
+        permissions:
+          - "view_ansible_roles"
+      - resource_type: "AnsibleVariable"
+        permissions:
+          - "view_ansible_variables"
+          - "edit_ansible_variables"
+      - resource_type: "Architecture"
+        permissions:
           - "view_architectures"
+      - resource_type: "Audit"
+        permissions:
           - "view_audit_logs"
-          - "view_compute_profiles"
-          - "view_compute_resources"
-          - "view_compute_resources_vms"
-          - "edit_compute_resources_vms"
-          - "power_compute_resources_vms"
-          - "console_compute_resources_vms"
-          - "view_config_groups"
-          - "edit_config_groups"
-          - "view_domains"
-          - "view_environments"
-          - "view_facts"
-          - "view_globals"
-          - "view_hostgroups"
+      - resource_type: "AuthSource"
+        permissions:
+          - "view_authenticators"
+          - "edit_authenticators"
+      - resource_type: "Bookmark"
+      - resource_type: "ComputeProfile"
+      - resource_type: "ComputeResource"
+      - resource_type: "ConfigReport"
+      - resource_type: "DiscoveryRule"
+      - resource_type: "Domain"
+      - resource_type: "ExternalUsergroup"
+        permissions:
+          - "view_external_usergroups"
+      - resource_type: "FactValue"
+      - resource_type: "Filter"
+      - resource_type: "Host"
+        permissions:
           - "view_hosts"
-          - "create_hosts"
-          - "edit_hosts"
-          - "destroy_hosts"
-          - "build_hosts"
-          - "power_hosts"
-          - "puppetrun_hosts"
-          - "view_discovered_hosts"
-          - "submit_discovered_hosts"
-          - "auto_provision_discovered_hosts"
-          - "provision_discovered_hosts"
-          - "edit_discovered_hosts"
-          - "destroy_discovered_hosts"
-          - "view_images"
-          - "view_locations"
-          - "view_media"
-          - "view_models"
-          - "view_operatingsystems"
-          - "view_external_variables"
-          - "view_organizations"
-          - "view_ptables"
-          - "view_puppetclasses"
-          - "edit_puppetclasses"
-          - "view_realms"
-          - "view_reports"
-          - "view_subnets"
-          - "view_trends"
-          - "view_containers"
-          - "commit_containers"
-          - "create_containers"
-          - "destroy_containers"
-          - "view_registries"
-          - "view_discovery_rules"
-          - "view_foreman_tasks"
-          - "edit_foreman_tasks"
-          - "view_activation_keys"
-          - "view_content_hosts"
-          - "create_content_hosts"
-          - "edit_content_hosts"
-          - "destroy_content_hosts"
-          - "view_content_views"
-          - "view_gpg_keys"
-          - "view_host_collections"
-          - "create_host_collections"
-          - "edit_host_collections"
-          - "destroy_host_collections"
-          - "view_lifecycle_environments"
-          - "view_products"
-          - "view_provisioning_templates"
-          - "edit_provisioning_templates"
-          - "deploy_provisioning_templates"
+      - resource_type: "Hostgroup"
+      - resource_type: "Image"
+      - resource_type: "KeyPair"
+      - resource_type: "Location"
+      - resource_type: "LookupValue"
+      - resource_type: "MailNotification"
+      - resource_type: "Medium"
+      - resource_type: "Model"
+      - resource_type: "Operatingsystem"
+      - resource_type: "Organization"
+      - resource_type: "Parameter"
+      - resource_type: "PersonalAccessToken"
+      - resource_type: "Ptable"
+      - resource_type: "ProvisioningTemplate"
+      - resource_type: "ReportTemplate"
+      - resource_type: "Realm"
+      - resource_type: "Role"
+        permissions:
+          - "view_roles"
+      - resource_type: "Setting"
+        permissions:
+          - "view_settings"
+      - resource_type: "SshKey"
+      - resource_type: "Subnet"
+      - resource_type: "Usergroup"
+        permissions:
+          - "view_usergroups"
+      - resource_type: "User"
+        permissions:
+          - "view_users"
+      - resource_type: "ForemanTasks::Task"
+      - resource_type: "ForemanTasks::RecurringLogic"
+        permissions:
           - "view_recurring_logics"
-          - "view_capsule_content"
-          - "view_config_reports"
-          - "view_job_templates"
-          - "create_job_templates"
-          - "edit_job_templates"
-          - "destroy_job_templates"
-          - "lock_job_templates"
-          - "view_job_invocations"
-          - "create_job_invocations"
-          - "view_external_parameters"
+      - resource_type: "JobTemplate"
+      - resource_type: "RemoteExecutionFeature"
+      - resource_type: "JobInvocation"
+      - resource_type: "TemplateInvocation"
+      - resource_type: "ForemanOpenscap::ArfReport"
+      - resource_type: "ForemanOpenscap::Policy"
+      - resource_type: "ForemanOpenscap::ScapContent"
+      - resource_type: "ForemanOpenscap::TailoringFile"
+      - resource_type: "Katello::ActivationKey"
+      - resource_type: "Katello::ContentView"
+      - resource_type: "Katello::ContentCredential"
+      - resource_type: "Katello::HostCollection"
+      - resource_type: "Katello::KTEnvironment"
+      - resource_type: "Katello::Product"
+      - resource_type: "Katello::Subscription"
+        permissions:
           - "view_subscriptions"
-          - "attach_subscriptions"
-          - "unattach_subscriptions"
-          - "view_arf_reports"
+      - resource_type: "Katello::SyncPlan"
+      - resource_type: "Katello::AlternateContentSource"
+        permissions:
+          - "view_alternate_content_sources"
+      - resource_type: "InsightsHit"
+      - resource_type: "Template"
+      - resource_type: "ForemanVirtWhoConfigure::Config"

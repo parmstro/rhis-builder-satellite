@@ -1,0 +1,75 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_ansible:
+
+  - name: "ansible_ssh_private_key_file"
+    full_name: "Private Key Path"
+    settings_type: "string"
+    default: ""
+    value: ""
+    description: "Use this to supply a path to an SSH Private Key that Ansible will use in lieu of a password Override with 'ansible_ssh_private_key_file' host parameter"
+
+  - name: "ansible_connection"
+    full_name: "Connection type"
+    settings_type: "string"
+    default: "ssh"
+    value: "ssh"
+    description: "Use this connection type by default when running Ansible playbooks. You can override this on hosts by adding a parameter 'ansible_connection'"
+
+  - name: "ansible_winrm_server_cert_validation"
+    full_name: "WinRM cert Validation"
+    settings_type: "string"
+    default: "validate"
+    value: "validate"
+    description: "Enable/disable WinRM server certificate validation when running Ansible playbooks. You can override this on hosts by adding a parameter 'ansible_winrm_server_cert_validation'"
+
+  - name: "ansible_verbosity"
+    full_name: "Default verbosity level"
+    settings_type: "string"
+    default: "Disabled"
+    value: "Disabled"
+    description: "Satellite will add this level of verbosity for additional debugging output when running Ansible playbooks."
+
+  - name: "ansible_post_provision_timeout"
+    full_name: "Post-provision timeout"
+    settings_type: "integer"
+    default: 360
+    value: 360
+    description: "Timeout (in seconds) to set when Satellite will trigger a play Ansible roles task after a host is fully provisioned. Set this to the maximum time you expect a host to take until it is ready after a reboot."
+
+  - name: "ansible_interval"
+    full_name: "Ansible report timeout"
+    settings_type: "integer"
+    default: 30
+    value: 30
+    description: "Timeout (in minutes) when hosts should have reported."
+
+  - name: "ansible_out_of_sync_disabled"
+    full_name: "Ansible out of sync disabled"
+    settings_type: "boolean"
+    default: false
+    value: false
+    description: "Disable host configuration status turning to out of sync for Ansible after report does not arrive within configured interval"
+
+  - name: "ansible_inventory_template"
+    full_name: "Default Ansible inventory report template"
+    settings_type: "string"
+    default: "Ansible - Ansible Inventory"
+    value: "Ansible - Ansible Inventory"
+    description: "Satellite will use this template to schedule the report with Ansible inventory"
+
+  - name: "ansible_roles_to_ignore"
+    full_name: "Ansible roles to ignore"
+    settings_type: "array"
+    default: ""
+    value: "[]"
+    description: "Those roles will be excluded when importing roles from capsule, The expected input is comma separated values and you can use * wildcard metacharactersFor example: foo*, *b*,*bar"
+
+  - name: "foreman_ansible_proxy_batch_size"
+    full_name: "Capsule tasks batch size for Ansible"
+    settings_type: "integer"
+    default: null
+    value: null
+    description: "Number of tasks which should be sent to the capsule in one request, if foreman_tasks_proxy_batch_trigger is enabled. If set, overrides foreman_tasks_proxy_batch_size setting for Ansible jobs."

@@ -1,26 +1,14 @@
 ---
 # Ensure the SCAP policy configuation
 
-- name: "Ensure the rhisam scap policies configuration"
+- name: "Ensure the scap policies configuration"
+  when: scap_policies is defined and (scap_policies | length) > 0
   ansible.builtin.include_tasks: "ensure_scap_policy.yml"
-  loop: "{{ scap_policies_rhisam }}"
+  loop: "{{ scap_policies }}"
   loop_control:
-    loop_var: scap_policies
-  when: "scap_policies_rhisam is defined"
+    loop_var: scap_policy
+  no_log: true
   tags:
     - tags_rhisam
     - tags_scap_config
     - tags_scap_policies
-    - tags_scap_policies_rhisam
-
-- name: "Ensure the user scap policies configuration"
-  ansible.builtin.include_tasks: "ensure_scap_policy.yml"
-  loop: "{{ scap_policies_user }}"
-  loop_control:
-    loop_var: scap_policies
-  when: "scap_policies_user is defined"
-  tags:
-    - tags_user
-    - tags_scap_config
-    - tags_scap_policies
-    - tags_scap_policies_user

@@ -1,0 +1,40 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_config_management:
+
+  - name: "create_new_host_when_report_is_uploaded"
+    full_name: "Create new host when report is uploaded"
+    description: "Satellite will create the host when a report is received"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "matchers_inheritance"
+    full_name: "Matchers inheritance"
+    description: "Satellite matchers will be inherited by children when evaluating smart class parameters for hostgroups, organizations and locations"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "Default_parameters_Lookup_Path"
+    full_name: "Default parameters lookup path"
+    description: "Satellite will evaluate host smart class parameters in this order by default"
+    settings_type: "array"
+    default: "[fqdn, hostgroup, os, domain]"
+    value: "[fqdn, hostgroup, os, domain]"
+
+  - name: "interpolate_erb_in_parameters"
+    full_name: "Interpolate ERB in parameters"
+    description: "Satellite will parse ERB in parameters value in the ENC output"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "always_show_configuration_status"
+    full_name: "Always show configuration status"
+    description: "All hosts will show a configuration status even when a Puppet capsule is not assigned"
+    settings_type: "boolean"
+    default: false
+    value: false

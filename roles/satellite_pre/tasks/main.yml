@@ -44,3 +44,12 @@
     - tags_rhisam
     - tags_satellite_pre
     - tags_satellite_pre_idm_integration
+
+
+- name: "Tune system for satellite"
+  when: apply_standard_tuning
+  ansible.builtin.import_tasks: "tune_for_satellite.yml"
+  tags:
+    - tags_rhisam
+    - tags_satellite_pre
+    - tags_satellite_pre_tune_for_satellite

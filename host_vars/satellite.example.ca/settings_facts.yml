@@ -1,0 +1,89 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_facts:
+
+  - name: "create_new_host_when_facts_are_uploaded"
+    full_name: "Create new host when facts are uploaded"
+    description: "Satellite will create the host when new facts are received"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "location_fact"
+    full_name: "Location fact"
+    description: "Hosts created from facts will be placed in the location this fact dictates. The content of this fact should be the full label of the location."
+    settings_type: "string"
+    default: "foreman_location"
+    value: "foreman_location"
+
+  - name: "organization_fact"
+    full_name: "Organization fact"
+    description: "Hosts created from facts will be placed in the organization this fact dictates. The content of this fact should be the full label of the organization."
+    settings_type: "string"
+    default: "foreman_organization"
+    value: "foreman_organization"
+
+  - name: "default_location"
+    full_name: "Default location"
+    descrtipion: "Hosts created from facts will be placed in this location if no location fact was sent"
+    settings_type: "string"
+    default: "Default Location"
+    value: "Default Location"
+
+  - name: "default_organization"
+    full_name: "Default organization"
+    description: "Hosts created from facts will be placed in this organization if no organization fact was sent"
+    settings_type: "string"
+    default: "Default Organization"
+    value: "Default Organization"
+
+  - name: "update_hostgroup_from_facts"
+    full_name: "Update hostgroup from facts"
+    description: "Satellite will update a host's hostgroup from its facts"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "ignore_facts_for_operatingsystem"
+    full_name: "Ignore facts for operating system"
+    description: "Stop updating Operating System from facts"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "ignore_facts_for_domain"
+    full_name: "Ignore facts for domain"
+    description: "Stop updating domain values from facts"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "update_subnets_from_facts"
+    full_name: "Update subnets from facts"
+    descrtipion: "Satellite will update a host's subnet from its facts"
+    settings_type: "string"
+    default: "None"
+    value: "None"
+
+  - name: "ignore_puppet_facts_for_provisioning"
+    full_name: "Ignore interfaces facts for provisioning"
+    descrtipion: "Stop updating IP and MAC address values from facts (affects all interfaces)"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "ignored_interface_identifiers"
+    full_name: "Ignore interfaces with matching identifier"
+    descrtipion: "Skip creating or updating host network interfaces objects with identifiers matching these values from incoming facts. You can use * wildcard to match identifiers with indexes e.g. macvtap*. The ignored interfaces raw facts will be still stored in the DB, see the 'Exclude pattern' setting for more details."
+    settings_type: "array"
+    default: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*]"
+    value: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*]"
+
+  - name: "excluded_facts"
+    full_name: "Exclude pattern for facts stored in satellite"
+    descrtipion: "Exclude pattern for all types of imported facts (puppet, ansible, rhsm). Those facts won't be stored in satellite's database. You can use * wildcard to match names with indexes e.g. ignore* will filter out ignore, ignore123 as well as a::ignore or even a::ignore123::b"
+    settings_type: "array"
+    default: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*, load_averages::*, memory::swap::available*, memory::swap::capacity, memory::swap::used*, memory::system::available*, memory::system::capacity, memory::system::used*, memoryfree, memoryfree_mb, swapfree, swapfree_mb, uptime_hours, uptime_days]"
+    value: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*, load_averages::*, memory::swap::available*, memory::swap::capacity, memory::swap::used*, memory::system::available*, memory::system::capacity, memory::system::used*, memoryfree, memoryfree_mb, swapfree, swapfree_mb, uptime_hours, uptime_days]"

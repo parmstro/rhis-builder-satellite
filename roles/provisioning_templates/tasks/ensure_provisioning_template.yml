@@ -14,8 +14,9 @@
 
 - name: "Ensure state of provisioning template - {{ provisioning_template.name }}"
   redhat.satellite.provisioning_template:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     audit_comment: "{{ provisioning_template.audit_comment | default(omit) }}"

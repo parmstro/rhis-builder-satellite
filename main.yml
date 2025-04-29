@@ -4,10 +4,28 @@
   hosts: sat_primary
   become: true
   gather_facts: true
-  vars_files:
-    - "~/rhisbuilder_vault.yml"
 
   tasks:
+
+    - name: "Load the vault variables"
+      when: vault_path is defined
+      ansible.builtin.include_vars:
+        file: "{{ vault_path }}"
+
+    - name: "Load the other variables"
+      when: vars_path is defined
+      ansible.builtin.include_vars:
+        file: "{{ vars_path }}"
+
+    - name: "Load the vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+
+    - name: "Load the other variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
 
     - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
@@ -22,6 +40,13 @@
       tags:
         - tags_phase_3
         - tags_satellite_install
+
+    - name: "Apply role of satellite_post to {{ ansible_fqdn }}"
+      ansible.builtin.include_role:
+        name: satellite_post
+      tags:
+        - tags_phase_3
+        - tags_satellite_post
 
     - name: "Ensure hammer configuration"
       ansible.builtin.import_tasks: "tasks/configure_hammer.yml"
@@ -47,15 +72,23 @@
         - tags_manifest
 
     - name: "Ensure Satellite manifest configuration"
-      ansible.builtin.import_role:
-        name: subscription_manifests
       when:
         - satellite_pre_use_idm
         - rex_kerberos_enabled
+      ansible.builtin.import_role:
+        name: rex_kerberos
       tags:
         - tags_rhisam
         - tags_basic_config
         - tags_rex_kerberos
+
+    - name: "Ensure content credentials configuration"
+      ansible.builtin.import_role:
+        name: content_credentials
+      tags:
+        - tags_content_config
+        - tags_redhat_repos
+        - tags_repository_sets
 
     - name: "Ensure repository sets configuration"
       ansible.builtin.import_role:
@@ -68,6 +101,14 @@
     - name: "Ensure custom products configuration"
       ansible.builtin.import_role:
         name: custom_products
+      tags:
+        - tags_content_config
+        - custom_repos
+        - tags_repositories
+
+    - name: "Ensure additional repository configuration"
+      ansible.builtin.import_role:
+        name: repositories
       tags:
         - tags_content_config
         - custom_repos
@@ -103,11 +144,12 @@
 
 #    We are currently ensuring sync'd content for media
 #    Satellite automatically creates the media when kickstart trees are added.
-#    - name: "Configure OS media"
-#      ansible.builtin.import_role: "media"
-#      tags:
-#        - tags_provisioning_config
-#        - tags_media
+    - name: "Configure OS media"
+      ansible.builtin.import_role:
+        name: "installation_media"
+      tags:
+        - tags_provisioning_config
+        - tags_media
 
     - name: "Configure partition tables"
       ansible.builtin.import_role:
@@ -122,6 +164,13 @@
       tags:
         - tags_provisioning_config
         - tags_provisioning_templates
+
+    - name: "Synchronized satellite template repositories"
+      ansible.builtin.import_role:
+        name: templates_sync
+      tags:
+        - tags_provisioning_config
+        - tags_templates_sync
 
     - name: "Configure operating systems"
       ansible.builtin.import_role:
@@ -256,6 +305,12 @@
       tags:
         - tags_user_roles
 
+    - name: "Configure satellite users"
+      ansible.builtin.import_role:
+        name: users
+      tags:
+        - tags_users
+
     - name: "Configure satellite user groups"
       ansible.builtin.import_role:
         name: user_groups
@@ -267,11 +322,5 @@
         name: user_groups_external
       tags:
         - tags_user_groups_external
-
-    - name: "Configure satellite users"
-      ansible.builtin.import_role:
-        name: users
-      tags:
-        - tags_users
 
 # End of Satellite Configuration

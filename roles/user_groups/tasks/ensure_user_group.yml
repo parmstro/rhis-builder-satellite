@@ -1,0 +1,24 @@
+---
+
+# This play will create the POC specific usergroups in Satellite
+# and map them to our external IdM groups.
+#
+# EXTERNAL AUTH_SOURCES VIA THE API
+#
+# Please see https://bugzilla.redhat.com/show_bug.cgi?id=1336236
+#
+
+- name: "Ensure user group state for - {{ satellite_user_group.name }}"
+  redhat.satellite.usergroup:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}" # drop through to the module default (true)
+    name: "{{ satellite_user_group.name }}"
+    admin: "{{ satellite_user_group.admin | default(omit) }}" # drop through to the module default (false)
+    roles: "{{ satellite_user_group.roles | default(omit) }}" # pass a list object
+    users: "{{ satellite_user_group.users | default(omit) }}" # pass a list object
+    usergroups: "{{ satellite_user_group.usergroups | default(omit) }}" # pass a list object
+    updated_name: "{{ satellite_user_group.updated_name | default(omit) }}"
+    state: "{{ satellite_user_group.state | default(omit) }}" # drop through to the module default (present)

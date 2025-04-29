@@ -7,11 +7,12 @@
 # All manifests are user manifests.
 
 - name: "Ensure the manifests are configured in the portal"
+  when: "redhat_manifests is defined"
   ansible.builtin.include_tasks: "ensure_redhat_manifest.yml"
   loop: "{{ redhat_manifests }}"
   loop_control:
     loop_var: redhat_manifest
-  when: "redhat_manifests is defined"
+  no_log: true
   tags:
     - tags_rhisam
     - tags_user

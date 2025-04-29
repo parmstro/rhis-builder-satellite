@@ -9,8 +9,8 @@
   ansible.builtin.uri:
     url: "{{ satellite_url }}/ansible/api/ansible_roles/sync"
     method: "PUT"
-    user: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
     force_basic_auth: true
     body:
       proxy_id: "{{ satellite_api_proxy_id_string }}"

@@ -13,14 +13,15 @@
     hours_since_publication: 8766                # assume the last publication was long ago.. one year - 365.25 days
     exceeded_publication_threshold_hours: false  # assume we haven't exceeded the threshold
 
-- name: "Get content view info: {{ cv.name }}"
+- name: "Get content view info: {{ content_view.name }}"
   redhat.satellite.content_view_info:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    name: "{{ cv.name }}"
+    name: "{{ content_view.name }}"
   register: cv_info
   changed_when: false
 
@@ -36,8 +37,8 @@
 
 - name: "Determine if we have exceeded publication threshold hours"
   when:
-    - cv.publication_threshold_hours is defined
-    - (hours_since_publication|float) > (cv.publication_threshold_hours|float)
+    - content_view.publication_threshold_hours is defined
+    - (hours_since_publication|float) > (content_view.publication_threshold_hours|float)
   ansible.builtin.set_fact:
     exceeded_publication_threshold_hours: true
 
@@ -49,22 +50,23 @@
     publish_content: true
 
 - name: "If we been asked to force publish *this* content view, Publish"
-  when: (cv.force_publish is defined and cv.force_publish)
+  when: (content_view.force_publish is defined and content_view.force_publish)
   ansible.builtin.set_fact:
     publish_content: true
 
-- name: "Publishing content view - {{ cv.name }}"
+- name: "Publishing content view - {{ content_view.name }}"
   when: publish_content
   redhat.satellite.content_view_version:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    content_view: "{{ cv.name }}"
-    description: "{{ cv.description | default(omit) }}"
-    version: "{{ cv.version | default(omit) }}" # default is a new version
-    lifecycle_environments: "{{ cv.environments | default(omit) }}" # underlying default is publish new version to the library
-    state: "{{ cv.state | default(omit) }}" # underlying default is present
+    content_view: "{{ content_view.name }}"
+    description: "{{ content_view.description | default(omit) }}"
+    version: "{{ content_view.version | default(omit) }}" # default is a new version
+    lifecycle_environments: "{{ content_view.environments | default(omit) }}" # underlying default is publish new version to the library
+    state: "{{ content_view.state | default(omit) }}" # underlying default is present
   async: "{{ cv_publish_timeout | default(14400) }}"
   poll: "{{ cv_publish_retry_interval | default(15) }}"

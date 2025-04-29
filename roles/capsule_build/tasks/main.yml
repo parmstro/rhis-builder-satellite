@@ -8,6 +8,7 @@
   loop: "{{ platform_hosts }}"
   loop_control:
     loop_var: host
+  no_log: true
   register: async_list
 
 - name: "Wait for all nodes to be built- Task will complete when the last host is up and running."

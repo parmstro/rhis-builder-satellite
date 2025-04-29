@@ -10,24 +10,24 @@ os_family: Redhat
 zerombr
 clearpart --all
 
+# This partition table is used with the use_nbde option
 # The system will reencrypt the drive with a secret key on reboot
+# The actual password is needed by anaconda to encrypt the drive and save to the keyslot
+# We will handle this with a password rotation scheme at first boot
 
-<% if @host.provider.downcase == 'vmware' %>
-part /boot --fstype ext4 --size=1024 --ondisk=sda
-part pv.01 --size=1 --grow --ondisk=sda --encrypted --passphrase <%= host_param('default_passphrase') %>
+part /boot --fstype ext4 --size=1024 --ondisk=<%= host_param('boot_disk') %>
+part /boot/efi --fstype="efi" --size=2048 --ondisk=<%= host_param('boot_disk') %>
+part pv.01 --size=1 --grow --ondisk=<%= host_param('root_disk') %> --encrypted --passphrase <%= host_param('default_passphrase') %>
+<% pvs = [] -%>
+<% if host_param('additional_disks') -%>
+<% host_param('additional_disks').each do |disk| -%>
+part pv.<%= disk[-3,3] %> --size=1 --grow --ondisk=<%= disk %> --encrypted --passphrase <%= host_param('default_passphrase') %>
+<% pvs.push("pv." + disk[-3,3]) -%>
 <% end -%>
+<% end %>
 
-<% if @host.provider.downcase == 'rhv' %>
-part /boot --fstype ext4 --size=1024 --ondisk=vda
-part pv.01 --size=1 --grow --ondisk=vda --encrypted --passphrase <%= host_param('default_passphrase') %>
-<% end -%>
+volgroup vg_root pv.01 <%= pvs.join(' ') %>
 
-<% if @host.provider.downcase == 'baremetal' %>
-part /boot --fstype ext4 --size=1024 --ondisk=sda
-part pv.01 --size=1 --grow --ondisk=sda --encrypted --passphrase <%= host_param('default_passphrase') %>
-<% end -%>
-
-volgroup vg_root pv.01
 logvol swap  --recommended --vgname=vg_root --name=lv_swap
 logvol /tmp  --vgname=vg_root --size=1024 --name=lv_tmp --fstype=xfs
 logvol /var/tmp  --vgname=vg_root --size=1024 --name=lv_var_tmp --fstype=xfs

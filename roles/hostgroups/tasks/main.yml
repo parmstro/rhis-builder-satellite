@@ -1,27 +1,15 @@
 ---
 
-# Configure the rhisam and user hostgroup specs
-#
+# Configure the satellite hostgroup specs
+
 - name: "Ensure the state of the rhisam hostgroups"
+  when: satellite_hostgroups is defined and (satellite_hostgroups | length) > 0
   ansible.builtin.include_tasks: "ensure_hostgroup.yml"
-  loop: "{{ hostgroups_rhisam }}"
+  loop: "{{ satellite_hostgroups }}"
   loop_control:
-    loop_var: hostgroup
-  when: "hostgroups_rhisam is defined"
+    loop_var: satellite_hostgroup
+  no_log: true
   tags:
     - tags_rhisam
     - tags_provisioning_config
     - tags_hostgroups
-    - tags_hostgroups_rhisam
-
-- name: "Ensure the state of the user hostgroups"
-  ansible.builtin.include_tasks: "ensure_hostgroup.yml"
-  loop: "{{ hostgroups_user }}"
-  loop_control:
-    loop_var: hostgroup
-  when: "hostgroups_user is defined"
-  tags:
-    - tags_user
-    - tags_provisioning_config
-    - tags_hostgroups
-    - tags_hostgroups_user

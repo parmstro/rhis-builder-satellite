@@ -20,10 +20,11 @@
     mode: "0644"
   when: "scap_content.scap_file is defined"
 
-- name: "Ensure the scap content is loaded"
+- name: "Ensure the scap content state for - {{ scap_content.title }}"
   redhat.satellite.scap_content:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     title: "{{ scap_content.title }}"

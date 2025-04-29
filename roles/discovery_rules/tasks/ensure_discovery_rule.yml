@@ -2,10 +2,11 @@
 # This task ensures the state of the discovery rule
 # state defaults to present
 
-- name: "Ensure discovery rule - {{ discovery_rule.name }}"
+- name: "Ensure discovery rule state for - {{ discovery_rule.name }}"
   redhat.satellite.discovery_rule:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     validate_certs: "{{ satellite_validate_certs }}"
     organizations: "{{ discovery_rule.organizations | default(omit) }}"

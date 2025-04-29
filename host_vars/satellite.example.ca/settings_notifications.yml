@@ -1,0 +1,16 @@
+---
+
+settings_notifications:
+  - name: "rss_enable"
+    full_name: "RSS enable"
+    description: "Whether to pull RSS notifications or not"
+    settings_type: "boolean"
+    default: "true"
+    value: "true"
+
+  - name: "rss_url"
+    full_name: "RSS enable"
+    description: "URL to fetch RSS notifications from"
+    settings_type: "string"
+    default: "https://www.redhat.com/en/rss/blog/channel/red-hat-satellite"
+    value: "https://www.redhat.com/en/rss/blog/channel/red-hat-satellite"

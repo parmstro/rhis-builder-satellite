@@ -1,6 +1,0 @@
----
-hosts:
-  - name: "alta-wunsch.parmstrong.ca"
-    fqdn: "alta-wunsch.parmstrong.ca"
-  - name: "lab-c2s2n1.parmstrong.ca"
-    fqdn: "lab-c2s2n1.parmstrong.ca"

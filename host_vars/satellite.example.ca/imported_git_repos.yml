@@ -6,7 +6,7 @@
 # This really allows you to import any git repos that may contain content
 # that you otherwise want to reference in your build
 
-git_repos_rhisam:
+git_repos:
 # RHEL9
   - repository: "https://github.com/RedHatOfficial/ansible-role-rhel9-e8.git"
     dest: "/etc/ansible/roles/ansible-role-rhel9-e8"

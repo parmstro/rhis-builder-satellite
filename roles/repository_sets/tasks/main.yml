@@ -1,26 +1,14 @@
 ---
 # Configure the rhisam and user repositories
 
-- name: "Enable the rhisam repository sets"
-  ansible.builtin.include_tasks: "enable_repository_set.yml"
-  loop: "{{ repository_sets_rhisam }}"
+- name: "Ensure the state of repository sets"
+  when: repository_sets is defined and (repository_sets | length) > 0
+  ansible.builtin.include_tasks: "ensure_repository_set.yml"
+  loop: "{{ repository_sets }}"
   loop_control:
     loop_var: repository_set
-  when: "repository_sets_rhisam is defined"
+  no_log: true
   tags:
     - tags_rhisam
     - tags_content_management_config
     - tags_repositories
-    - tags_repositories_rhisam
-
-- name: "Enable the user repository sets"
-  ansible.builtin.include_tasks: "enable_repository_set.yml"
-  loop: "{{ repository_sets_user }}"
-  loop_control:
-    loop_var: repository_set
-  when: "repository_sets_user is defined"
-  tags:
-    - tags_user
-    - tags_content_management_config
-    - tags_repositories
-    - tags_repositories_user

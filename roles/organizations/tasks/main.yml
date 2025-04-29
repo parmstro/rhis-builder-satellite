@@ -1,7 +1,9 @@
 ---
 
 - name: "Ensure Organizations"
+  when: satellite_organizations is defined and (satellite_organizations | length) > 0
   ansible.builtin.include_tasks: "ensure_organization.yml"
-  loop: "{{ organizations }}"
+  loop: "{{ satellite_organizations }}"
   loop_control:
-    loop_var: organization
+    loop_var: satellite_organization
+  no_log: true

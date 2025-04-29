@@ -1,0 +1,52 @@
+---
+
+# Set the basic system level tuning for satellite
+
+# Reasoning: satellite core information is stored in postgres database which performs poorly under TPH, same with redis
+- name: "Configure transparent huge pages to [never]"
+  ansible.builtin.command: 'grubby --args="transparent_hugepage=never" --update-kernel ALL'
+  register: grubby_result
+  changed_when: grubby_result.rc == 0
+
+# ensure tuned is installed and performance profile is set to throughput-performance and TPH is turned off
+- name: "Install tuned"
+  ansible.builtin.dnf:
+    name: "tuned"
+    state: "present"
+
+- name: "Reboot the Satellite server and wait till its up"
+  ansible.builtin.reboot:
+    pre_reboot_delay: 10
+    post_reboot_delay: 60
+    reboot_timeout: 300
+
+- name: "Gather TPH status from kernel"
+  ansible.builtin.command:
+    cmd: "cat /sys/kernel/mm/transparent_hugepage/enabled"
+  register: tph_result
+  changed_when: tph_result.rc == 0
+
+- name: "Ensure TPH never was registered by the command line"
+  ansible.builtin.assert:
+    that: "'[never]' in tph_result.stdout"
+
+- name: "Configure new profile directory"
+  ansible.builtin.file:
+    path: "/etc/tuned/satellite"
+    state: "directory"
+    mode: "0640"
+    owner: "root"
+    group: "root"
+
+- name: "Create the tuned.conf file"
+  ansible.builtin.template:
+    src: "tuned.conf.j2"
+    dest: "/etc/tuned/satellite/tuned.conf"
+    mode: "0770"
+    owner: "root"
+    group: "root"
+
+- name: "Enable the profile"
+  ansible.builtin.command: "tuned-adm profile satellite"
+  register: tuned_adm_result
+  changed_when: tuned_adm_result.rc == 0

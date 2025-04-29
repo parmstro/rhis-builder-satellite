@@ -3,7 +3,7 @@
 # Add your template files to the files directory of the Role
 # OR add them in this hostvars folder and adjust the path
 
-provisioning_templates_rhisam:
+provisioning_templates:
 # snippets
   - name: "soe_create_users_selinux"
     type: "snippet"
@@ -38,7 +38,7 @@ provisioning_templates_rhisam:
     locations:
       - "{{ satellite_location }}"
 
-  - name: "soe_ifcfg_generic_interface"
+  - name: "soe_kickstart_ifcfg_generic_interface"
     type: "snippet"
     locked: false
     description: "Modified to support defined network zone"
@@ -148,6 +148,3 @@ provisioning_templates_rhisam:
       - "{{ satellite_organization }}"
     locations:
       - "{{ satellite_location }}"
-
-# Uncomment below to create your user templates
-# provisioning_templates_user:

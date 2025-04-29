@@ -1,0 +1,22 @@
+---
+
+- name: "Ensure synchronization of templates from {{ satellite_template_repo.name }}"
+  redhat.satellite.templates_import:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    repo: "{{ satellite_template_repo.repo_url }}"
+    dirname: "{{ satellite_template_repo.dirname | default('satellite_templates') }}"
+    branch: "{{ satellite_template_repo.branch | default('main') }}"
+    associate: "{{ satellite_template_repo.associate | default('new') }}"
+    ca_path: "{{ satellite_template_repo.ca_path | default(omit) }}"
+    filter: "{{ satellite_template_repo.filter | default(omit) }}"
+    force: "{{ satellite_template_repo.force | default(omit) }}"                    # force update of locked templates
+    http_proxy: "{{ satellite_template_repo.http_proxy | default(omit) }}"
+    http_proxy_policy: "{{ satellite_template_repo.http_proxy_policy | default(omit) }}"
+    locations: "{{ satellite_template_repo.locations | default(omit) }}"
+    organizations: "{{ satellite_template_repo.organizations | default(omit) }}"
+    prefix: "{{ satellite_template_repo.prefix | default(omit) }}"
+    verbose: "{{ satellite_template_repo.force | default(false) }}"

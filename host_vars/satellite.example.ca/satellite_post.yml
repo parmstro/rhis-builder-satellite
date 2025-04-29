@@ -1,0 +1,7 @@
+---
+
+satellite_post:
+  postgres_max_connections: 1000
+  postgres_shared_buffers: "16GB"
+  postgres_work_mem: "8MB"
+  postgres_avcl: 2000

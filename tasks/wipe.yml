@@ -3,8 +3,9 @@
 
 - name: "Wiping disks for {{ target_host.name }}"
   redhat.satellite.job_invocation:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     search_query: "name ^ ({{ target_host.name }})"
     job_template: "Provisioning Action - Re-init Baremetal Linux Host"

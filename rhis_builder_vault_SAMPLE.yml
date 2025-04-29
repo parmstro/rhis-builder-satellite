@@ -1,33 +1,61 @@
 ---
-# This is the private vault file for your rhisbuilder secrets
-# This file is required to be in the root of the home directory of the executing user
-# i.e. ~/rhisbuilder_vault.yml
+
+# This is intended to be the vault secrets file for common variables
+# used throughout the rhis-builder series of projects.
 #
-# Use this file to define all secrets in the project
-# Use rhisbuilder_local.yml to define non-secret location dependent variables
-# see: SAMPLE_rhisbuilder_local.yml
-# All other secrets are defined in their respective vars folders
+# You would typically put this in a hidden directory below
+# the home directory of the executing user
+# i.e. ~/.ansible/rhis_builder_vault.yml
 
-# whether we are building AAP servers from images or with Satellite once Satellite is provisioned.
-# false means Satellite will build the AAP - best for metal and vmware deploys
-
-# Tell the linter to ignore long lines
 # yamllint disable rule:line-length
 
-build_aap_from_image: false
-
-# What platform we are going to bootstrap from i.e. where we build the initial IdM Server and Satellite Server
-# one of vmware, aws
-# TODO - support metal, google, azure
-rhisbuilder_bootstrap_target: "vmware"
-
-# The user under which site.yml launches - this sets the default user to allow sudo access
-rhisbuilder_default_user: "ansiblerunner"
+# Default user names for this file
+rhis_builder_default_user: "ansiblerunner"
 default_admin_username: "admin"
+
+# These are technically no longer secrets as the no longer contain organization identifying data.
+automation_hub_url_vault: "https://console.redhat.com/api/automation-hub/content/published/"
+automation_hub_auth_url_vault: "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
+
+
+# Red Hat Hybrid Cloud Console tokens
+# one for automation hub
+# one for imagebuilder
+# see: https://console.redhat.com/ansible/automation-hub/token
+# Used by rhis-builder-provisioner to setup the provisioner note
+# Used by rhis-builder-day-2-ops to configure AAP hub synchronization
+redhat_automation_hub_token_vault: "ey.................................Xmg"
+automation_hub_token_refresh_cmd_vault: 'curl https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token -d grant_type=refresh_token -d client_id="cloud-services" -d refresh_token="{{ automation_hub_token_vault }}" --fail --silent --show-error --output /dev/null'
+
+
+# Red Hat Hybrid Cloud Console Organization and Activation Key
+# These are used for registering your boostrap systems
+default_org_number_vault: 1234567                # a number without quotes listed on the Activation Key page
+default_activation_key_vault: "rhis-builder"    # a string - the name of the activation key
+
+# Aliases may be required due to the variation among the collections used within rhis-builder
+cdn_organization_vault: "{{ default_org_number_vault }}"
+cdn_activation_key_vault: "{{ default_activation_key_vault }}"
+
+# We are currently trying to reduce the number of ssh keys pairs within the projects
+# These tend to be a security risk if left around.
+# A cleanup operation will be defined and implemented
+default_ssh_pub_key_vault: "ssh-rsa AAAA.........YgY7w== ansiblerunner@provisioner.example.ca"  # noqa yaml[line-length]
+ssh_pub_key_vault: "{{ default_ssh_pub_key_vault }}"
+
+
+imagebuilder_offline_token_vault: "ey.....................................................gY"
+
 
 #####################################
 # Phase 1 - init_env secrets
 #####################################
+
+# These varaibles will be used in our landing zone builing projects and
+# will be used there as well as when creating Satellite Compute resources
+
+# For the new rhis-builder-[*] projects we do not yet have
+# landing zone initialization code
 
 ## Secrets needed for using AWS bootstrap target
 # Your 12-digit AWS account number
@@ -37,14 +65,10 @@ aws_secret_key_vault: 'YOUR-AWS-SECRET-KEY-which-should-be-longer'              
 
 # Region in which to manage resources
 ec2_region: us-east-1
-
-## AWS EC2 naming parameters - used to create FQDNs in route53 and identify machines
-# name_prefix is provided so you do not have to create a new route53 zone
-# Given these two values, hosts will have rhis.a-route53-zone-you-own.com as
-# the non-host part of the DNS FQDN
 ec2_name_prefix: rhis
 workshop_dns_zone: 'a-route53-zone-you-own.com'
 
+# This will be used when performing initalization
 # Allow rhisbuilder to interact with route53
 manage_public_dns: true
 
@@ -59,30 +83,8 @@ manage_public_dns: true
 # imagebuilder_image_type: 'aws'
 # imagebuilder_include_filesystem: false
 
-# These are technically no longer secrets as the no longer contain organization identifying data.
-automation_hub_url_vault: "https://console.redhat.com/api/automation-hub/content/published/"
-automation_hub_auth_url_vault: "https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token"
-
-# Red Hat Hybrid Cloud Console tokens
-# one for automation hub
-# one for imagebuilder
-# see: https://console.redhat.com/ansible/automation-hub/token
-automation_hub_token_vault: "eyJhbGcciOiJIUz... big long string"                                 # notsecret
-offline_token_vault: "eyJhbGciOiJIUz... big long string"                                         # notsecret
-
-# Red Hat Hybrid Cloud Console Organization and Activation Key
-# These are used for registering your boostrap systems
-#
-default_org_number_vault: 4242424242             # a number without quotes listed on the Activation Key page      # notsecret
-default_activation_key_vault: "build_rhis"       # a string - the name of the activation key                      # notsecret
-
-# Aliases
-org_number_vault: "{{ default_org_number_vault }}"                                               # notsecret
-activation_key_vault: "{{ default_activation_key_vault }}"                                       # notsecret
-
 # Default password for cloud-init when deploying
 baseimage_password_vault: "eyJhbGciOiJIUz"                                                       # notsecret
-
 
 # Setting up defaults to be used everywhere in our process
 # These defaults are fine for development or testing
@@ -94,6 +96,15 @@ baseimage_password_vault: "eyJhbGciOiJIUz"                                      
 default_environment_username_vault: "{{ rhisbuilder_default_user }}"                             # notsecret
 default_environment_password_vault: "eyJhbGciOiJIUz"                                             # notsecret
 satellite_server_url_vault: "https://satellite.example.ca"
+
+nbde_encryption_password_vault: "{{ default_environment_password_vault }}"
+
+# NOTE: Due to the fact that we consume multiple ansible collections
+#       from different development groups it is not always possible
+#       to have consistent variable names, but we do our best.
+#       You will find various places within the project where
+#       we use additional layers of indirection to try to maintain
+#       a single variable that controls a given configuration point
 
 # Satellite administrator
 satellite_username_vault: "{{ default_admin_username }}"                                         # notsecret
@@ -107,9 +118,6 @@ realm_admin_password_vault: "{{ default_environment_password_vault }}"          
 # Override defaults here as necessary
 idm_activationkey_vault: "{{ default_activation_key_vault }}"                                    # notsecret
 sat_activationkey_vault: "{{ default_activation_key_vault }}"                                    # notsecret
-
-idm_rhsm_org_vault: "{{ default_org_number_vault }}"                                             # notsecret
-sat_rhsm_org_vault: "{{ default_org_number_vault }}"                                             # notsecret
 
 # Secrets used for bootstrapping on VMware
 vcenter_username_vault: "Administrator@VSPHERE.LOCAL"                                            # notsecret
@@ -142,6 +150,13 @@ aws1_region_vault: "ca-central-1"
 ipa_admin_principal_vault: "{{ default_admin_username }}"                                         # notsecret
 ipa_admin_password_vault: "{{ default_environment_password_vault }}"                              # notsecret
 ipa_dm_password_vault: "{{ default_environment_password_vault }}"                                 # notsecret
+
+# Service user for interacting with IdM
+ipa_principal_username_vault: "{{ ipa_admin_principal_vault }}"
+ipa_principal_password_vault: "{{ ipa_admin_password_vault }}"
+
+# for creating kvm services
+kvm_ssl_rsa_key_pass_vault: "{{ default_environment_password_vault }}"
 
 
 #####################################
@@ -177,10 +192,12 @@ manifest_subs_vault:
     pool_id: "the_last_pool_id"                                                   # notsecret
     qty: 100
 
+#  Remember Lookup always acts locally! Adjust accordingly.
+
 # Satellite Remote Execution ssh user and keys
 # allows you to predefine the ssh keys for Satellite remote execution
-remote_execution_ssh_keys_vault: "{{ lookup('file', '/home/{{ rhisbuilder_default_user }}/.ssh/id_rsa.pub') }}"     # notsecret
-remote_execution_ssh_user_vault: "{{ rhisbuilder_default_user }}"                                                   # notsecret
+remote_execution_ssh_keys_vault: "{{ lookup('file', '/home/' + rhis_builder_default_user + '/.ssh/id_rsa.pub') }}"     # notsecret
+remote_execution_ssh_user_vault: "{{ rhis_builder_default_user }}"                                                   # notsecret
 # On AWS, the workflows by default add the SSH key to the user 'ec2-user'                         # notsecret
 # remote_execution_ssh_user_vault: "ec2-user"                                                     # notsecret
 
@@ -203,11 +220,18 @@ vcenter_virtwho_password_vault: "{{ default_environment_password_vault }}"      
 satellite_virtwho_username_vault: "{{ sat_inital_admin_username_vault }}"                         # notsecret
 satellite_virtwho_password_vault: "{{ default_environment_password_vault }}"                      # notsecret
 
+# satellite email secrets
+# We are using a basic gmail app password method here
+satellite_smtp_user_name_vault: "satellite@example.ca"
+satellite_smtp_password_vault: "eyJhbGciOiJSUzUxMiJ9"
+satellite_smtp_authentication: "login"
+
+# satellite provisioning settings secrets
+default_provisioning_root_password_vault: "{{ default_environment_password_vault }}"              # notsecret
 
 ############################################
-# Phase 4 - Controller, Hub and Host Secrets
+# Phase 4 - AAP Secrets
 ############################################
-# Credentials for registry.redhat.io
 aap_default_controller_fqdn: "controller1.example.ca"
 aap_default_hub_fqdn: "hub1.example.ca"
 
@@ -223,9 +247,9 @@ aap_admin_password_vault: "{{ default_environment_password_vault }}"            
 aap_pg_password_vault: "eyJhbGciOiJSUzUxMiJ9"                                                     # notsecret
 aap_auth_ldap_bind_dn_vault: "uid=ldap-lookup,cn=users,cn=accounts,{{ aap_ldap_domain_map }}"     # notsecret
 aap_auth_ldap_bind_password_vault: "{{ default_environment_password_vault }}"                     # notsecret
+
 redhat_registry_username_vault: "eyJhbGciOiJIUz|builder"                                          # notsecret
 redhat_registry_password_vault: "eyJhbGciOiJSUzUxMiJ9... big long string ...wmDz-i71LdKfVC1Wu7AoG8xsEUxD01A"    # notsecret
-redhat_automation_hub_token_vault: "eyJhbGciOiJIUzI1N... big long string ..._aVq6E8rOFNI557O8Vc3xCQM2o"         # notsecret
 
 aap_hub_ssl_rsa_key_pass_vault: "eyJhbGciOiJSUzUxMiJ9"                                            # notsecret
 aap_registry_username_vault: "{{ cdn_username_vault }}"                                           # notsecret
@@ -238,12 +262,14 @@ aap_hub_ldap_bind_password_vault: "{{ default_environment_password_vault }}"    
 private_hub_username_vault: "{{ default_admin_username }}"                                        # notsecret
 private_hub_password_vault: "{{ default_environment_password_vault }}"                            # notsecret
 
+# automation hub token generated for standalone aap 2.4 automation hub
+private_automation_hub24_token_vault: "asdfasdfasdfasdfasdfasdfasdfasdf"
+
 containerhost_registry_vault: "registry.redhat.io"                                                # notsecret
 containerhost_registry_username_vault: "{{ cdn_username_vault }}"                                 # notsecret
 containerhost_registry_password_vault: "{{ cdn_password_vault }}"                                 # notsecret
 
-# When building the execution environment, we pull the ca.crt from a host
-# registered to the idm server... the private automation hub.
+satellite_ansible_callback_config_key_vault: "203520146d360cdeb39436e7c76aa22e"
 
 #####################################
 # RHISPost Secrets

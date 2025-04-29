@@ -2,26 +2,14 @@
 # rhisam global parameters ensure RHISAM usecases behave appropriately
 # Optional parameters can be added for your usecases
 
-- name: "Configuring the rhisam global parameters"
+- name: "Configuring the global parameters"
+  when: global_parameters is defined and (global_parameters | length) > 0
   ansible.builtin.include_tasks: "ensure_global_parameter.yml"
-  loop: "{{ global_parameters_rhisam }}"
+  loop: "{{ global_parameters }}"
   loop_control:
     loop_var: global_parameter
-  when: "global_parameters_rhisam is defined"
+  no_log: true
   tags:
     - tags_rhisam
     - tags_provisioning_config
     - tags_global_parameters
-    - tags_global_parameters_rhisam
-
-- name: "Configuring the user global parameters"
-  ansible.builtin.include_tasks: "ensure_global_parameter.yml"
-  loop: "{{ global_parameters_user }}"
-  loop_control:
-    loop_var: global_parameter
-  when: "global_parameters_user is defined"
-  tags:
-    - tags_user
-    - tags_provisioning_config
-    - tags_global_parameters
-    - tags_global_parameters_user

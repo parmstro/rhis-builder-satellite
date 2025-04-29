@@ -28,7 +28,7 @@ aws1_secret_key: "{{ aws1_secret_key_vault }}"
 aws1_gov_cloud: false
 aws1_region: "ca-central-1"
 
-compute_resources_rhisam:
+compute_resources:
   - name: "VMware_Lab"
     provider: "vmware"
     description: "Lab VCenter Server"
@@ -37,28 +37,27 @@ compute_resources_rhisam:
     provider_params:
       caching_enabled: false  # setting this to true currently causes some server faults.
       datacenter: "example.ca"
-      url: "192.168.252.30"
+      url: "192.168.140.30"
       user: "{{ vcenter_service_username }}"
       password: "{{ vcenter_service_password }}"
 
-compute_resources_user:
   - name: "Azure_Lab"
     provider: "AzureRm"
     description: "Example.ca Resource Group"
     locations: "{{ satellite_location }}"
     organizations: "{{ satellite_organization }}"
     images:
-      - name: "RHEL88"
+      - name: "RHEL95_latest"
         architecture: "x86_64"
-        operatingsystem: "RHEL 8.8"
+        operatingsystem: "RHEL 9.5"
         image_username: "realm-capsule"
-        image_password: "{{ satellite_admin_password }}"
-        uuid: "marketplace://RedHat:rhel-byos:rhel-lvm88-gen2:8.8.2023053015"
+        image_password: "{{ satellite_password }}"
+        uuid: "marketplace://RedHat:RHEL:9-lvm-gen2:latest"
       - name: "ImageBuilderImage"
         architecture: "x86_64"
-        operatingsystem: "RHEL 8.8"
+        operatingsystem: "RHEL 8.10"
         image_username: "realm-capsule"
-        image_password: "{{ satellite_admin_password }}"
+        image_password: "{{ satellite_password }}"
         uuid: "custom://composer-api-50f19253-239a-4478-b5c7-18ee052047df"
     provider_params:
       app_ident: "{{ azure1_client_id_vault }}"

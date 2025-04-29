@@ -9,7 +9,9 @@
 # All manifests are user manifests.
 
 - name: "Ensure the manifests state"
+  when: redhat_manifests is defined and (redhat_manifests | length) > 0
   ansible.builtin.include_tasks: "ensure_subscription_manifest.yml"
   loop: "{{ redhat_manifests }}"
   loop_control:
     loop_var: subscription_manifest
+  no_log: true

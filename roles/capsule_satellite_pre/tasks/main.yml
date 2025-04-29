@@ -18,7 +18,9 @@
 #     loop_var: cert_capsule
 
 - name: "Fetch tar and script files on the Satellite for each Capsule"
+  when: capsules is defined and (capsules | length) > 0
   ansible.builtin.include_tasks: "capsule_fetch_files.yml"
   loop: "{{ capsules }}"
   loop_control:
     loop_var: cert_capsule
+  no_log: true

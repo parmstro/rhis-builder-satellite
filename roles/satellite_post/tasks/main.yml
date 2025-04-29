@@ -1,0 +1,20 @@
+---
+
+# Perform satellite installation post tasks. e.g. post install tuning
+
+- name: "Ensure postgresql configuration updates"
+  ansible.builtin.blockinfile:
+    path: "/etc/foreman-installer/custom-hiera.yaml"
+    block: |
+      postgresql::server::config_entries:
+        max_connections: "{{ satellite_post.postgres_max_connections | default(1000) }}"
+        shared_buffers: "{{ satellite_post.postgres_shared_buffers | default('2GB') }}"
+        work_mem: "{{ satellite_post.postgres_work_mem | default('8MB') }}"
+        autovacuum_vacuum_cost_limit: "{{ satellite_post.postgres_avcl | default(2000) }}"
+
+- name: "Rerun_installer"
+  ansible.builtin.include_role:
+    name: satellite
+  tags:
+    - tags_phase_3
+    - tags_satellite_post

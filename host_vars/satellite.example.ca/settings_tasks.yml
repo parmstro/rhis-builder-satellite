@@ -1,0 +1,68 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_tasks:
+
+  - name: "foreman_tasks_sync_task_timeout"
+    full_name: "Sync task timeout"
+    settings_type: "integer"
+    default: 120
+    value: 120
+    description: "Number of seconds to wait for synchronous task to finish."
+
+  - name: "dynflow_enable_console"
+    full_name: "Enable dynflow console"
+    settings_type: "boolean"
+    default: true
+    value: true
+    description: "Enable the dynflow console (/foreman_tasks/dynflow) for debugging"
+
+  - name: "dynflow_console_require_auth"
+    full_name: "Require auth for dynflow console"
+    settings_type: "boolean"
+    default: true
+    value: true
+    description: "Require user to be authenticated as user with admin rights when accessing dynflow console"
+
+  - name: "foreman_tasks_proxy_action_retry_count"
+    full_name: "Capsule action retry count"
+    settings_type: "integer"
+    default: 4
+    value: 4
+    description: "Number of attempts to start a task on the capsule before failing"
+
+  - name: "foreman_tasks_proxy_action_retry_interval"
+    full_name: "Capsule action retry interval"
+    settings_type: "integer"
+    default: 15
+    value: 15
+    description: "Time in seconds between retries"
+
+  - name: "foreman_tasks_proxy_batch_trigger"
+    full_name: "Allow Capsule batch tasks"
+    settings_type: "boolean"
+    default: true
+    value: true
+    description: "Allow triggering tasks on the capsule in batches"
+
+  - name: "foreman_tasks_proxy_batch_size"
+    full_name: "Capsule tasks batch size"
+    settings_type: "integer"
+    default: 100
+    value: 100
+    description: "Number of tasks which should be sent to the capsule in one request, if foreman_tasks_proxy_batch_trigger is enabled"
+
+  - name: "foreman_tasks_troubleshooting_url"
+    full_name: "Tasks troubleshooting URL"
+    settings_type: "string"
+    default: "https://access.redhat.com/solutions/satellite6-tasks#%{label}"
+    value: "https://access.redhat.com/solutions/satellite6-tasks#%{label}"
+    description: "Url pointing to the task troubleshooting documentation. It should contain %{label} placeholder, that will be replaced with normalized task label (restricted to only alphanumeric characters)). %{version} placeholder is also available."
+
+  - name: "foreman_tasks_polling_multiplier"
+    full_name: "Polling intervals multiplier"
+    settings_type: "integer"
+    default: 1
+    value: 1
+    description: "Polling multiplier which is used to multiply the default polling intervals. This can be used to prevent polling too frequently for long running tasks."

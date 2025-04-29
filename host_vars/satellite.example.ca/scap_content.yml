@@ -3,15 +3,13 @@
 # Add the files to the scap role directory, or update the scap_file path to support
 # your configuration
 
-scap_contents_rhisam:
+scap_contents:
   - title: "RHEL 8 SCAP content"
     scap_file: "ssg-rhel8-ds.xml"
     locations:
       - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
-
-scap_contents_user:
   - title: "RHEL 7 SCAP content"
     scap_file: "ssg-rhel7-ds.xml"
     locations:
@@ -25,15 +23,13 @@ scap_contents_user:
     organizations:
       - "{{ satellite_organization }}"
 
-scap_tailoring_files_rhisam:
+scap_tailoring_files:
   - name: "RHEL 8 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel8-ds-tailoring.xml"
     locations:
       - "{{ satellite_location }}"
     organizations:
       - "{{ satellite_organization }}"
-
-scap_tailoring_files_user:
   - name: "RHEL 7 DS 2022 Tailoring v3.0"
     scap_file: "ssg-rhel7-ds-tailoring.xml"
     locations:

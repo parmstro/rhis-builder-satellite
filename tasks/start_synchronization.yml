@@ -8,47 +8,36 @@
 # avoid setting skip_sync_all or skip_publish_all in your variable file
 # call it with an extravar instead
 
-- name: "Get the unique list of rhisam products"
-  when: repository_sets_rhisam is defined
+- name: "Get the unique list of products"
+  when: repository_sets is defined and (repository_sets | length) > 0
   ansible.builtin.set_fact:
-    products_to_sync: "{{ repository_sets_rhisam | map(attribute='product') | list | unique }}"
+    products_to_sync: "{{ repository_sets | map(attribute='product') | list | unique }}"
 
-- name: "List the products to be synchronized"
+- name: "Log the products to be synchronized"
   ansible.builtin.debug:
     var: products_to_sync
 
-- name: "Sync the rhisam products with the CDN"
+- name: "Sync the products from the CDN"
+  when: products_to_sync is defined and (products_to_sync | length) > 0
   ansible.builtin.include_tasks: "sync_product.yml"
   loop: "{{ products_to_sync }}"
   loop_control:
     loop_var: product_to_sync
-
-- name: "Get the unique list of user products"
-  when: repository_sets_user is defined
-  ansible.builtin.set_fact:
-    products_to_sync: "{{ repository_sets_user | map(attribute='product') | list | unique }}"
-
-- name: "List the products to be synchronized"
-  ansible.builtin.debug:
-    var: products_to_sync
-
-- name: "Sync the user products"
-  ansible.builtin.include_tasks: "sync_product.yml"
-  loop: "{{ products_to_sync }}"
-  loop_control:
-    loop_var: product_to_sync
+  no_log: true
 
 - name: "Get the unique list of custom products"
-  when: custom_products is defined
+  when: custom_products is defined and (custom_products | length) > 0
   ansible.builtin.set_fact:
-    products_to_sync: "{{ custom_products | map(attribute='name') | list | unique }}"
+    custom_products_to_sync: "{{ custom_products | map(attribute='name') | list | unique }}"
 
-- name: "List the products to be synchronized"
+- name: "Log the custom products to be synchronized"
   ansible.builtin.debug:
     var: products_to_sync
 
 - name: "Sync the custom products"
+  when: custom_products_to_sync is defined and (custom_products_to_sync | length) > 0
   ansible.builtin.include_tasks: "sync_product.yml"
-  loop: "{{ products_to_sync }}"
+  loop: "{{ custom_products_to_sync }}"
   loop_control:
     loop_var: product_to_sync
+  no_log: true

@@ -1,0 +1,75 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_boot_disk:
+
+  - name: "bootdisk_ipxe_dir"
+    full_name: "iPXE directory"
+    description: "Path to directory containing iPXE images"
+    settings_type: "string"
+    default: "/usr/share/ipxe"
+    value: "/usr/share/ipxe"
+
+  - name: "bootdisk_isolinux_dir"
+    full_name: "ISOLINUX directory"
+    description: "Path to directory containing isolinux images"
+    settings_type: "string"
+    default: "/usr/share/syslinux"
+    value: "/usr/share/syslinux"
+
+  - name: "bootdisk_syslinux_dir"
+    full_name: "SYSLINUX directory"
+    description: "Path to directory containing syslinux images"
+    settings_type: "string"
+    default: "/usr/share/syslinux"
+    value: "/usr/share/syslinux"
+
+  - name: "bootdisk_grub2_dir"
+    full_name: "Grub2 directory"
+    description: "Path to directory containing grubx64.efi and shimx64.efi"
+    settings_type: "string"
+    default: "/var/lib/tftpboot/grub2"
+    value: "/var/lib/tftpboot/grub2"
+
+  - name: "bootdisk_host_template"
+    full_name: "Host image template"
+    description: "iPXE template to use for host-specific boot disks"
+    settings_type: "string"
+    default: "Boot disk iPXE - host"
+    value: "Boot disk iPXE - host"
+
+  - name: "bootdisk_generic_host_template"
+    full_name: "Generic image template"
+    description: "iPXE template to use for generic host boot disks"
+    settings_type: "string"
+    default: "Boot disk iPXE - generic host"
+    value: "Boot disk iPXE - generic host"
+
+  - name: "bootdisk_generic_efi_host_template"
+    full_name: "Generic Grub2 EFI image template"
+    description: "iPXE template to use for generic EFI host boot disks"
+    settings_type: "string"
+    default: "Boot disk Grub2 EFI - generic host"
+    value: "Boot disk Grub2 EFI - generic host"
+
+  - name: "bootdisk_mkiso_command"
+    full_name: "ISO generation command"
+    description: "Command to generate ISO image, use genisoimage or mkisofs"
+    settings_type: "string"
+    default: "genisoimage"
+    value: "genisoimage"
+
+  - name: "bootdisk_cache_media"
+    full_name: "Installation media caching"
+    description: "Installation media files will be cached for full host images"
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "bootdisk_allowed_types"
+    full_name: "Allowed bootdisk types"
+    description: "List of allowed bootdisk types, remove type to disable it"
+    settings_type: "array"
+    default: "[subnet, full_host]"
+    value: "[subnet, full_host]"

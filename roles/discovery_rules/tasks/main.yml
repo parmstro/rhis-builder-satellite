@@ -1,24 +1,14 @@
 ---
 # This task configures the rhisam discovery rules
 #
-- name: "Create the rhisam discovery rules"
+- name: "Ensure the state of discovery rules"
+  when: discovery_rules is defined and (discovery_rules | length) > 0
   ansible.builtin.include_tasks: "ensure_discovery_rule.yml"
-  loop: "{{ discovery_rules_rhisam }}"
+  loop: "{{ discovery_rules }}"
   loop_control:
     loop_var: discovery_rule
-  when: "discovery_rules_rhisam is defined"
+  no_log: true
   tags:
     - tags_rhisam
-    - tags_provisioning_config
-    - tags_discovery_rules
-
-- name: "Create the user discovery rules"
-  ansible.builtin.include_tasks: "ensure_discovery_rule.yml"
-  loop: "{{ discovery_rules_user }}"
-  loop_control:
-    loop_var: discovery_rule
-  when: "discovery_rules_user is defined"
-  tags:
-    - tags_user
     - tags_provisioning_config
     - tags_discovery_rules

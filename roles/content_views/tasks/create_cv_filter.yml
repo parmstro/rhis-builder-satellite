@@ -2,26 +2,28 @@
 # This play creates the Content View Filters for a Content View
 #
 
-- name: "Configure the content view filter - {{ cvf.name }}"
+- name: "Configure the content view filter - {{ content_view_filter.name }}"
   redhat.satellite.content_view_filter:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
-    name: "{{ cvf.name }}"
-    description: "{{ cvf.description | default(omit) }}"
-    content_view: "{{ cv.name }}"
-    filter_type: "{{ cvf.type }}"
-    inclusion: "{{ cvf.inclusion }}"
-    repositories: "{{ cvf.repositories }}"
-    original_packages: "{{ cvf.original_packages | default(omit) }}"
-    original_module_streams: "{{ cvf.original_module_streams | default(omit) }}"
+    content_view: "{{ content_view.name }}"
+    name: "{{ content_view_filter.name }}"
+    description: "{{ content_view_filter.description | default(omit) }}"
+    filter_type: "{{ content_view_filter.type }}"
+    inclusion: "{{ content_view_filter.inclusion }}"
+    repositories: "{{ content_view_filter.repositories }}"
+    original_packages: "{{ content_view_filter.original_packages | default(omit) }}"
+    original_module_streams: "{{ content_view_filter.original_module_streams | default(omit) }}"
 
 
 - name: "Configure Content View Filter Rules"
+  when: content_view_filter.rules is defined and (content_view_filter.rules | length) > 0
   ansible.builtin.include_tasks: "create_cvf_rules.yml"
-  loop: "{{ cvf.rules }}"
+  loop: "{{ content_view_filter.rules }}"
   loop_control:
-    loop_var: cvfr
-  when: "cvf.rules is defined"
+    loop_var: content_view_filter_rule
+  no_log: true

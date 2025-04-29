@@ -1,0 +1,134 @@
+---
+
+# yamllint disable rule:line-length
+
+settings_remote_execution:
+
+  - name: "remote_execution_fallback_proxy"
+    full_name: "Fallback to Any Capsule"
+    description: "Search the host for any Capsule with Remote Execution, useful when the host has no subnet or the subnet does not have an execution Capsule"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "remote_execution_global_proxy"
+    full_name: "Enable Global Capsule"
+    description: "Search for remote execution Capsule outside of the Capsules assigned to the host. The search will be limited to the host's organization and location."
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "remote_execution_ssh_user"
+    full_name: "SSH User"
+    description: "Default user to use for SSH. You may override per host by setting a parameter called remote_execution_ssh_user."
+    settings_type: "string"
+    default: "{{ foreman_proxy_realm_principal }}"
+    value: "realm-capsule"
+
+  - name: "remote_execution_effective_user"
+    full_name: "Effective User"
+    description: "Default user to use for executing the script. If the user differs from the SSH user, su or sudo is used to switch the user."
+    settings_type: "string"
+    default: "root"
+    value: "root"
+
+  - name: "remote_execution_effective_user_method"
+    full_name: "Effective User Method"
+    description: 'What command should be used to switch to the effective user. One of ["sudo", "dzdo", "su"]'
+    settings_type: "string"
+    default: "sudo"
+    value: "sudo"
+
+  - name: "remote_execution_effective_user_password"
+    full_name: "Effective user password"
+    description: "Effective user password"
+    settings_type: "string"
+    encrypted: true
+    default: ""
+    value: ""
+
+  - name: "remote_execution_sync_templates"
+    full_name: "Sync Job Templates"
+    description: "Whether we should sync templates from disk when running db:seed."
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "remote_execution_ssh_port"
+    full_name: "SSH Port"
+    description: "Port to use for SSH communication. Default port 22. You may override per host by setting a parameter called remote_execution_ssh_port."
+    settings_type: "integer"
+    default: 22
+    value: 22
+
+  - name: "remote_execution_connect_by_ip"
+    full_name: "Connect by IP"
+    description: "Should the ip addresses on host interfaces be preferred over the fqdn? It is useful when DNS not resolving the fqdns properly. You may override this per host by setting a parameter called remote_execution_connect_by_ip. For dual-stacked hosts you should consider the remote_execution_connect_by_ip_prefer_ipv6 setting"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "remote_execution_connect_by_ip_prefer_ipv6"
+    full_name: "Prefer IPv6 over IPv4"
+    description: "When connecting using ip address, should the IPv6 addresses be preferred? If no IPv6 address is set, it falls back to IPv4 automatically. You may override this per host by setting a parameter called remote_execution_connect_by_ip_prefer_ipv6. By default and for compatibility, IPv4 will be preferred over IPv6 by default"
+    settings_type: "boolean"
+    default: false
+    value: false
+
+  - name: "remote_execution_ssh_password"
+    full_name: "Default SSH password"
+    description: "Default password to use for SSH. You may override per host by setting a parameter called remote_execution_ssh_password"
+    settings_type: "string"
+    encrypted: true
+    default: ""
+    value: ""
+
+  - name: "remote_execution_ssh_key_passphrase"
+    full_name: "Default SSH key passphrase"
+    description: "Default key passphrase to use for SSH. You may override per host by setting a parameter called remote_execution_ssh_key_passphrase"
+    settings_type: "string"
+    encrypted: true
+    default: ""
+    value: ""
+
+  - name: "remote_execution_workers_pool_size"
+    full_name: "Workers pool size"
+    description: "Amount of workers in the pool to handle the execution of the remote execution jobs. Restart of the dynflowd/foreman-tasks service is required."
+    settings_type: "integer"
+    default: 5
+    value: 5
+
+  - name: "remote_execution_cleanup_working_dirs"
+    full_name: "Cleanup working directories"
+    description: "When enabled, working directories will be removed after task completion. You may override this per host by setting a parameter called remote_execution_cleanup_working_dirs."
+    settings_type: "boolean"
+    default: true
+    value: true
+
+  - name: "remote_execution_cockpit_url"
+    full_name: "Cockpit URL"
+    description: "Where to find the Cockpit instance for the Web Console button. By default, no button is shown."
+    settings_type: "string"
+    default: ""
+    value: "https://%{host}:9090"
+
+  - name: "remote_execution_form_job_template"
+    full_name: "Form Job Template"
+    description: "Choose a job template that is pre-selected in job invocation form"
+    settings_type: "string"
+    default: "Run Command - Script Default"
+    value: "Run Command - Script Default"
+
+  - name: "remote_execution_job_invocation_report_template"
+    full_name: "Job Invocation Report Template"
+    description: "Select a report template used for generating a report for a particular remote execution job"
+    settings_type: "string"
+    default: "Job - Invocation Report"
+    value: "Job - Invocation Report"
+
+  - name: "remote_execution_time_to_pickup"
+    full_name: "Time to pickup"
+    description: "Time in seconds within which the host has to pick up a job. If the job is not picked up within this limit, the job will be cancelled. Defaults to 1 day. Applies only to pull-mqtt based jobs."
+    settings_type: "integer"
+    default: 86400
+    value: 86400

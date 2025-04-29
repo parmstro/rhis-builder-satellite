@@ -1,8 +1,8 @@
 ---
 # Activation keys that we use in the RH-ISAM
 
-activation_keys_rhisam:
-  - name: "SOE_RHEL8"
+activation_keys:
+  - name: "SOE8_dev"
     state: "present"
     description: "Activate a RHEL 8 system"
     organization: "{{ satellite_organization }}"
@@ -10,13 +10,73 @@ activation_keys_rhisam:
     content_overrides:
       - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
         override: "enabled"
-    content_view: "SOE_RHEL8"
+    content_view: "SOE8"
     lifecycle_environment: "Development"
     unlimited_hosts: true
 
-  - name: "SOE_JBoss"
+  - name: "SOE8_qa"
     state: "present"
-    description: "Activate a RHEL8 SOE_JBoss system"
+    description: "Activate a RHEL 8 system"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE8_prod"
+    state: "present"
+    description: "Activate a RHEL 8 system"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
+  - name: "SOE8_dev_EPEL"
+    state: "present"
+    description: "Activate a RHEL 8 with EPEL system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8_EPEL"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "SOE8_qa_EPEL"
+    state: "present"
+    description: "Activate a RHEL 8 system with EPEL in qualification"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8_EPEL"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE8_prod_EPEL"
+    state: "present"
+    description: "Activate a RHEL 8 system with EPEL in production"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
+  - name: "SOE8_dev_JBoss"
+    state: "present"
+    description: "Activate a RHEL8 SOE_JBoss system in development"
     organization: "{{ satellite_organization }}"
     auto_attach: false
     content_overrides:
@@ -24,32 +84,229 @@ activation_keys_rhisam:
         override: "enabled"
       - label: "jb-eap-7.4-for-rhel-8-x86_64-rpms"
         override: "enabled"
-    content_view: "SOE_JBoss"
+    content_view: "SOE8_JBoss"
     lifecycle_environment: "Development"
     unlimited_hosts: true
 
-  - name: "SOE_RHEL9"
+  - name: "SOE8_qa_JBoss"
     state: "present"
-    description: "Activate a RHEL 9 system"
+    description: "Activate a RHEL8 SOE_JBoss system in qualification"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8_JBoss"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE8_prod_JBoss"
+    state: "present"
+    description: "Activate a RHEL8 SOE_JBoss system in production"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE8_JBoss"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
+  - name: "SOE9_dev"
+    state: "present"
+    description: "Activate a RHEL 9 system in development"
     organization: "{{ satellite_organization }}"
     auto_attach: false
     content_overrides:
       - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
         override: "enabled"
-    content_view: "SOE_RHEL9"
+    content_view: "SOE9"
     lifecycle_environment: "Development"
     unlimited_hosts: true
 
-activation_keys_user:
-  - name: "SOE_RHEL7"
+  - name: "SOE9_qa"
     state: "present"
-    description: "Activate a RHEL 7 system"
+    description: "Activate a RHEL 9 system in qualification"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE9_prod"
+    state: "present"
+    description: "Activate a RHEL 9 system in production"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
+  - name: "SOE9_dev_EPEL"
+    state: "present"
+    description: "Activate a RHEL 9 system with EPEL in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_EPEL"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "SOE9_qa_EPEL"
+    state: "present"
+    description: "Activate a RHEL 9 system with EPEL in qualification"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_EPEL"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE9_prod_EPEL"
+    state: "present"
+    description: "Activate a RHEL 9 system with EPEL in production"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_EPEL"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
+  - name: "SOE9_dev_JBoss"
+    state: "present"
+    description: "Activate a RHEL9 SOE9_JBoss system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_JBoss"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "SOE9_qa_JBoss"
+    state: "present"
+    description: "Activate a RHEL9 SOE9_JBoss system in qualification"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_JBoss"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE9_prod_JBoss"
+    state: "present"
+    description: "Activate a RHEL9 SOE9_JBoss system in production"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "jb-eap-7.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE9_JBoss"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
+
+  - name: "SOE7"
+    state: "present"
+    description: "Activate a RHEL 7 system in development"
     organization: "{{ satellite_organization }}"
     auto_attach: false
     content_overrides:
       - label: "rhel-7-server-satellite-client-6-rpms"
         override: "enabled"
-    content_view: "SOE_RHEL7"
+    content_view: "SOE7"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "CentOS79"
+    state: "present"
+    description: "Activate a RHEL 7 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "Default_Organization_CentOS79_CentOS79"
+        override: "enabled"
+      - label: "Default_Organization_CentOS79_updates"
+        override: "enabled"
+    content_view: "CentOS79"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "OEL79"
+    state: "present"
+    description: "Activate a RHEL 7 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "Default_Organization_OEL79_OEL79"
+        override: "enabled"
+    content_view: "OEL79"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "convert_CentOS2RHEL7"
+    state: "present"
+    description: "Activate a CentOS79 system in a convert2rhel content view"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "Default_Organization_CentOS79_CentOS79"
+        override: "enabled"
+      - label: "Default_Organization_convert2rhel_convert2rhel7"
+        override: "enabled"
+      - label: "Default_Organization_CentOS79_updates"
+        override: "enabled"
+      - label: "rhel-7-server-els-satellite-client-6-rpms"
+        override: "enabled"
+      - label: "rhel-7-server-els-rpms"
+        override: "enabled"
+      - label: "rhel-7-server-extras-rpms"
+        override: "enabled"
+    content_view: "convert_CentOS2RHEL7"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "convert_OEL2RHEL7"
+    state: "present"
+    description: "Activate an OEL79 system in a convert2rhel content view"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "Default_Organization_OEL79_OEL79"
+        override: "enabled"
+      - label: "Default_Organization_convert2rhel_convert2rhel7"
+        override: "enabled"
+      - label: "rhel-7-server-els-satellite-client-6-rpms"
+        override: "enabled"
+      - label: "rhel-7-server-els-rpms"
+        override: "enabled"
+      - label: "rhel-7-server-extras-rpms"
+        override: "enabled"
+    content_view: "OEL79"
     lifecycle_environment: "Development"
     unlimited_hosts: true
 

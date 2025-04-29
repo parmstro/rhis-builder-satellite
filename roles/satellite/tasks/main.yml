@@ -11,6 +11,7 @@
     satellite_installer_scenario: "satellite"                   # noqa: var-naming[no-role-prefix]
     satellite_installer_options: "{{ sat_installer_options }}"
     satellite_installer_verbose: "{{ sat_installer_verbose }}"
+  no_log: true
 
 #  when:
 #    - "'foreman.service' in ansible_facts['services']"

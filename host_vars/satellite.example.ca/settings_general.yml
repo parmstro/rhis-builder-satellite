@@ -22,12 +22,12 @@ settings_general:
 
   - description: "URL where your Foreman instance is reachable (see also Provisioning unattended_url)"
     settings_type: "string"
-    default: "https://sat6.example.ca"
+    default: "https://satellite.example.ca"
     updated_at: null
     id: "foreman_url"
     name: "foreman_url"
     full_name: "Foreman URL"
-    value: "https://sat6.example.ca"
+    value: "https://satellite.example.ca"
     category: "general"
     category_name: "General"
     readonly: false
@@ -87,7 +87,7 @@ settings_general:
     id: "login_text"
     name: "login_text"
     full_name: "Login page footer text"
-    value: "Version $VERSION"
+    value: "Version: $VERSION        Deployed with rhis-builder-satellite"
     category: "general"
     category_name: "General"
     readonly: false

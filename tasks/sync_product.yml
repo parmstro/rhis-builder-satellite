@@ -5,11 +5,13 @@
     sync_content: false                              # default to false - only sync when necessary
     hours_since_sync: 8766                           # assume the last sync was long ago.. one year - 365.25 days
     last_sync_datetime: 0                            # reset the last_sync_datetime
+    must_sync_product: false
 
 - name: "Get the product info"
   redhat.satellite.resource_info:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
@@ -27,18 +29,18 @@
 - name: "Determine if the product is in sync"
   when:
     - product_info.resources[0].sync_state is defined
-    - (product_info.resources[0].sync_state | type_debug) == "NoneType"
+    - (product_info.resources[0].sync_state | type_debug) == "NoneType" # Product never sync'd
   ansible.builtin.set_fact:
     must_sync_product: true
 
-- name: "Determine hours since last synchronization time"
+- name: "Determine hours since last synchronization time for {{ product_to_sync }}"
   when: last_sync_datetime
   ansible.builtin.set_fact:
     hours_since_sync: "{{ (now(utc=true) - (last_sync_datetime[:-4] | to_datetime)).seconds / 3600 | float }}"
 
 - name: "Display the last_sync_datetime"
   ansible.builtin.debug:
-    msg: "The last sync was on {{ last_sync_datetime }}, {{ hours_since_sync }} hours ago."
+    msg: "The last sync was on {{ last_sync_datetime | default('Never') }}, {{ hours_since_sync }} hours ago."
 
 - name: "Determine if we need to sync based on time"
   when:
@@ -51,14 +53,15 @@
   when:
     - must_sync_product
   ansible.builtin.debug:
-    msg: "We must sync the product"
+    msg: "We must sync the product {{ product_to_sync }}"
 
-- name: "Sync product"
+- name: "Sync product {{ product_to_sync }}"
   when:
     - must_sync_product
   redhat.satellite.repository_sync:
-    username: "{{ satellite_admin_username }}"
-    password: "{{ satellite_admin_password }}"
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs }}"
