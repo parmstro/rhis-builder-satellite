@@ -40,10 +40,11 @@ sat_installer_options:
   - '--foreman-proxy-content-enable-docker true'
   - '--foreman-proxy-content-enable-file true'
   - '--foreman-proxy-content-enable-yum true'
+  - '--foreman-proxy-content-enable-ostree true'
   - '--foreman-proxy-plugin-discovery-install-images true'
 
-#  Currently this must be false - no plugin shipped in repos
-#  - '--foreman-proxy-content-enable-ostree false'
+# Currently this must be false - no plugin shipped in repos
+# ostree no longer errors, but the ostree plugin is also not here...
 #  - '--foreman-proxy-content-enable-python true'
 
 # when we are using Satellite as the dhcp server
