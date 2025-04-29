@@ -52,6 +52,7 @@ sat_installer_options:
   - '--foreman-proxy-content-enable-docker true'
   - '--foreman-proxy-content-enable-file true'
   - '--foreman-proxy-content-enable-yum true'
+  - '--foreman-proxy-content-enable-ostree true'
   - '--foreman-proxy-plugin-discovery-install-images true'
   - '--foreman-proxy-dhcp true'
   - '--foreman-proxy-dhcp-interface "{{ dhcp_interface }}"'
@@ -62,6 +63,3 @@ sat_installer_options:
   - '--foreman-proxy-dhcp-pxeserver "192.168.140.12"'
   - '--foreman-proxy-dhcp-network "192.168.140.0"'
   - '--foreman-proxy-dhcp-netmask "255.255.252.0"'
-#  - '--foreman-proxy-content-enable-ostree false'
-#  - '--foreman-proxy-content-enable-python true'
-# when we are using Satellite as the dhcp server
