@@ -11,7 +11,7 @@
 
 # Default user names for this file
 rhis_builder_default_user: "ansiblerunner"
-default_admin_username: "admin"
+default_admin_username_vault: "admin"
 
 # These are technically no longer secrets as the no longer contain organization identifying data.
 automation_hub_url_vault: "https://console.redhat.com/api/automation-hub/content/published/"
@@ -107,11 +107,11 @@ nbde_encryption_password_vault: "{{ default_environment_password_vault }}"
 #       a single variable that controls a given configuration point
 
 # Satellite administrator
-satellite_username_vault: "{{ default_admin_username }}"                                         # notsecret
+satellite_username_vault: "{{ default_admin_username_vault }}"                                         # notsecret
 satellite_password_vault: "{{ default_environment_password_vault }}"                             # notsecret
 
 # Identity Management Administrator
-realm_admin_username_vault: "{{ default_admin_username }}"                                       # notsecret
+realm_admin_username_vault: "{{ default_admin_username_vault }}"                                       # notsecret
 realm_admin_password_vault: "{{ default_environment_password_vault }}"                           # notsecret
 
 # The general secrets for Idm and Satellite images (built into image to register with CDN on first boot)
@@ -147,7 +147,7 @@ aws1_region_vault: "ca-central-1"
 #####################################
 # variable names required by the role
 # (the Satellite Pre role uses these to install the IdM client)
-ipa_admin_principal_vault: "{{ default_admin_username }}"                                         # notsecret
+ipa_admin_principal_vault: "{{ default_admin_username_vault }}"                                         # notsecret
 ipa_admin_password_vault: "{{ default_environment_password_vault }}"                              # notsecret
 ipa_dm_password_vault: "{{ default_environment_password_vault }}"                                 # notsecret
 
@@ -163,7 +163,7 @@ kvm_ssl_rsa_key_pass_vault: "{{ default_environment_password_vault }}"
 # Phase 3 - Satellite Install secrets
 #####################################
 sat_ssl_rsa_key_pass_vault: "{{ default_environment_password_vault }}"                            # notsecret
-sat_inital_admin_username_vault: "{{ default_admin_username }}"                                   # notsecret
+sat_inital_admin_username_vault: "{{ default_admin_username_vault }}"                                   # notsecret
 sat_inital_admin_password_vault: "{{ default_environment_password_vault }}"                       # notsecret
 
 # This is used to pull the keytab instead of recreating it
@@ -242,7 +242,7 @@ aap_controller_manifest_zip_vault: "/tmp/rhis_aap_manifest.zip"
 
 # AAP controller and hub inventory file template secrets
 aap_controller_ssl_rsa_key_pass_vault: "eyJhbGciOiJSUzUxMiJ9"                                     # notsecret
-aap_admin_username_vault: "{{ default_admin_username }}"                                          # notsecret
+aap_admin_username_vault: "{{ default_admin_username_vault }}"                                          # notsecret
 aap_admin_password_vault: "{{ default_environment_password_vault }}"                              # notsecret
 aap_pg_password_vault: "eyJhbGciOiJSUzUxMiJ9"                                                     # notsecret
 aap_auth_ldap_bind_dn_vault: "uid=ldap-lookup,cn=users,cn=accounts,{{ aap_ldap_domain_map }}"     # notsecret
@@ -259,7 +259,7 @@ aap_hub_admin_password_vault: "{{ default_environment_password_vault }}"        
 aap_hub_pg_password_vault: "eyJhbGciOiJSUzUxMiJ9"                                                 # notsecret
 aap_hub_ldap_bind_password_vault: "{{ default_environment_password_vault }}"                      # notsecret
 
-private_hub_username_vault: "{{ default_admin_username }}"                                        # notsecret
+private_hub_username_vault: "{{ default_admin_username_vault }}"                                        # notsecret
 private_hub_password_vault: "{{ default_environment_password_vault }}"                            # notsecret
 
 # automation hub token generated for standalone aap 2.4 automation hub
@@ -278,5 +278,5 @@ satellite_ansible_callback_config_key_vault: "203520146d360cdeb39436e7c76aa22e"
 github_demo_username_vault: "user@example.ca"                                                   # notsecret
 github_demo_gpat_vault: "ghp_withalongrandomstringof$tU!!"                                      # notsecret
 
-aap_idm_machine_username_vault: "{{ default_admin_username }}"                                  # notsecret
+aap_idm_machine_username_vault: "{{ default_admin_username_vault }}"                                  # notsecret
 aap_idm_machine_password_vault: "eyJhbGciOiJIUz"                                                # notsecret
