@@ -185,7 +185,7 @@ custom_products:
       - name: "rhel9/rhel-bootc"
         label: "rhel9_rhel-bootc"
         description: "rhel9 bootc image mode container repo"
-        upstream_name: "rhel9/rhel-bootc"
+        docker_upstream_name: "rhel9/rhel-bootc"
         content_type: "docker"
         url: "https://registry.redhat.io"
         username: "{{ redhat_registry_username_vault }}"

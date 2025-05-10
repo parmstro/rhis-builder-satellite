@@ -26,6 +26,7 @@
     deb_releases: "{{ custom_product_repository.deb_releases | default(omit) }}"
     description: "{{ custom_product_repository.description | default(omit) }}"
     docker_tags_whitelist: "{{ custom_product_repository.docker_tags_whitelist | default(omit) }}"
+    docker_upstream_name: "{{ custom_product_repository.docker_upstream_name | default(omit) }}"
     download_concurrency: "{{ custom_product_repository.download_concurrency | default(omit) }}"
     download_policy: "{{ custom_product_repository.download_policy | default(omit) }}"
     exclude_tags: "{{ custom_product_repository.exclude_tags | default(omit) }}"
