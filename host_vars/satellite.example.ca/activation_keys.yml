@@ -152,6 +152,38 @@ activation_keys:
     lifecycle_environment: "Production"
     unlimited_hosts: true
 
+  - name: "SOE9_dev_aap_24"
+    state: "present"
+    description: "Activate a RHEL 9 AAP 2.4 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "ansible-automation-platform-2.4-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "rhel-9-for-x86_64-supplementary-rpms"
+        override: "enabled"
+    content_view: "SOE_AAP24"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "SOE9_dev_aap_25"
+    state: "present"
+    description: "Activate a RHEL 9 AAP 2.5 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "ansible-automation-platform-2.5-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "rhel-9-for-x86_64-supplementary-rpms"
+        override: "enabled"
+    content_view: "SOE_AAP25"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
   - name: "SOE9_dev_EPEL"
     state: "present"
     description: "Activate a RHEL 9 system with EPEL in development"

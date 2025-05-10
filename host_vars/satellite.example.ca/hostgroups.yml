@@ -300,6 +300,103 @@ satellite_hostgroups:
         parameter_type: "string"
         value: "/dev/nvme0n1"
 
+  - name: "kvm_host"
+    parent: "hg_x86_64_rhel9_metal"
+    description: "RHEL 9 SOE baremetal hostgroup for KVM Hypervisor"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE9"
+    activation_keys: "SOE9_dev"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    domain: "{{ satellite_domain }}"
+    subnet: "example.ca"
+    realm: "{{ satellite_domain | upper }}"
+    architecture: "x86_64"
+    operatingsystem: "RHEL 9.5"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "kvm_host_enabled"
+        hidden_value: false
+        parameter_type: "boolean"
+        value: true
+
+  - name: "aap_24"
+    parent: "hg_x86_64_rhel9_metal"
+    description: "Baremetal hostgroup for AAP 2.4 deployments"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE_AAP24"
+    activation_keys: "SOE9_dev_aap_24"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    domain: "{{ satellite_domain }}"
+    subnet: "example.ca"
+    realm: "{{ satellite_domain | upper }}"
+    architecture: "x86_64"
+    operatingsystem: "RHEL 9.5"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+
+  - name: "aap_25"
+    parent: "hg_x86_64_rhel9_metal"
+    description: "Baremetal hostgroup for AAP 2.5 deployments"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE_AAP25"
+    activation_keys: "SOE9_dev_aap_25"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    domain: "{{ satellite_domain }}"
+    subnet: "example.ca"
+    realm: "{{ satellite_domain | upper }}"
+    architecture: "x86_64"
+    operatingsystem: "RHEL 9.5"
+    kickstart_repository: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+
   - name: "hg_x86_64_rhel9_vm"
     description: "RHEL 9 SOE vm hostgroup"
     organization: "{{ satellite_organization }}"
@@ -309,7 +406,7 @@ satellite_hostgroups:
     content_source: "satellite.example.ca"
     lifecycle_environment: "Development"
     content_view: "SOE9"
-    activation_keys: "SOE9_dev"
+    activation_keys: "SOE9_dev_aap_24"
     openscap_capsule: "{{ satellite_fqdn }}"
     ansible_roles:
       - theforeman.foreman_scap_client
@@ -350,6 +447,22 @@ satellite_hostgroups:
     pxe_loader: "Grub2 UEFI"
     root_pass: "{{ satellite_password }}"
 
+  - name: "aap24_vm"
+    parent: "hg_x86_64_rhel9_vm/dev"
+    description: "RHEL 9 SOE for JBoss development vm"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    compute_resource: "VMware_Lab"
+    compute_profile: "SOE_Medium"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE_AAP24"
+    activation_keys: "SOE_dev_aap_24"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
 
   - name: "soe9_dev_jboss"
     parent: "hg_x86_64_rhel9_vm/dev"

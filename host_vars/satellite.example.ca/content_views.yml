@@ -653,9 +653,9 @@ composite_content_views:
     components:
       - content_view: "SOE9"
         latest: true
-      - content_view: "AAP24_Files"
+      - content_view: "AAP25_Files"
         latest: true
-      - content_view: "AAP24_RPMs"
+      - content_view: "AAP25_RPMs"
         latest: true
     environments:
       - "Library"
