@@ -52,7 +52,7 @@ sat_installer_options:
   - '--foreman-proxy-content-enable-docker true'
   - '--foreman-proxy-content-enable-file true'
   - '--foreman-proxy-content-enable-yum true'
-  - '--foreman-proxy-content-enable-ostree true'
+#  - '--foreman-proxy-content-enable-ostree true'
   - '--foreman-proxy-plugin-discovery-install-images true'
   - '--foreman-proxy-dhcp true'
   - '--foreman-proxy-dhcp-interface "{{ dhcp_interface }}"'
