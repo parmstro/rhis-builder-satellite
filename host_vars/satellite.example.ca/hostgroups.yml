@@ -447,9 +447,9 @@ satellite_hostgroups:
     pxe_loader: "Grub2 UEFI"
     root_pass: "{{ satellite_password }}"
 
-  - name: "aap24_vm"
+  - name: "aap_24_vm"
     parent: "hg_x86_64_rhel9_vm/dev"
-    description: "RHEL 9 SOE for JBoss development vm"
+    description: "RHEL 9 vm for AAP 2.4 host deployments"
     organization: "{{ satellite_organization }}"
     locations: "{{ satellite_location }}"
     compute_resource: "VMware_Lab"
@@ -458,6 +458,23 @@ satellite_hostgroups:
     lifecycle_environment: "Development"
     content_view: "SOE_AAP24"
     activation_keys: "SOE_dev_aap_24"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
+
+  - name: "aap_25_vm"
+    parent: "hg_x86_64_rhel9_vm/dev"
+    description: "RHEL 9 vm for AAP 2.5 host deployments"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    compute_resource: "VMware_Lab"
+    compute_profile: "SOE_Medium"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE_AAP25"
+    activation_keys: "SOE_dev_aap_25"
     ansible_roles:
       - theforeman.foreman_scap_client
     ptable: "RHEL_Server_Compliance"
