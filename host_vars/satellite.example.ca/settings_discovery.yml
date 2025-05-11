@@ -42,8 +42,8 @@ settings_discovery:
   - name: "discovery_hostname"
     full_name: "Hostname facts"
     settings_type: "array"
-    default: "[discovery_bootif]"
-    value: "[chassis_position, discovery_bootif]"
+    default: '["discovery_bootif"]'
+    value: '["chassis_position", "discovery_bootif"]'
     description: "List of facts to use for the hostname (first wins)"
 
   - name: "discovery_auto"

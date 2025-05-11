@@ -78,12 +78,12 @@ settings_facts:
     full_name: "Ignore interfaces with matching identifier"
     descrtipion: "Skip creating or updating host network interfaces objects with identifiers matching these values from incoming facts. You can use * wildcard to match identifiers with indexes e.g. macvtap*. The ignored interfaces raw facts will be still stored in the DB, see the 'Exclude pattern' setting for more details."
     settings_type: "array"
-    default: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*]"
-    value: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*]"
+    default: '["lo", "en*v*", "usb*", "vnet*", "macvtap*", ";vdsmdummy;", "veth*", "docker*", "tap*", "qbr*", "qvb*", "qvo*", "qr-*", "qg-*", "vlinuxbr*", "vovsbr*", "br-int", "vif*", "cali*"]'
+    value: '["lo", "en*v*", "usb*", "vnet*", "macvtap*", ";vdsmdummy;", "veth*", "docker*", "tap*", "qbr*", "qvb*", "qvo*", "qr-*", "qg-*", "vlinuxbr*", "vovsbr*", "br-int", "vif*", "cali*"]'
 
   - name: "excluded_facts"
     full_name: "Exclude pattern for facts stored in satellite"
     descrtipion: "Exclude pattern for all types of imported facts (puppet, ansible, rhsm). Those facts won't be stored in satellite's database. You can use * wildcard to match names with indexes e.g. ignore* will filter out ignore, ignore123 as well as a::ignore or even a::ignore123::b"
     settings_type: "array"
-    default: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*, load_averages::*, memory::swap::available*, memory::swap::capacity, memory::swap::used*, memory::system::available*, memory::system::capacity, memory::system::used*, memoryfree, memoryfree_mb, swapfree, swapfree_mb, uptime_hours, uptime_days]"
-    value: "[lo, en*v*, usb*, vnet*, macvtap*, ;vdsmdummy;, veth*, docker*, tap*, qbr*, qvb*, qvo*, qr-*, qg-*, vlinuxbr*, vovsbr*, br-int, vif*, cali*, load_averages::*, memory::swap::available*, memory::swap::capacity, memory::swap::used*, memory::system::available*, memory::system::capacity, memory::system::used*, memoryfree, memoryfree_mb, swapfree, swapfree_mb, uptime_hours, uptime_days]"
+    default: '["lo", "en*v*", "usb*", "vnet*", "macvtap*", ";vdsmdummy;", "veth*", "docker*", "tap*", "qbr*", "qvb*", "qvo*", "qr-*", "qg-*", "vlinuxbr*", "vovsbr*", "br-int", "vif*", "cali*", "load_averages:*", "memory::swap::available*", "memory::swap::capacity", "memory::swap::used*", "memory::system::available*", "memory::system::capacity", "memory::system::used*", "memoryfree", "memoryfree_mb", "swapfree", "swapfree_mb", "uptime_hours", "uptime_days"]'
+    value: '["lo", "en*v*", "usb*", "vnet*", "macvtap*", ";vdsmdummy;", "veth*", "docker*", "tap*", "qbr*", "qvb*", "qvo*", "qr-*", "qg-*", "vlinuxbr*", "vovsbr*", "br-int", "vif*", "cali*", "load_averages:*", "memory::swap::available*", "memory::swap::capacity", "memory::swap::used*", "memory::system::available*", "memory::system::capacity", "memory::system::used*", "memoryfree", "memoryfree_mb", "swapfree", "swapfree_mb", "uptime_hours", "uptime_days"]'

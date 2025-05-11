@@ -130,12 +130,12 @@ settings_content:
     default: true
     value: true
 
-  - name: "download_rate_limit"
-    full_name: "Download rate limit"
-    description: "Maximum download rate when syncing a repository (requests per second). Use 0 for no limit."
-    settings_type: "integer"
-    default: null
-    value: null
+  # - name: "download_rate_limit"
+  #   full_name: "Download rate limit"
+  #   description: "Maximum download rate when syncing a repository (requests per second). Use 0 for no limit."
+  #   settings_type: "integer"
+  #   default: null
+  #   value: null
 
   - name: "default_download_policy"
     full_name: "Default Custom Repository download policy"
@@ -291,12 +291,12 @@ settings_content:
     default: 2000
     value: 2000
 
-  - name: ""
-    full_name: "Orphaned Content Protection Time"
-    description: "Time in minutes before content that is not contained within a repository and has not been accessed is considered orphaned."
-    settings_type: "integer"
-    default: 1440
-    value: 1440
+  # - name: ""
+  #   full_name: "Orphaned Content Protection Time"
+  #   description: "Time in minutes before content that is not contained within a repository and has not been accessed is considered orphaned."
+  #   settings_type: "integer"
+  #   default: 1440
+  #   value: 1440
 
   - name: "orphan_protection_time"
     full_name: "Completed pulp task protection days"

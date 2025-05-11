@@ -22,8 +22,8 @@ settings_config_management:
     full_name: "Default parameters lookup path"
     description: "Satellite will evaluate host smart class parameters in this order by default"
     settings_type: "array"
-    default: "[fqdn, hostgroup, os, domain]"
-    value: "[fqdn, hostgroup, os, domain]"
+    default: '["fqdn", "hostgroup", "os", "domain"]'
+    value: '["fqdn", "hostgroup", "os", "domain"]'
 
   - name: "interpolate_erb_in_parameters"
     full_name: "Interpolate ERB in parameters"

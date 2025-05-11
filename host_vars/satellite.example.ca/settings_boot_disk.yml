@@ -71,5 +71,5 @@ settings_boot_disk:
     full_name: "Allowed bootdisk types"
     description: "List of allowed bootdisk types, remove type to disable it"
     settings_type: "array"
-    default: "[subnet, full_host]"
-    value: "[subnet, full_host]"
+    default: '["subnet", "full_host"]'
+    value: '["subnet", "full_host"]'
