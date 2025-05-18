@@ -25,8 +25,8 @@ global_parameters:
     hidden_value: false
     state: "present"
 
-  - name: "ansible_tower_fqdn"
-    value: "aap.example.ca"
+  - name: "ansible_controller_api_url"
+    value: "https://aapcontroller24.example.ca/api/v2"
     parameter_type: "string"
     hidden_value: false
     state: "present"
