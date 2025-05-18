@@ -69,6 +69,8 @@
     ipaadmin_password: "{{ ipa_admin_password }}"
     name: "{{ ipa_dns_zone }}"
     update_policy: "{{ foreman_proxy_bind_update_policy }}"
+    allow_sync_ptr: true
+    dynamic_update: true
 
 - name: "Set up IdM reverse lookup zone to allow foreman proxy to update DNS"
   redhat.rhel_idm.ipadnszone:
@@ -76,3 +78,5 @@
     ipaadmin_password: "{{ ipa_admin_password }}"
     name: "{{ ipa_dns_reverse_zone }}"
     update_policy: "{{ foreman_proxy_bind_update_policy_reverse }}"
+    allow_sync_ptr: true
+    dynamic_update: true
