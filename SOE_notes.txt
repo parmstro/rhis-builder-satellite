@@ -1,0 +1,12 @@
+# When creating an SOE I have always been going through the same process.
+
+# Add new product and repositories
+# sync them
+# Decide what OS to use
+# Decide what the basic partitioning will look like
+# What build process will I use
+# What 
+#
+# Define a new content view and the lifecycle path it should follow
+# Define an activation key with overrides
+# Publish and promote the content
