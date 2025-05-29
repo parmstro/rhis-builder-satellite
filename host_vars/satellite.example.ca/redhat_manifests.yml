@@ -15,7 +15,7 @@ redhat_manifests:
     portal_url: "https://subscription.rhsm.redhat.com"
 #    repository_url:  # specify a url for alternate content source in Satellite
     state: present
-    subs: "{{ satdev_subs_vault }}"
+    subs: "{{ example_ca_subs_vault }}"
     validate_certs: true
 
 # we want to eventually support searching by contract number + SKU
