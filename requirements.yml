@@ -1,18 +1,31 @@
 ---
 # These are the collections required by the builder
 collections:
-
-- ansible.controller
-- ansible.netcommon
-- ansible.posix
-- ansible.utils
-- azure.azcollection
-- community.general
-- community.vmware
-- community.aws
-- containers.podman
-- redhat.rhel_idm
-- redhat.rhel_system_roles
-- redhat.satellite
-- redhat.satellite_operations
-- redhat.redhat_csp_download
+  - name: "ansible.controller"
+    version: "4.5.22"         # use 4.5.22 when deploying aap 2.4, use 4.6.13 when deploying aap 2.5 or greater
+  - name: "ansible.netcommon"
+    version: "*"
+  - name: "ansible.posix"
+    version: "*"
+  - name: "ansible.utils"
+    version: "*"
+  - name: "azure.azcollection"
+    version: "*"
+  - name: "community.general"
+    version: "*"
+  - name: "community.vmware"
+    version: "*"
+  - name: "community.aws"
+    version: "*"
+  - name: "containers.podman"
+    version: "*"
+  - name: "redhat.rhel_idm"
+    version: ">=1.14.7"           # earlier versions fail with 'dns_over_tls' option error
+  - name: "redhat.rhel_system_roles"
+    version: "*"
+  - name: "redhat.satellite"
+    version: "*"
+  - name: "redhat.satellite_operations"
+    version: "*"
+  - name: "redhat.redhat_csp_download"
+    version: "*"
