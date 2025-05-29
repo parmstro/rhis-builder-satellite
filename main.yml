@@ -1,5 +1,19 @@
 ---
 
+- name: "Configure the ansible environment"
+  hosts: provisioner
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: "Update collections"
+      ansible.builtin.command: "ansible-galaxy collection install -r {{ playbook_dir }}/requirements.yml"
+      register: result
+      changed_when: result.rc == 0
+      tags:
+        - tags_init
+
 - name: "Build the satellite primary"
   hosts: sat_primary
   become: true
@@ -11,41 +25,49 @@
       when: vault_path is defined
       ansible.builtin.include_vars:
         file: "{{ vault_path }}"
+      tags:
+        - tags_init
 
     - name: "Load the other variables"
       when: vars_path is defined
       ansible.builtin.include_vars:
         file: "{{ vars_path }}"
+      tags:
+        - tags_init
 
     - name: "Load the vault variables"
       when: vault_dir is defined
       ansible.builtin.include_vars:
         dir: "{{ vault_dir }}"
+      tags:
+        - tags_init
 
     - name: "Load the other variables"
       when: vars_dir is defined
       ansible.builtin.include_vars:
         dir: "{{ vars_dir }}"
+      tags:
+        - tags_init
 
     - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
         name: satellite_pre
       tags:
-        - tags_phase_3
+        - tags_rhisam
         - tags_satellite_pre
 
     - name: "Apply role of satellite to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
         name: satellite
       tags:
-        - tags_phase_3
+        - tags_rhisam
         - tags_satellite_install
 
     - name: "Apply role of satellite_post to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
         name: satellite_post
       tags:
-        - tags_phase_3
+        - tags_rhisam
         - tags_satellite_post
 
     - name: "Ensure hammer configuration"
