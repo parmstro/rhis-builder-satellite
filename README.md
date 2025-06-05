@@ -8,6 +8,7 @@ I know that most of you have experience with these things, but we also work with
 
 If you haven't been there yet, please visit the [rhis-builder-provisioner wiki](https://github.com/parmstro/rhis-builder-provisioner/wiki) first
 
+See rhis-builder-vault-SAMPLE repo for secrets definitions.
 ***
 
 Hey, welcome to the next repo on your way to building the RHIS.
