@@ -2,4 +2,5 @@ inventory
 ansible.cfg
 rhis-builder-satellite.code-workspace
 run_main.sh
-/home/ansiblerunner/rhis/rhis-builder-satellite/host_vars/satellite1.parmstrong.ca
+host_vars/satellite1.parmstrong.ca/*
+
