@@ -3,4 +3,7 @@ ansible.cfg
 rhis-builder-satellite.code-workspace
 run_main.sh
 host_vars/satellite1.parmstrong.ca/*
-
+parmstrong.ca.*
+files/ssg-rhel7-ds-tailoring.xml
+files/ssg-rhel8-ds-tailoring.xml
+files/ssg-rhel9-ds-tailoring.xml
