@@ -1,6 +1,6 @@
 # this controls our build in Satellite
 
-satellite_fqdn: "sat6.parmstrong.ca"
+satellite_fqdn: "satellite1.parmstrong.ca"
 satellite_username: "{{ satellite_username_vault }}"
 satellite_password: "{{ satellite_password_vault }}"
 satellite_initial_location: "Default Location"
