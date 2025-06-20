@@ -12,7 +12,7 @@
 # satgroup-operator - combines a number of roles - BootStrap_User, Remote Execution User, Task Manager, Edit Hosts, Discovery Manager, Viewer
 # For the POC we only need to create the Operator Role
 
-- name: "Ensure the role state for - {{ satellite_role.name }}"
+- name: "Ensure the role state for - {{ satellite_role.name }}"  # noqa: args[module] ansible linter does not like our perfectly reasonable value
   redhat.satellite.role:
     username: "{{ satellite_username | default(omit) }}"
     password: "{{ satellite_password | default(omit) }}"
