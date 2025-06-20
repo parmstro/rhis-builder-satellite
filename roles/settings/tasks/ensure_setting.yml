@@ -1,7 +1,7 @@
 ---
 # set a Satellite general setting to a particular value.
 
-- name: "Configuring setting - {{ setting.name }}"
+- name: "Configuring {{ _section_fact }}:{{ setting.name }}" # noqa: name[template]
   redhat.satellite.setting:
     username: "{{ satellite_username | default(omit) }}"
     password: "{{ satellite_password | default(omit) }}"
