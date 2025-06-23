@@ -86,4 +86,4 @@ logvol /var/log       --vgname=vg_root --fstype=xfs --name=lv_var_log   --size=6
 logvol /var/log/audit --vgname=vg_root --fstype=xfs --name=lv_var_audit --size=2048
 logvol /              --vgname=vg_root --fstype=xfs --name=lv_root      --size=102400 
 logvol /home          --vgname=vg_root --fstype=xfs --name=lv_home      --size=10240
-logvol /var           --vgname=vg_root --fstype=xfs --name=lv_var       --size=32768 --maxsize=409600 --grow
+logvol /var           --vgname=vg_root --fstype=xfs --name=lv_var       --size=1 --maxsize=409600 --grow
