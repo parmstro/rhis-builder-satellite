@@ -32,6 +32,32 @@ content_views:
     repositories:
       - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 RPMs"
         product: "Red Hat Ansible Automation Platform"
+    filters:
+      - name: "Include_All_Packages_No_Errata"
+        type: "rpm"
+        inclusion: true
+        description: "Include all rpms with no errata for all repositories"
+        original_packages: true
+        repositories: "[]"
+      - name: "Include_All_Streams_No_Errata"
+        type: "modulemd"
+        inclusion: true
+        description: "Include all module streams with no errata for all repositories"
+        original_module_streams: true
+        repositories: "[]"
+      - name: "Include_Errata_By_Date"
+        type: "erratum"
+        inclusion: true
+        description: "Include all errata updated as of {{ errata_end_date }}"
+        repositories: "[]"
+        rules:
+          - name: "errata-by-date-{{ errata_end_date }}"
+            end_date: "{{ errata_end_date }}"
+            date_type: "updated"
+            types:
+              - "enhancement"
+              - "bugfix"
+              - "security"
     environments:
       - "Library"
 
@@ -54,6 +80,32 @@ content_views:
     repositories:
       - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 RPMs"
         product: "Red Hat Ansible Automation Platform"
+    filters:
+      - name: "Include_All_Packages_No_Errata"
+        type: "rpm"
+        inclusion: true
+        description: "Include all rpms with no errata for all repositories"
+        original_packages: true
+        repositories: "[]"
+      - name: "Include_All_Streams_No_Errata"
+        type: "modulemd"
+        inclusion: true
+        description: "Include all module streams with no errata for all repositories"
+        original_module_streams: true
+        repositories: "[]"
+      - name: "Include_Errata_By_Date"
+        type: "erratum"
+        inclusion: true
+        description: "Include all errata updated as of {{ errata_end_date }}"
+        repositories: "[]"
+        rules:
+          - name: "errata-by-date-{{ errata_end_date }}"
+            end_date: "{{ errata_end_date }}"
+            date_type: "updated"
+            types:
+              - "enhancement"
+              - "bugfix"
+              - "security"
     environments:
       - "Library"
 
@@ -66,6 +118,34 @@ content_views:
     repositories:
       - name: "EPEL8"
         product: "EPEL8"
+      - name: "EPEL8"                     # EPEL8 cv requires EPEL8_Stream
+        product: "EPEL8_Stream"           # required by testapp wordpress
+    filters:
+      - name: "Include_All_Packages_No_Errata"
+        type: "rpm"
+        inclusion: true
+        description: "Include all rpms with no errata for all repositories"
+        original_packages: true
+        repositories: "[]"
+      - name: "Include_All_Streams_No_Errata"
+        type: "modulemd"
+        inclusion: true
+        description: "Include all module streams with no errata for all repositories"
+        original_module_streams: true
+        repositories: "[]"
+      - name: "Include_Errata_By_Date"
+        type: "erratum"
+        inclusion: true
+        description: "Include all errata updated as of {{ errata_end_date }}"
+        repositories: "[]"
+        rules:
+          - name: "errata-by-date-{{ errata_end_date }}"
+            end_date: "{{ errata_end_date }}"
+            date_type: "updated"
+            types:
+              - "enhancement"
+              - "bugfix"
+              - "security"
     environments:
       - "Library"
 
@@ -77,6 +157,32 @@ content_views:
     repositories:
       - name: "EPEL9"
         product: "EPEL9"
+    filters:
+      - name: "Include_All_Packages_No_Errata"
+        type: "rpm"
+        inclusion: true
+        description: "Include all rpms with no errata for all repositories"
+        original_packages: true
+        repositories: "[]"
+      - name: "Include_All_Streams_No_Errata"
+        type: "modulemd"
+        inclusion: true
+        description: "Include all module streams with no errata for all repositories"
+        original_module_streams: true
+        repositories: "[]"
+      - name: "Include_Errata_By_Date"
+        type: "erratum"
+        inclusion: true
+        description: "Include all errata updated as of {{ errata_end_date }}"
+        repositories: "[]"
+        rules:
+          - name: "errata-by-date-{{ errata_end_date }}"
+            end_date: "{{ errata_end_date }}"
+            date_type: "updated"
+            types:
+              - "enhancement"
+              - "bugfix"
+              - "security"
     environments:
       - "Library"
 
@@ -120,6 +226,8 @@ content_views:
       - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS Kickstart 8.10"
         product: "Red Hat Enterprise Linux for x86_64"
       - name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 RPMs"
+        product: "Red Hat Enterprise Linux for x86_64"
+      - name: "Red Hat Satellite 6 Client 2 for RHEL 8 x86_64 RPMs"
         product: "Red Hat Enterprise Linux for x86_64"
     filters:
       - name: "Include_All_Packages_No_Errata"
@@ -175,15 +283,17 @@ content_views:
         product: "Red Hat Enterprise Linux for x86_64"
       - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary RPMs 9"
         product: "Red Hat Enterprise Linux for x86_64"
-      - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream Kickstart 9.4"
+      - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream Kickstart 9.6"
         product: "Red Hat Enterprise Linux for x86_64"
       - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.4"
         product: "Red Hat Enterprise Linux for x86_64"
-      - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream Kickstart 9.5"
+      - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream Kickstart 9.6"
         product: "Red Hat Enterprise Linux for x86_64"
       - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS Kickstart 9.5"
         product: "Red Hat Enterprise Linux for x86_64"
       - name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 RPMs"
+        product: "Red Hat Enterprise Linux for x86_64"
+      - name: "Red Hat Satellite 6 Client 2 for RHEL 9 x86_64 RPMs"
         product: "Red Hat Enterprise Linux for x86_64"
     filters:
       - name: "Include_All_Packages_No_Errata"
@@ -241,9 +351,15 @@ content_views:
         product: "Red Hat Enterprise Linux for ARM 64"
       - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream Kickstart 9.5"
         product: "Red Hat Enterprise Linux for ARM 64"
+      - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream Kickstart 9.2"  # known to work with RPi4++
+        product: "Red Hat Enterprise Linux for ARM 64"
       - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS Kickstart 9.5"
         product: "Red Hat Enterprise Linux for ARM 64"
+      - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS Kickstart 9.2"     # known to work with RPi4++
+        product: "Red Hat Enterprise Linux for ARM 64"
       - name: "Red Hat Satellite Client 6 for RHEL 9 aarch64 RPMs"
+        product: "Red Hat Enterprise Linux for ARM 64"
+      - name: "Red Hat Satellite 6 Client 2 for RHEL 9 aarch64 RPMs"
         product: "Red Hat Enterprise Linux for ARM 64"
     filters:
       - name: "Include_All_Packages_No_Errata"
@@ -427,13 +543,15 @@ content_views:
     force_publish: false
     publication_threshold_hours: 24
     repositories:
-      - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9.4"
+      - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream RPMs 9.6"
         product: "Red Hat Enterprise Linux for x86_64"
-      - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 9.4"
+      - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS RPMs 9.6"
         product: "Red Hat Enterprise Linux for x86_64"
-      - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary RPMs 9.4"
+      - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary RPMs 9.6"
         product: "Red Hat Enterprise Linux for x86_64"
       - name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 RPMs"
+        product: "Red Hat Enterprise Linux for x86_64"
+      - name: "Red Hat Satellite 6 Client 2 for RHEL 9 x86_64 RPMs"
         product: "Red Hat Enterprise Linux for x86_64"
     filters:
       - name: "Include_All_Packages_No_Errata"
