@@ -36,7 +36,7 @@ compute_profiles:
               mode: "persistent"
               controller_key: 1000
               datastore: "{{ vmware_cluster1_datastore }}"
-              size_gb: 65
+              size_gb: 120
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
@@ -50,7 +50,7 @@ compute_profiles:
           password: "{{ satellite_password }}"
           ssh_key_data: "{{ azure1_user_ssh_key }}"
           premium_os_disk: "false"
-          os_disk_size_gb: "80"
+          os_disk_size_gb: "120"
           os_disk_caching: ""
           script_command: ""
           script_uris: ""
@@ -63,7 +63,7 @@ compute_profiles:
               private_ip: "true"
           volumes_attributes:
             0:
-              disk_size_gb: "10"
+              disk_size_gb: "120"
               data_disk_caching: ""
 
   - name: "SOE_Medium"
@@ -94,7 +94,7 @@ compute_profiles:
               mode: "persistent"
               controller_key: 1000
               datastore: "{{ vmware_cluster1_datastore }}"
-              size_gb: 100
+              size_gb: 120
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
@@ -108,7 +108,7 @@ compute_profiles:
           password: "{{ satellite_password }}"
           ssh_key_data: "{{ azure1_user_ssh_key }}"
           premium_os_disk: "false"
-          os_disk_size_gb: "80"
+          os_disk_size_gb: "120"
           os_disk_caching: ""
           script_command: ""
           script_uris: ""
@@ -152,7 +152,7 @@ compute_profiles:
               mode: "persistent"
               controller_key: 1000
               datastore: "{{ vmware_cluster1_datastore }}"
-              size_gb: 100
+              size_gb: 120
           interfaces_attributes:
             0:
               type: "VirtualVmxnet3"
@@ -166,7 +166,7 @@ compute_profiles:
           password: "{{ satellite_password }}"
           ssh_key_data: "{{ azure1_user_ssh_key }}"
           premium_os_disk: "false"
-          os_disk_size_gb: "80"
+          os_disk_size_gb: "120"
           os_disk_caching: ""
           script_command: ""
           script_uris: ""
