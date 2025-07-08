@@ -46,6 +46,10 @@ activation_keys:
     content_overrides:
       - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
         override: "enabled"
+      - label: "Default_Organization_EPEL8_EPEL8"
+        override: "enabled"
+      - label: "Default_Organization_EPEL8_EPEL8_Stream"
+        override: "enabled"
     content_view: "SOE8_EPEL"
     lifecycle_environment: "Development"
     unlimited_hosts: true
@@ -57,6 +61,10 @@ activation_keys:
     auto_attach: false
     content_overrides:
       - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
+        override: "enabled"
+      - label: "Default_Organization_EPEL8_EPEL8"
+        override: "enabled"
+      - label: "Default_Organization_EPEL8_EPEL8_Stream"
         override: "enabled"
     content_view: "SOE8_EPEL"
     lifecycle_environment: "Qualification"
@@ -70,7 +78,11 @@ activation_keys:
     content_overrides:
       - label: "satellite-client-6-for-rhel-8-x86_64-rpms"
         override: "enabled"
-    content_view: "SOE8"
+      - label: "Default_Organization_EPEL8_EPEL8"
+        override: "enabled"
+      - label: "Default_Organization_EPEL8_EPEL8_Stream"
+        override: "enabled"
+    content_view: "SOE8_EPEL"
     lifecycle_environment: "Production"
     unlimited_hosts: true
 
@@ -192,6 +204,8 @@ activation_keys:
     content_overrides:
       - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
         override: "enabled"
+      - label: "Default_Organization_EPEL9_EPEL9"
+        override: "enabled"
     content_view: "SOE9_EPEL"
     lifecycle_environment: "Development"
     unlimited_hosts: true
@@ -204,6 +218,8 @@ activation_keys:
     content_overrides:
       - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
         override: "enabled"
+      - label: "Default_Organization_EPEL9_EPEL9"
+        override: "enabled"
     content_view: "SOE9_EPEL"
     lifecycle_environment: "Qualification"
     unlimited_hosts: true
@@ -215,6 +231,8 @@ activation_keys:
     auto_attach: false
     content_overrides:
       - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "Default_Organization_EPEL9_EPEL9"
         override: "enabled"
     content_view: "SOE9_EPEL"
     lifecycle_environment: "Production"
