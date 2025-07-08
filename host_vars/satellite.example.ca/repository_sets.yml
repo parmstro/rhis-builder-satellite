@@ -19,13 +19,13 @@ repository_sets:
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
       - releasever: "9.5"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
       - releasever: "9.5"
 
 # RHEL9 repos
@@ -45,6 +45,9 @@ repository_sets:
       - releasever: "9"
 
   - name: "Red Hat Satellite Client 6 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
+  - name: "Red Hat Satellite 6 Client 2 for RHEL 9 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
 
 # RHEL 8.x kickstarts
@@ -77,6 +80,9 @@ repository_sets:
   - name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
 
+  - name: "Red Hat Satellite 6 Client 2 for RHEL 8 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
 # Ansible Automation Platform 2.4 and 2.5
   - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (Files)"
     product: "Red Hat Ansible Automation Platform"
@@ -91,10 +97,10 @@ repository_sets:
     product: "Red Hat Ansible Automation Platform"
 
 # Satellite 6.16
-  - name: "Red Hat Satellite Capsule 6.16 for RHEL 8 x86_64 (RPMs)"
+  - name: "Red Hat Satellite Capsule 6.17 for RHEL 9 x86_64 (RPMs)"
     product: "Red Hat Satellite Capsule"
 
-  - name: "Red Hat Satellite Maintenance 6.16 for RHEL 8 x86_64 (RPMs)"
+  - name: "Red Hat Satellite Maintenance 6.17 for RHEL 9 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
 
 
@@ -170,29 +176,29 @@ repository_sets:
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - AppStream (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
 
   - name: "Red Hat Enterprise Linux 9 for x86_64 - Supplementary (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
 
 # RHEL9_aarch64 kickstart repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
       - releasever: "9.5"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
-      - releasever: "9.4"
+      - releasever: "9.6"
       - releasever: "9.5"
 
 # RHEL9_aarch64 repos
@@ -212,6 +218,9 @@ repository_sets:
       - releasever: "9"
 
   - name: "Red Hat Satellite Client 6 for RHEL 9 aarch64 (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+
+  - name: "Red Hat Satellite 6 Client 2 for RHEL 9 aarch64 (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
 
 # RHEL8 and RHEL9 HA Repos
