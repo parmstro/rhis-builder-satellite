@@ -15,7 +15,53 @@ satellite_location: "{{ satellite_initial_location }}"
 # Add additional content not needed for boostrap but still valuable and useful
 # Can be set to false to skip managemet of repos, CVs and CCVs
 repository_sets:
-  # RHEL 9.x kickstart
+############## RHEL 10 ##################
+# RHEL 10.x kickstart
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - BaseOS (Kickstart)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "10.0"
+
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - AppStream (Kickstart)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "10.0"
+
+# RHEL10 repos
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - BaseOS (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - AppStream (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - Supplementary (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - Extensions (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Satellite Client 6 for RHEL 10 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
+  - name: "Red Hat Satellite 6 Client 2 for RHEL 10 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
+# RHEL10 HA repos
+  - name: "Red Hat Enterprise Linux 10 for x86_64 - High Availability (RPMs)"
+    product: "Red Hat Enterprise Linux High Availability for x86_64"
+    repository_list:
+      - releasever: "10"
+
+############## RHEL 9 ##################
+# RHEL 9.x kickstart
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
@@ -50,129 +96,13 @@ repository_sets:
   - name: "Red Hat Satellite 6 Client 2 for RHEL 9 x86_64 (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
 
-# RHEL 8.x kickstarts
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
-    product: "Red Hat Enterprise Linux for x86_64"
+# RHEL9 HA repos
+  - name: "Red Hat Enterprise Linux 9 for x86_64 - High Availability (RPMs)"
+    product: "Red Hat Enterprise Linux High Availability for x86_64"
     repository_list:
-      - releasever: "8.10"
+      - releasever: "9"
 
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8.10"
-
-# RHEL 8 Repos
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8"
-
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8"
-
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8"
-
-  - name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-
-  - name: "Red Hat Satellite 6 Client 2 for RHEL 8 x86_64 (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-
-# Ansible Automation Platform 2.4 and 2.5
-  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (Files)"
-    product: "Red Hat Ansible Automation Platform"
-
-  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (RPMs)"
-    product: "Red Hat Ansible Automation Platform"
-
-  - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 (Files)"
-    product: "Red Hat Ansible Automation Platform"
-
-  - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 (RPMs)"
-    product: "Red Hat Ansible Automation Platform"
-
-# Satellite 6.16
-  - name: "Red Hat Satellite Capsule 6.17 for RHEL 9 x86_64 (RPMs)"
-    product: "Red Hat Satellite Capsule"
-
-  - name: "Red Hat Satellite Maintenance 6.17 for RHEL 9 x86_64 (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-
-
-# JBoss Repos Needed for the JBoss server pipeline
-  - name: "JBoss Enterprise Application Platform 7.4 (RHEL 8) (RPMs)"
-    product: "JBoss Enterprise Application Platform"
-
-  - name: "JBoss Enterprise Application Platform 7.4 (RHEL 9) (RPMs)"
-    product: "JBoss Enterprise Application Platform"
-
-# These repos are not necessarily needed for the default SOE test-destroy pipeline,
-# however, if you want to do convert2rhel and LEAPP piplines, you need these
-# Thes pull in the RHEL 7 and RHEL 8 repos and other Red Hat products
-
-# RHEL 7 Repos for convert2rhel and LEAPP_7_2_8
-  - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
-    product: "Red Hat Enterprise Linux Server"
-    repository_list:
-      - releasever: "7Server"
-        basearch: "x86_64"
-
-  - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
-    product: "Red Hat Enterprise Linux Server"
-
-  - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
-    product: "Red Hat Enterprise Linux Server"
-    repository_list:
-      - releasever: "7Server"
-        basearch: "x86_64"
-
-  - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
-    product: "Red Hat Enterprise Linux Server"
-    repository_list:
-      - releasever: "7Server"
-        basearch: "x86_64"
-
-  - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
-    product: "Red Hat Enterprise Linux Server"
-    repository_list:
-      - releasever: "7Server"
-        basearch: "x86_64"
-
-# RHEL 7 Kickstart
-  - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
-    product: "Red Hat Enterprise Linux Server"
-    repository_list:
-      - releasever: "7.9"
-        basearch: "x86_64"
-
-  - name: "Red Hat Satellite Client 6 (for RHEL 7 Server) (RPMs)"
-    product: "Red Hat Enterprise Linux Server"
-
-  - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
-    product: "Red Hat Ansible Engine"
-
-# RHEL 8.10 repos for LEAPP
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8.10"
-
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8.10"
-
-  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
-    product: "Red Hat Enterprise Linux for x86_64"
-    repository_list:
-      - releasever: "8.10"
-
-# RHEL9.4 repos for LEAPP_8_2_9
+# RHEL9 repos for LEAPP_8_2_9
   - name: "Red Hat Enterprise Linux 9 for x86_64 - BaseOS (RPMs)"
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
@@ -188,6 +118,7 @@ repository_sets:
     repository_list:
       - releasever: "9.6"
 
+############## RHEL 9 aarch64 ##################
 # RHEL9_aarch64 kickstart repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
@@ -223,16 +154,149 @@ repository_sets:
   - name: "Red Hat Satellite 6 Client 2 for RHEL 9 aarch64 (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
 
-# RHEL8 and RHEL9 HA Repos
+############## RHEL 8 ##################
+# RHEL 8.x kickstarts
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8.10"
+
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (Kickstart)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8.10"
+
+# RHEL 8 Repos
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8"
+
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8"
+
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8"
+
+  - name: "Red Hat Satellite Client 6 for RHEL 8 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
+  - name: "Red Hat Satellite 6 Client 2 for RHEL 8 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
+# RHEL8 HA Repos
   - name: "Red Hat Enterprise Linux 8 for x86_64 - High Availability (RPMs)"
     product: "Red Hat Enterprise Linux High Availability for x86_64"
     repository_list:
       - releasever: "8"
 
-  - name: "Red Hat Enterprise Linux 9 for x86_64 - High Availability (RPMs)"
-    product: "Red Hat Enterprise Linux High Availability for x86_64"
+# RHEL 8.10 repos for LEAPP
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
-      - releasever: "9"
+      - releasever: "8.10"
+
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8.10"
+
+  - name: "Red Hat Enterprise Linux 8 for x86_64 - Supplementary (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+    repository_list:
+      - releasever: "8.10"
+
+############## AAP ##################
+# Ansible Automation Platform 2.4 and 2.5
+  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (Files)"
+    product: "Red Hat Ansible Automation Platform"
+
+  - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Ansible Automation Platform"
+
+  - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 (Files)"
+    product: "Red Hat Ansible Automation Platform"
+
+  - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Ansible Automation Platform"
+
+############## Satellite ##################
+# Satellite 6.16
+  - name: "Red Hat Satellite Capsule 6.17 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Satellite Capsule"
+
+  - name: "Red Hat Satellite Maintenance 6.17 for RHEL 9 x86_64 (RPMs)"
+    product: "Red Hat Enterprise Linux for x86_64"
+
+############## JBoss EAP ##################
+# JBoss Repos Needed for the JBoss server pipeline
+  - name: "JBoss Enterprise Application Platform 7.4 (RHEL 8) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+  - name: "JBoss Enterprise Application Platform 7.4 (RHEL 9) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+  - name: "JBoss Enterprise Application Platform 8.0 (RHEL 8 x86_64) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+  - name: "JBoss Enterprise Application Platform 8.0 (RHEL 9 x86_64) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+  - name: "JBoss Enterprise Application Platform 8.1 (RHEL 8 x86_64) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+  - name: "JBoss Enterprise Application Platform 8.1 (RHEL 9 x86_64) (RPMs)"
+    product: "JBoss Enterprise Application Platform"
+
+# These repos are not necessarily needed for the default SOE test-destroy pipeline,
+# however, if you want to do convert2rhel and LEAPP piplines, you need these
+# Thes pull in the RHEL 7 and RHEL 8 repos and other Red Hat products
+
+# convert2rhel demo repos
+# RHEL 7 Kickstart
+  - name: "Red Hat Enterprise Linux 7 Server (Kickstart)"
+    product: "Red Hat Enterprise Linux Server"
+    repository_list:
+      - releasever: "7.9"
+        basearch: "x86_64"
+
+# RHEL 7 Repos
+  - name: "Red Hat Enterprise Linux 7 Server (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
+
+  - name: "Red Hat Enterprise Linux 7 Server - Extras (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+
+  - name: "Red Hat Enterprise Linux 7 Server - RH Common (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
+
+  - name: "Red Hat Enterprise Linux 7 Server - Optional (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
+
+  - name: "Red Hat Enterprise Linux 7 Server - Supplementary (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
+
+  - name: "Red Hat Satellite Client 6 (for RHEL 7 Server) (RPMs)"
+    product: "Red Hat Enterprise Linux Server"
+
+  - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
+    product: "Red Hat Ansible Engine"
 
 # Please see custom products for:
 # CentOS79
