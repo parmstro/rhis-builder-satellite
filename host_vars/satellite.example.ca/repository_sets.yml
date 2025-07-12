@@ -7,6 +7,7 @@
 # Content promotion is embedded in the publish operation for this project
 skip_sync: false
 skip_publish_all: false
+force_sync: true
 
 # repository sets are for this organization
 satellite_organization: "{{ satellite_initial_organization }}"
@@ -59,6 +60,45 @@ repository_sets:
     product: "Red Hat Enterprise Linux High Availability for x86_64"
     repository_list:
       - releasever: "10"
+
+############## RHEL 10 aarch64 ##################
+# RHEL10_aarch64 kickstart repos
+  - name: "Red Hat Enterprise Linux 10 for ARM 64 - BaseOS (Kickstart)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    repository_list:
+      - releasever: "10.0"
+
+  - name: "Red Hat Enterprise Linux 10 for ARM 64 - AppStream (Kickstart)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    repository_list:
+      - releasever: "10.0"
+
+# RHEL10_aarch64 repos
+  - name: "Red Hat Enterprise Linux 10 for ARM 64 - BaseOS (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Enterprise Linux 10 for ARM 64 - AppStream (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Enterprise Linux 10 for ARM 64 - Supplementary (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Enterprise Linux 10 for ARM 64 - Extensions (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    repository_list:
+      - releasever: "10"
+
+  - name: "Red Hat Satellite Client 6 for RHEL 10 aarch64 (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
+
+  - name: "Red Hat Satellite 6 Client 2 for RHEL 10 aarch64 (RPMs)"
+    product: "Red Hat Enterprise Linux for ARM 64"
 
 ############## RHEL 9 ##################
 # RHEL 9.x kickstart
