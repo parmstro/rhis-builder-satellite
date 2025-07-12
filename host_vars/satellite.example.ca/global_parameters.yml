@@ -74,6 +74,10 @@ global_parameters:
     value: true
     parameter_type: "boolean"
 
+  - name: "install_environment_group"
+    value: "server-product-environment"
+    parameter_type: "string"
+
   - name: "network_zone"
     value: "public"
     parameter_type: "string"
