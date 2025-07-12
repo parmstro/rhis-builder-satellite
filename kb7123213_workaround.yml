@@ -1,0 +1,40 @@
+---
+
+# See: https://access.redhat.com/solutions/7123213
+# Your list of repositories
+- name: "Update repository download policy"
+  hosts: satellite.example.ca
+  become: true
+  gather_facts: true
+  vars:
+    satellite_username: "admin"
+    satellite_password: "#Legend2013"
+    satellite_url: "https://satellite.example.ca"
+    satellite_organization: "Default Organization"
+    satellite_repositories:
+      - name: "Red Hat Ansible Automation Platform 2.4 for RHEL 9 x86_64 Files"
+        product: "Red Hat Ansible Automation Platform"
+        content_type: "file"
+        download_policy: "on_demand"         # Set repo to on-demand
+
+      - name: "Red Hat Ansible Automation Platform 2.5 for RHEL 9 x86_64 Files"
+        product: "Red Hat Ansible Automation Platform"
+        content_type: "file"
+        download_policy: "immediate"         # Set repo to immediate
+
+  tasks:
+
+    - name: "Ensure the state of the specified repositories"
+      when: satellite_repositories is defined and ( satellite_repositories | length ) > 0
+      redhat.satellite.repository:
+        username: "{{ satellite_username }}"
+        password: "{{ satellite_password }}"
+        server_url: "{{ satellite_url }}"
+        organization: "{{ satellite_organization }}"
+        name: "{{ satellite_repository.name }}"
+        state: "{{ satellite_repository.state | default(omit) }}"
+        product: "{{ satellite_repository.product }}"
+        content_type: "{{ satellite_repository.content_type }}"
+      loop: "{{ satellite_repositories }}"
+      loop_control:
+        loop_var: satellite_repository
