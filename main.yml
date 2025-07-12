@@ -53,45 +53,45 @@
       ansible.builtin.include_role:
         name: satellite_pre
       tags:
-        - tags_rhisam
         - tags_satellite_pre
+        - tags_pre_sync
 
     - name: "Apply role of satellite to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
         name: satellite
       tags:
-        - tags_rhisam
         - tags_satellite_install
+        - tags_pre_sync
 
     - name: "Apply role of satellite_post to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
         name: satellite_post
       tags:
-        - tags_rhisam
         - tags_satellite_post
+        - tags_pre_sync
 
     - name: "Ensure hammer configuration"
       ansible.builtin.import_tasks: "tasks/configure_hammer.yml"
       tags:
-        - tags_rhisam
         - tags_basic_config
         - tags_configure_hammer
+        - tags_pre_sync
 
     - name: "Ensure Satellite manifest configuration"
       ansible.builtin.import_role:
         name: redhat_manifests
       tags:
-        - tags_rhisam
         - tags_basic_config
         - tags_manifest
+        - tags_pre_sync
 
     - name: "Ensure Satellite manifest configuration"
       ansible.builtin.import_role:
         name: subscription_manifests
       tags:
-        - tags_rhisam
         - tags_basic_config
         - tags_manifest
+        - tags_pre_sync
 
     - name: "Ensure Satellite manifest configuration"
       when:
@@ -100,9 +100,9 @@
       ansible.builtin.import_role:
         name: rex_kerberos
       tags:
-        - tags_rhisam
         - tags_basic_config
         - tags_rex_kerberos
+        - tags_pre_sync
 
     - name: "Ensure content credentials configuration"
       ansible.builtin.import_role:
@@ -111,6 +111,7 @@
         - tags_content_config
         - tags_redhat_repos
         - tags_repository_sets
+        - tags_pre_sync
 
     - name: "Ensure repository sets configuration"
       ansible.builtin.import_role:
@@ -119,6 +120,7 @@
         - tags_content_config
         - tags_redhat_repos
         - tags_repository_sets
+        - tags_pre_sync
 
     - name: "Ensure custom products configuration"
       ansible.builtin.import_role:
@@ -127,6 +129,7 @@
         - tags_content_config
         - custom_repos
         - tags_repositories
+        - tags_pre_sync
 
     - name: "Ensure additional repository configuration"
       ansible.builtin.import_role:
@@ -135,6 +138,7 @@
         - tags_content_config
         - custom_repos
         - tags_repositories
+        - tags_pre_sync
 
     # This task should occur synchronously - we want all the repos populated before we start creating content views
     - name: "Ensure repository synchronization... go grab a meal, this will take a while"
@@ -147,6 +151,7 @@
       ansible.builtin.import_role:
         name: lifecycle_environments
       tags:
+        - tags_post_sync
         - tags_content_config
         - tags_lifecycle_environments
 
@@ -154,6 +159,7 @@
       ansible.builtin.import_role:
         name: sync_plans
       tags:
+        - tags_post_sync
         - tags_content_config
         - sync_plans
 
@@ -161,6 +167,7 @@
       ansible.builtin.import_role:
         name: content_views
       tags:
+        - tags_post_sync
         - tags_content_config
         - tags_content_views
 
@@ -170,6 +177,7 @@
       ansible.builtin.import_role:
         name: "installation_media"
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_media
 
@@ -177,6 +185,7 @@
       ansible.builtin.import_role:
         name: partition_tables
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_ptables
 
@@ -184,6 +193,7 @@
       ansible.builtin.import_role:
         name: provisioning_templates
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_provisioning_templates
 
@@ -191,6 +201,7 @@
       ansible.builtin.import_role:
         name: templates_sync
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_templates_sync
 
@@ -198,6 +209,7 @@
       ansible.builtin.import_role:
         name: operating_systems
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_operating_systems
 
@@ -205,6 +217,7 @@
       ansible.builtin.import_role:
         name: activation_keys
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_activation_keys
 
@@ -212,6 +225,7 @@
       ansible.builtin.import_role:
         name: domains
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_network
         - tags_domains
@@ -220,6 +234,7 @@
       ansible.builtin.import_role:
         name: realms
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_network
         - tags_realms
@@ -228,6 +243,7 @@
       ansible.builtin.import_role:
         name: subnets
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_network
         - tags_subnets
@@ -235,6 +251,7 @@
     - name: "Build PXE Linux defaults"
       ansible.builtin.import_tasks: "tasks/build_pxe_linux_defaults.yml"
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_pxe_defaults
 
@@ -242,6 +259,7 @@
       ansible.builtin.import_role:
         name: compute_resources
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_compute_resources
 
@@ -249,6 +267,7 @@
       ansible.builtin.import_role:
         name: compute_profiles
       tags:
+        - tags_post_sync
         - tags_rhisam
         - tags_provisioning_config
         - tags_compute_profiles
@@ -257,6 +276,7 @@
       ansible.builtin.import_role:
         name: virtwho_configs
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_virt_who
 
@@ -264,12 +284,14 @@
       ansible.builtin.import_role:
         name: imported_git_repos
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_clone_git_repos
 
     - name: "Ensure import ansible roles"
       ansible.builtin.import_tasks: "tasks/ensure_import_roles.yml"
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_ansible_import_roles
 
@@ -277,6 +299,7 @@
       ansible.builtin.import_role:
         name: scap_contents
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_scap_contents
 
@@ -284,6 +307,7 @@
       ansible.builtin.import_role:
         name: scap_tailoring_files
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_scap_tailoring_files
 
@@ -291,6 +315,7 @@
       ansible.builtin.import_role:
         name: hostgroups
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_host_groups
 
@@ -298,6 +323,7 @@
       ansible.builtin.import_role:
         name: scap_policies
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_scap_policies
 
@@ -305,6 +331,7 @@
       ansible.builtin.import_role:
         name: discovery_rules
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_discovery_rules
 
@@ -312,6 +339,7 @@
       ansible.builtin.import_role:
         name: global_parameters
       tags:
+        - tags_post_sync
         - tags_provisioning_config
         - tags_global_parameters
 
@@ -319,6 +347,7 @@
       ansible.builtin.import_role:
         name: settings
       tags:
+        - tags_post_sync
         - tags_settings
         - tags_general_settings
 
@@ -326,6 +355,7 @@
       ansible.builtin.import_role:
         name: user_roles
       tags:
+        - tags_post_sync
         - tags_settings
         - tags_user_roles
 
@@ -333,13 +363,13 @@
       ansible.builtin.import_role:
         name: users
       tags:
-        - tags_settings
         - tags_users
 
     - name: "Configure satellite user groups"
       ansible.builtin.import_role:
         name: user_groups
       tags:
+        - tags_post_sync
         - tags_settings
         - tags_user_groups
 
@@ -347,6 +377,7 @@
       ansible.builtin.import_role:
         name: user_groups_external
       tags:
+        - tags_post_sync
         - tags_settings
         - tags_user_groups_external
 
