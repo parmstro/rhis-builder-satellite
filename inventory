@@ -1,5 +1,5 @@
 [provisioner]
-localhost
+provisioner.example.ca
 
 [idm_primary]
 idm.example.ca
@@ -14,10 +14,10 @@ capsule1.parmstrong.ca
 capsule2.parmstrong.ca
 
 [aap_controller]
-controller1.example.ca
+aapcontroller24.example.ca
 
 [automation_hub]
-ah1.example.ca
+aaphub24.example.ca
 
 [container_servers]
 containerhost1.example.ca
