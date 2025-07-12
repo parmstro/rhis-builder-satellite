@@ -16,8 +16,8 @@ cdn_sat_activation_key: "{{ cdn_sat_activation_key_vault }}"
 repository_ids:
   - rhel-9-for-x86_64-baseos-rpms
   - rhel-9-for-x86_64-appstream-rpms
-  - satellite-6.16-for-rhel-9-x86_64-rpms
-  - satellite-maintenance-6.16-for-rhel-9-x86_64-rpms
+  - satellite-6.17-for-rhel-9-x86_64-rpms
+  - satellite-maintenance-6.17-for-rhel-9-x86_64-rpms
 
 sat_firewalld_zone: "public"
 sat_firewalld_services:
