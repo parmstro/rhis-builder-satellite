@@ -1,8 +1,9 @@
 ---
-# We now call the satellite_operations.installer role to run the installer
-# - name: "Check to see if Satellite is already configured"
-#   ansible.builtin.service_facts:
-#   register: service_facts
+
+# tags don't flow through external roles
+# This is one of the reasons for run_role.yml and run_role_task.yml
+# This will not upgrade the satellite even if you have chnaged the repos
+# please run upgrades interactively
 
 - name: "Install the Satellite server with specified configuration."
   ansible.builtin.include_role:
@@ -13,8 +14,4 @@
     satellite_installer_verbose: "{{ sat_installer_verbose }}"
   no_log: true
 
-#  when:
-#    - "'foreman.service' in ansible_facts['services']"
-#    - "ansible_facts['services']['foreman.service']['state'] != 'running'"
-#    - "skip_satellite_installed is defined"
-#    - "not skip_satellite_installer"
+# using tags here and calling main with the tags will not execute the role.
