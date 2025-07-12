@@ -8,7 +8,6 @@ async_delay: 30
 
 apply_standard_tuning: true
 
-
 # prerequisites
 cdn_organization_id: "{{ cdn_organization_id_vault }}"
 cdn_sat_activation_key: "{{ cdn_sat_activation_key_vault }}"
