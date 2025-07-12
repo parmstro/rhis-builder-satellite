@@ -6,8 +6,10 @@ model: Ptable
 os_family: Redhat
 -%>
 # This partition scheme meets most major Compliance Profiles (CPGPC, DISA-STIG, CIS2, PCI-DSS, etc..). 
-# NOTE: requires 1st disk = 100G
- 
+# NOTE: requires 1st disk = 120G
+# NOTE: requires 2nd disk = 50G
+
+
 zerombr
 clearpart --all
  
@@ -24,12 +26,12 @@ part pv.<%= disk[-3,3] %> --size=1 --grow --ondisk=<%= disk %>
 
 volgroup vg_root pv.01 <%= pvs.join(' ') %>
 
-logvol swap --recommended --vgname=vg_root --name=lv_swap
-logvol /tmp  --vgname=vg_root --size=1024 --name=lv_tmp --fstype=xfs
-logvol /var/tmp  --vgname=vg_root --size=1024 --name=lv_var_tmp --fstype=xfs
-logvol /var/log --vgname=vg_root --size=6144 --name=lv_var_log --fstype=xfs
-logvol /var/log/audit --vgname=vg_root --size=1024 --name=lv_var_audit --fstype=xfs
-logvol /var --vgname=vg_root --size=1 --grow --name=lv_var --fstype=xfs
-logvol /  --vgname=vg_root --size=32768 --name=lv_root --fstype=xfs
-logvol /home  --vgname=vg_root --size=10240 --name=lv_home --fstype=xfs
-logvol /data  --vgname=vg_root --size=32768 --name=lv_data --fstype=xfs
+logvol swap                        --vgname=vg_root --recommended --name=lv_swap
+logvol /tmp           --fstype=xfs --vgname=vg_root --size=6144  --name=lv_tmp
+logvol /var/tmp       --fstype=xfs --vgname=vg_root --size=6144  --name=lv_var_tmp
+logvol /var/log       --fstype=xfs --vgname=vg_root --size=6144  --name=lv_var_log
+logvol /var/log/audit --fstype=xfs --vgname=vg_root --size=6144  --name=lv_var_audit 
+logvol /              --fstype=xfs --vgname=vg_root --size=65536 --name=lv_root
+logvol /home          --fstype=xfs --vgname=vg_root --size=10240 --name=lv_home
+logvol /var           --fstype=xfs --vgname=vg_root --size=1     --name=lv_var  --grow --maxsize=256000
+logvol /data          --fstype=xfs --vgname=vg_root --size=32768 --name=lv_data

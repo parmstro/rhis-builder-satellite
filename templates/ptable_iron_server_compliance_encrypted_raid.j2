@@ -79,11 +79,11 @@ part pv.<%= disk[-3,3] %> --size=1 --grow --ondisk=<%= disk %> --encrypted --pas
 volgroup vg_root --pesize=4096 pv.42 
 volgroup vg_data --pesize=4096 <%= pvs.join(' ') %>
 
-logvol swap           --vgname=vg_root --name=lv_swap --recommended
-logvol /tmp           --vgname=vg_root --fstype=xfs --name=lv_tmp       --size=2048
-logvol /var/tmp       --vgname=vg_root --fstype=xfs --name=lv_var_tmp   --size=2048
-logvol /var/log       --vgname=vg_root --fstype=xfs --name=lv_var_log   --size=6144
-logvol /var/log/audit --vgname=vg_root --fstype=xfs --name=lv_var_audit --size=2048
-logvol /              --vgname=vg_root --fstype=xfs --name=lv_root      --size=102400 
-logvol /home          --vgname=vg_root --fstype=xfs --name=lv_home      --size=10240
-logvol /var           --vgname=vg_root --fstype=xfs --name=lv_var       --size=1 --maxsize=409600 --grow
+logvol swap               --vgname=vg_root --recommended --name=lv_swap 
+logvol /tmp               --vgname=vg_root --size=6144   --name=lv_tmp       --fstype=xfs
+logvol /var/tmp           --vgname=vg_root --size=6144   --name=lv_var_tmp   --fstype=xfs
+logvol /var/log           --vgname=vg_root --size=6144   --name=lv_var_log   --fstype=xfs
+logvol /var/log/audit     --vgname=vg_root --size=6144   --name=lv_var_audit --fstype=xfs
+logvol /                  --vgname=vg_root --size=65536  --name=lv_root      --fstype=xfs
+logvol /home              --vgname=vg_root --size=10240  --name=lv_home      --fstype=xfs
+logvol /var               --vgname=vg_root --size=1      --name=lv_var       --fstype=xfs --maxsize=409600 --grow

@@ -6,7 +6,7 @@ model: Ptable
 os_family: Redhat
 -%>
 # This partition table meets minimum CIS1 requirements
-# NOTE: requires 1st disk = 50G
+# NOTE: requires 1st disk = 100G
 
 zerombr
 clearpart --all
@@ -23,7 +23,8 @@ part pv.<%= disk[-3,3] %> --size=1 --grow --ondisk=<%= disk %>
 <% end %>
 
 volgroup vg_root pv.01 <%= pvs.join(' ') %>
-logvol swap --recommended --vgname=vg_root --name=lv_swap
-logvol /tmp  --vgname=vg_root --size=4096 --name=lv_tmp --fstype=xfs
-logvol /  --vgname=vg_root --size=32768 --name=lv_root --fstype=xfs
-logvol /home  --vgname=vg_root --size=10240 --name=lv_home --fstype=xfs
+
+logvol swap                        --vgname=vg_root --recommended --name=lv_swap
+logvol /tmp           --fstype=xfs --vgname=vg_root --size=6144  --name=lv_tmp
+logvol /              --fstype=xfs --vgname=vg_root --size=65536 --name=lv_root
+logvol /home          --fstype=xfs --vgname=vg_root --size=10240 --name=lv_home
