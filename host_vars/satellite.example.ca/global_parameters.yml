@@ -7,6 +7,16 @@
 # yamllint disable rule:line-length
 
 global_parameters:
+  - name: "an_example_user_global_parameter"
+    value: "Delete Me"
+    parameter_type: "string"
+
+  - name: "ansible_controller_api_url"
+    value: "https://aapcontroller24.example.ca/api/v2"
+    parameter_type: "string"
+    hidden_value: false
+    state: "present"
+
   - name: "ansible_host_config_key"
     value: "{{ satellite_ansible_callback_config_key_vault }}"
     parameter_type: "string"
@@ -22,12 +32,6 @@ global_parameters:
   - name: "ansible_roles_check_mode"
     value: false
     parameter_type: "boolean"
-    hidden_value: false
-    state: "present"
-
-  - name: "ansible_controller_api_url"
-    value: "https://aapcontroller24.example.ca/api/v2"
-    parameter_type: "string"
     hidden_value: false
     state: "present"
 
@@ -90,9 +94,13 @@ global_parameters:
     value: true
     parameter_type: "boolean"
 
-  - name: "remove_default_passphrase"
+  - name: "remote_execution_create_user"
     value: true
     parameter_type: "boolean"
+
+  - name: "remote_execution_effective_user_method"
+    value: "sudo"
+    parameter_type: "string"
 
   - name: "remote_execution_ssh_keys"
     value: "{{ remote_execution_ssh_keys_vault }}"
@@ -102,13 +110,9 @@ global_parameters:
     value: "{{ remote_execution_ssh_user_vault }}"
     parameter_type: "string"
 
-  - name: "remote_execution_create_user"
+  - name: "remove_default_passphrase"
     value: true
     parameter_type: "boolean"
-
-  - name: "remote_execution_effective_user_method"
-    value: "sudo"
-    parameter_type: "string"
 
   - name: "use_foreman_users"
     value: true
@@ -117,7 +121,3 @@ global_parameters:
   - name: "use_ntp"
     value: false
     parameter_type: "boolean"
-
-  - name: "an_example_user_global_parameter"
-    value: "Delete Me"
-    parameter_type: "string"
