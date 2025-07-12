@@ -7,7 +7,7 @@
 # Content promotion is embedded in the publish operation for this project
 skip_sync: false
 skip_publish_all: false
-force_sync: true
+force_sync: false
 
 # repository sets are for this organization
 satellite_organization: "{{ satellite_initial_organization }}"
@@ -164,13 +164,13 @@ repository_sets:
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
       - releasever: "9.6"
-      - releasever: "9.5"
+      - releasever: "9.2"
 
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream (Kickstart)"
     product: "Red Hat Enterprise Linux for ARM 64"
     repository_list:
       - releasever: "9.6"
-      - releasever: "9.5"
+      - releasever: "9.2"
 
 # RHEL9_aarch64 repos
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS (RPMs)"

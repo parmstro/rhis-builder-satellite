@@ -105,11 +105,19 @@ satellite_repositories:
     product: "Red Hat Enterprise Linux for ARM 64"
     content_type: "yum"
     download_policy: "immediate"
+  - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream Kickstart 9.2"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    content_type: "yum"
+    download_policy: "immediate"
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - AppStream RPMs 9"
     product: "Red Hat Enterprise Linux for ARM 64"
     content_type: "yum"
     download_policy: "immediate"
   - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS Kickstart 9.6"
+    product: "Red Hat Enterprise Linux for ARM 64"
+    content_type: "yum"
+    download_policy: "immediate"
+  - name: "Red Hat Enterprise Linux 9 for ARM 64 - BaseOS Kickstart 9.2"
     product: "Red Hat Enterprise Linux for ARM 64"
     content_type: "yum"
     download_policy: "immediate"
@@ -182,6 +190,7 @@ satellite_repositories:
     ssl_ca_cert: "RedHatSSL"
     download_policy: "immediate"
     unprotected: false
+
   - name: "convert2rhel8"
     product: "convert2rhel"
     content_type: "yum"
@@ -189,30 +198,35 @@ satellite_repositories:
     ssl_ca_cert: "RedHatSSL"
     download_policy: "immediate"
     unprotected: false
+
   - name: "CentOS79"
     product: "CentOS79"
     content_type: "yum"
     gpg_key: "CentOS79GPG"
     download_policy: "immediate"
     unprotected: false
+
   - name: "updates"
     product: "CentOS79"
     content_type: "yum"
     gpg_key: "CentOS79GPG"
     download_policy: "immediate"
     unprotected: false
+
   - name: "centos-9-appstream"
     product: "CentOS Stream 9"
     content_type: "yum"
     gpg_key: "CentOS9OfficialGPG"
     download_policy: "on_demand"
     unprotected: false
+
   - name: "centos-9-baseos"
     product: "CentOS Stream 9"
     content_type: "yum"
     gpg_key: "CentOS9OfficialGPG"
     download_policy: "on_demand"
     unprotected: false
+
   - name: "OEL79"
     product: "OEL79"
     content_type: "yum"
