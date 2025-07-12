@@ -1,0 +1,31 @@
+---
+
+- name: "Set _satpre_satellite_installed to false"
+  ansible.builtin.set_fact:
+    _satpre_satellite_installed: false
+
+
+- name: "Has satellite-installer been run"
+  block:
+
+    - name: "Get the state of the foreman service"
+      ansible.builtin.command: "sudo systemctl list-unit-files foreman.service"
+      register: foreman_status
+      changed_when: true
+
+    - name: "Assert that the foreman service exists"
+      ansible.builtin.assert:
+        that: "'foreman.service' in foreman_status.stdout"
+
+    - name: "Set _satpre_satellite_installed to true"
+      ansible.builtin.set_fact:
+        _satpre_satellite_installed: true
+
+  rescue:
+    - name: "Set _satpre_satellite_installed to false"
+      ansible.builtin.set_fact:
+        _satpre_satellite_installed: false
+
+- name: "Debug output"
+  ansible.builtin.debug:
+    var: _satpre_satellite_installed
