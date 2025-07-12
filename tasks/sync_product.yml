@@ -49,6 +49,12 @@
   ansible.builtin.set_fact:
     must_sync_product: true
 
+- name: "Determine if force_sync is set"
+  when: force_sync is defined and force_sync
+  ansible.builtin.set_fact:
+    must_sync_product: true
+  changed_when: force_sync
+
 - name: "Display Sync message"
   when:
     - must_sync_product
