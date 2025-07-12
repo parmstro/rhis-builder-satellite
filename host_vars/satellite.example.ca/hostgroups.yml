@@ -406,7 +406,7 @@ satellite_hostgroups:
     content_source: "satellite.example.ca"
     lifecycle_environment: "Development"
     content_view: "SOE9"
-    activation_keys: "SOE9_dev_aap_24"
+    activation_keys: "SOE9_dev"
     openscap_capsule: "{{ satellite_fqdn }}"
     ansible_roles:
       - theforeman.foreman_scap_client
