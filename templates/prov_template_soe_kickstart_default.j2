@@ -247,6 +247,12 @@ text
 reboot
 
 %packages
+<% if host_param('install_environment_group') -%>
+@^<%= host_param('install_environment_group') %>
+<% else -%>
+@^minimal-environment
+<% end -%>
+
 <%= snippet_if_exists(template_name + " custom packages") %>
 yum
 dhclient
@@ -260,7 +266,7 @@ chrony
 <% if rhel_compatible && os_major < 9 -%>
 wget
 <% end -%>
-@Core
+
 <% if host_param_true?('fips_enabled') -%>
 <%=   snippet 'fips_packages' %>
 <% end -%>
