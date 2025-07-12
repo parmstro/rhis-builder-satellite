@@ -67,12 +67,27 @@ hostnamectl set-hostname <%= @host.name %>
 
 <%= snippet 'redhat_register' %>
 
+subscription-manager refresh
+subscription-manager repos 
+
+<%= snippet 'soe_ensure_python' %>
+<% if (is_fedora && os_major > 29) || (rhel_compatible && os_major > 6) -%>
+<%= snippet 'soe_install_cockpit' %>
+<% end -%>
+
+<%= snippet('remote_execution_ssh_keys') %>
+<%= snippet "blacklist_kernel_modules" %>
+
 <% if host_enc['parameters']['realm'] && @host.realm && (@host.realm.realm_type == 'FreeIPA' || @host.realm.realm_type == 'Red Hat Identity Management') -%>
   <% if (rhel_compatible && os_major = 8) -%>
     # yum module enable and yum module install to pull in the idm client
     yum -y module enable idm:client
   <% end -%>
 <%= snippet 'freeipa_register' %>
+<% end -%>
+
+<% if host_param_true?('use_NBDE') %>
+  <%= snippet 'soe_use_NBDE' %>
 <% end -%>
 
 <% unless host_param_false?('package_upgrade') -%>
@@ -84,15 +99,11 @@ else
 fi
 <% end -%>
 
-<%= snippet('remote_execution_ssh_keys') %>
-
 <% if plugin_present?('katello') && host_param_true?('enable-remote-execution-pull') -%>
 <%= save_to_file('/root/remote_execution_pull_setup.sh', snippet('remote_execution_pull_setup'), verbatim: true) %>
 chmod +x /root/remote_execution_pull_setup.sh
 /root/remote_execution_pull_setup.sh
 <% end -%>
-
-<%= snippet "blacklist_kernel_modules" %>
 
 <%= snippet_if_exists(template_name + " custom post") -%>
 <% if chef_enabled %>
@@ -120,7 +131,6 @@ chmod +x /root/ansible_provisioning_call.sh
 <% if host_param_true?('use_NBDE') %>
   clevis luks pass -d /dev/sda2 -s 1 | cryptsetup reencrypt /dev/sda2
 <% end -%>
-
 
 sync
 
