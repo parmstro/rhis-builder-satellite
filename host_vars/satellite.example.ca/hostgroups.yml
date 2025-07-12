@@ -604,3 +604,65 @@ satellite_hostgroups:
     ptable: "RHEL_Server_Compliance"
     pxe_loader: "Grub2 UEFI"
     root_pass: "{{ satellite_password }}"
+
+  - name: "hg_x86_64_rhel10_metal"
+    description: "RHEL 10 SOE baremetal hostgroup"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE10"
+    activation_keys: "SOE10_dev"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    domain: "{{ satellite_domain }}"
+    subnet: "example.ca"
+    realm: "{{ satellite_domain | upper }}"
+    architecture: "x86_64"
+    operatingsystem: "RedHat 10.0"
+    kickstart_repository: "Red Hat Enterprise Linux 10 for x86_64 - BaseOS Kickstart 10.0"
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/nvme0n1"
+
+  - name: "hg_x86_64_rhel10_vm"
+    description: "RHEL 10 SOE vm hostgroup"
+    organization: "{{ satellite_organization }}"
+    locations: "{{ satellite_location }}"
+    compute_resource: "VMware_Lab"
+    compute_profile: "SOE_Medium"
+    content_source: "satellite.example.ca"
+    lifecycle_environment: "Development"
+    content_view: "SOE10"
+    activation_keys: "SOE10_dev"
+    openscap_capsule: "{{ satellite_fqdn }}"
+    ansible_roles:
+      - theforeman.foreman_scap_client
+    domain: "{{ satellite_domain }}"
+    subnet: "example.ca"
+    realm: "{{ satellite_domain | upper }}"
+    architecture: "x86_64"
+    operatingsystem: "RedHat 10.0"
+    kickstart_repository: "Red Hat Enterprise Linux 10 for x86_64 - BaseOS Kickstart 10.0"
+    ptable: "RHEL_Server_Compliance"
+    pxe_loader: "Grub2 UEFI"
+    root_pass: "{{ satellite_password }}"
+    parameters:
+      - name: "boot_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/sda"
+      - name: "root_disk"
+        hidden_value: false
+        parameter_type: "string"
+        value: "/dev/sda"
