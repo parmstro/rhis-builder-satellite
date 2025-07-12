@@ -4,11 +4,11 @@
 # NOTE - the file is named the other way around so you see it in the list and don't forget about it!
 
 product_plans:
-  - name: "Red Hat Enterprise Linux Server for x86_64"
+  - name: "Red Hat Enterprise Linux for x86_64"
     plan: "nightly_os"
     organization: "{{ satellite_organization }}"
 
-  - name: "Red Hat Enterprise Linux for x86_64"
+  - name: "Red Hat Enterprise Linux for ARM 64"
     plan: "nightly_os"
     organization: "{{ satellite_organization }}"
 
@@ -32,6 +32,14 @@ product_plans:
     plan: "nightly_os"
     organization: "{{ satellite_organization }}"
 
+  - name: "JBoss Enterprise Application Platform"
+    plan: "nightly_infra"
+    organization: "{{ satellite_organization }}"
+
+  - name: "rhel9_containers"
+    plan: "nightly_infra"
+    organization: "{{ satellite_organization }}"
+
   - name: "convert2rhel"
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"
@@ -49,6 +57,10 @@ product_plans:
     organization: "{{ satellite_organization }}"
 
   - name: "CentOS Stream 9"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
+  - name: "CentOS Stream 8"
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"
 
