@@ -391,3 +391,57 @@ activation_keys:
     content_view: "LEAPP_8_2_9"
     lifecycle_environment: "Development"
     unlimited_hosts: true
+
+  - name: "SOE10_dev"
+    state: "present"
+    description: "Activate a RHEL 10 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "rhel-10-for-x86_64-supplementary-rpms"
+        override: "enabled"
+      - label: "rhel-10-for-x86_64-extensions-rpms"
+        override: "enabled"
+      - label: "satellite-client-6-for-rhel-10-x86_64-rpms"
+        override: "enabled"
+      - label: "satellite-6-client-2-for-rhel-10-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE10"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
+
+  - name: "SOE10_qa"
+    state: "present"
+    description: "Activate a RHEL 10 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "rhel-10-for-x86_64-supplementary-rpms"
+        override: "enabled"
+      - label: "rhel-10-for-x86_64-extensions-rpms"
+        override: "enabled"
+      - label: "satellite-client-6-for-rhel-10-x86_64-rpms"
+        override: "enabled"
+      - label: "satellite-6-client-2-for-rhel-10-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE10"
+    lifecycle_environment: "Qualification"
+    unlimited_hosts: true
+
+  - name: "SOE10_prod"
+    state: "present"
+    description: "Activate a RHEL 10 system in development"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "rhel-10-for-x86_64-supplementary-rpms"
+        override: "enabled"
+      - label: "rhel-10-for-x86_64-extensions-rpms"
+        override: "enabled"
+      - label: "satellite-client-6-for-rhel-10-x86_64-rpms"
+        override: "enabled"
+      - label: "satellite-6-client-2-for-rhel-10-x86_64-rpms"
+        override: "enabled"
+    content_view: "SOE10"
+    lifecycle_environment: "Production"
+    unlimited_hosts: true
