@@ -255,7 +255,11 @@ reboot
 
 <%= snippet_if_exists(template_name + " custom packages") %>
 yum
+
+<% if (rhel_compatible && os_major <= 9) -%>
 dhclient
+<% end -%>
+
 <% if use_ntp -%>
 ntp
 -chrony
