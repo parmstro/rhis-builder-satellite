@@ -208,8 +208,59 @@ operating_systems:
 
   - name: "RedHat"
     major: 9
-    minor: 5
-    description: "RedHat 10,0"
+    minor: 6
+    description: "RHEL 9.6"
+    family: "Redhat"
+    password_hash: "SHA256"
+    organization: "{{ satellite_organization }}"
+    location: "{{ satellite_location }}"
+    state: "present"
+    architectures:
+      - "x86_64"
+      - "aarch64"
+    provisioning_templates:
+      - "Kickstart default"
+      - "Kickstart default finish"
+      - "Kickstart default PXELinux"
+      - "Linux host_init_config default"
+      - "Kickstart default iPXE"
+      - "Discovery Red Hat kexec"
+      - "Kickstart default PXEGrub"
+      - "Kickstart default PXEGrub2"
+      - "Kickstart default user data"
+      - "SOE Kickstart Default"
+      - "SOE Kickstart Default Finish"
+      - "SOE Kickstart Default PXELinux"
+    ptables:
+      - "Kickstart default"
+      - "Kickstart default thin"
+      - "RHEL_Server_CIS1"
+      - "RHEL_Server_Compliance"
+      - "RHEL_Server_Compliance_Encrypted"
+    default_templates:
+      - name: "SOE Kickstart Default"
+        template_kind: "provision"
+      - name: "SOE Kickstart Default Finish"
+        template_kind: "finish"
+      - name: "SOE Kickstart Default PXELinux"
+        template_kind: "PXELinux"
+      - name: "Linux host_init_config default"
+        template_kind: "host_init_config"
+      - name: "Kickstart default iPXE"
+        template_kind: "iPXE"
+      - name: "Discovery Red Hat kexec"
+        template_kind: "kexec"
+      - name: "Kickstart default PXEGrub"
+        template_kind: "PXEGrub"
+      - name: "Kickstart default PXEGrub2"
+        template_kind: "PXEGrub2"
+      - name: "Kickstart default user data"
+        template_kind: "user_data"
+
+  - name: "RedHat"
+    major: 10
+    minor: 0
+    description: "RHEL 10.0"
     family: "Redhat"
     password_hash: "SHA256"
     organization: "{{ satellite_organization }}"
