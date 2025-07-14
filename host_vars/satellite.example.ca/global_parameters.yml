@@ -78,6 +78,10 @@ global_parameters:
     value: "server-product-environment"
     parameter_type: "string"
 
+  - name: "install_reboot_kexec"
+    value: false
+    parameter_type: "boolean"
+
   - name: "network_zone"
     value: "public"
     parameter_type: "string"
@@ -120,6 +124,10 @@ global_parameters:
 
   - name: "use_foreman_users"
     value: true
+    parameter_type: "boolean"
+
+  - name: "use_graphical_installer"
+    value: false
     parameter_type: "boolean"
 
   - name: "use_ntp"
