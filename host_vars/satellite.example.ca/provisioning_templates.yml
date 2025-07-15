@@ -71,34 +71,13 @@ provisioning_templates:
     locations:
       - "{{ satellite_location }}"
 
-  - name: "soe_kickstart_ifcfg_bond_interface"
+  # this snippet now handles all the network config
+  - name: "soe_kickstart_network_interface"
     type: "snippet"
     locked: false
-    description: "Modified to support defined network zone"
+    description: "SOE version"
     audit_comment: "created by rhis-builder-satellite"
-    path: "prov_template_snippet_soe_kickstart_ifcfg_bond_interface.j2"
-    organizations:
-      - "{{ satellite_organization }}"
-    locations:
-      - "{{ satellite_location }}"
-
-  - name: "soe_kickstart_ifcfg_bonded_interface"
-    type: "snippet"
-    locked: false
-    description: "Modified to support defined network zone"
-    audit_comment: "created by rhis-builder-satellite"
-    path: "prov_template_snippet_soe_kickstart_ifcfg_bonded_interface.j2"
-    organizations:
-      - "{{ satellite_organization }}"
-    locations:
-      - "{{ satellite_location }}"
-
-  - name: "soe_kickstart_networking_setup"
-    type: "snippet"
-    locked: false
-    description: "Modified to support defined network zone"
-    audit_comment: "created by rhis-builder-satellite"
-    path: "prov_template_snippet_soe_kickstart_networking_setup.j2"
+    path: "prov_template_snippet_soe_kickstart_network_interface.j2"
     organizations:
       - "{{ satellite_organization }}"
     locations:
@@ -116,6 +95,17 @@ provisioning_templates:
       - "{{ satellite_location }}"
 
 # provisioning
+  - name: "OEM Kickstart Default"
+    type: "provision"
+    locked: false
+    description: "The default kickstart provided by theForeman/Satellite"
+    audit_comment: "created by rhis-builder-satellite"
+    path: "prov_template_oem_kickstart_default.j2"
+    organizations:
+      - "{{ satellite_organization }}"
+    locations:
+      - "{{ satellite_location }}"
+
   - name: "SOE Kickstart Default Finish"
     type: "provision"
     locked: false
