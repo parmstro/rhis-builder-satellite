@@ -1,23 +1,24 @@
 <%#
 kind: provision
-name: SOE Kickstart Default
+name: Kickstart default
 model: ProvisioningTemplate
-description: Satellite 6.12 Kickstart Default template clone with customizations
 oses:
+- AlmaLinux
 - CentOS
 - CentOS_Stream
 - Fedora
 - RedHat
-- OracleLinux
-
+- Rocky
 test_on:
 - host4dhcp
 - host6dhcp
 - host4and6dhcp
 - host4static
 - host6static
+- rhel9_dhcp
+- rocky8_dhcp
+- rocky9_dhcp
 description: |
-  This kickstart template has been customized to support NBDE and Satellite 6.12
   The provisioning template for kickstart based distributions. The output is fetched by Anaconda installer during
   the network based installation. To customize the installation, modify the host parameters.
 
@@ -28,8 +29,14 @@ description: |
   - time-zone: string (default="UTC")
   - http-proxy: string (default="")
   - http-proxy-port: string (default="")
+  - force-puppet: boolean (default=false)
   - enable-epel: boolean (default=false)
-  
+  - enable-puppetlabs-repo: boolean (default=false)
+  - enable-puppetlabs-puppet5-repo: boolean (default=false)
+  - enable-puppetlabs-puppet6-repo: boolean (default=false)
+  - enable-official-puppet7-repo: boolean (default=false)
+  - enable-official-puppet8-repo: boolean (default=false)
+  - skip-puppet-setup: boolean (default=false)
   - salt_master: string (default=undef)
   - ntp-server: string (default=undef)
   - bootloader-append: string (default="nofb quiet splash=quiet")
@@ -38,13 +45,10 @@ description: |
   - disable-uek: boolean (default=false)
   - use-ntp: boolean (default depends on OS release)
   - fips_enabled: boolean (default=false)
-  - ks_debug: boolean (default=false)set
-
   - encrypt_grub: boolean (default=false)
-  - enable-remote-execution-pull: boolean (default=false)
   - use_graphical_installer: boolean (default=false)
-  - use_NBDE: boolean (default=false)
-  - create_users_selinux: boolean (default=false)
+  - enable-remote-execution-pull: boolean (default=false)
+  - additional-packages: string (default=undef)
 
   Reference links:
   - https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/6/html/installation_guide/s1-kickstart2-options
@@ -60,10 +64,11 @@ description: |
   # safemode renderer does not support unary negation
   proxy_uri = host_param('http-proxy') ? "http://#{host_param('http-proxy')}:#{host_param('http-proxy-port')}" : nil
   proxy_string = proxy_uri ? " --proxy=#{proxy_uri}" : ''
+  puppet_enabled = !host_param_true?('skip-puppet-setup') && (host_puppet_server.present? || host_param_true?('force-puppet'))
   salt_enabled = host_param('salt_master') ? true : false
   chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
   section_end = (rhel_compatible && os_major <= 5) ? '' : '%end'
-  use_ntp = host_param_true?('use-ntp', (is_fedora && os_major < 16) || (rhel_compatible && os_major <= 7))
+  use_ntp = host_param_true?('use-ntp', (is_fedora && os_major < 16) || (rhel_compatible && os_major <= 6))
   iface = @host.provision_interface
   appstream_present = false
   use_rhsm = (@host.operatingsystem.name == 'RedHat' || @host.operatingsystem.name == 'RHEL') && os_major >= 9
@@ -100,27 +105,20 @@ liveimg --url=<%= liveimg_url %> <%= proxy_string %>
 <% else %>
 <%= @mediapath %><%= proxy_string %>
 <% @additional_media.each do |medium| -%>
-<% if rhel_compatible && @host.operatingsystem.name.downcase.include?("centos") && os_major >= 8 && medium[:url] && medium[:url].include?("AppStream") -%>
-# renamed from "<%= medium[:url] %>" for CentOS Anaconda to work
-repo --name AppStream --baseurl <%= medium[:url] %>
-<% else -%>
 repo --name <%= medium[:name] %> --baseurl <%= medium[:url] %> <%= medium[:install] ? ' --install' : '' %><%= proxy_string %>
 <% end -%>
-<% end -%>
-
 <%= snippet_if_exists(template_name + " custom repositories") %>
 <% end %>
 lang <%= host_param('lang') || 'en_US.UTF-8' %>
 selinux --<%= host_param('selinux-mode') || host_param('selinux') || 'enforcing' %>
 keyboard <%= host_param('keyboard') || 'us' %>
 
-##### previous network options moved to snippet kickstart_network_interface #####
 <%
 # start with provisioning interface, then other non-bond non-bridge interfaces and the bonds + bridges at the end
 @host.interfaces.reject{ |iface| iface.bmc? }.sort_by { |iface| (iface.bond? || iface.bridge?) ? 0 : iface.provision? ? 20 : 10 }.each do |iface|
 -%>
 <%= snippet(
-      'kickstart_network_interface',
+      'soe_kickstart_network_interface',
       variables: {
         iface: iface,
         host: @host,
@@ -128,7 +126,9 @@ keyboard <%= host_param('keyboard') || 'us' %>
         static6: @static6
       }
     ) -%>
-<% end -%>
+<%
+end
+-%>
 
 rootpw --iscrypted <%= root_pass %>
 <% if host_param_true?('disable-firewall') -%>
@@ -141,10 +141,14 @@ authselect --useshadow --passalgo=<%= @host.operatingsystem.password_hash.downca
 <% else -%>
 authconfig --useshadow --passalgo=<%= @host.operatingsystem.password_hash.downcase || 'sha256' %> --kickstart
 <% end -%>
-
-# We are going to use an ansible role to assign time services, so just set the time zone
-# --ntpservers is deprecated in RHEL9 
+<% if rhel_compatible && os_major < 9 -%>
+timezone --utc <%= host_param('time-zone') || 'UTC' %> <%= host_param('ntp-server') ? "--ntpservers #{host_param('ntp-server')}" : '' %>
+<% else -%>
 timezone --utc <%= host_param('time-zone') || 'UTC' %>
+<% if host_param('ntp-server') -%>
+timesource --ntp-server <%= host_param('ntp-server') %>
+<% end -%>
+<% end -%>
 
 <% if rhel_compatible -%>
 services --disabled gpm,sendmail,cups,pcmcia,isdn,rawdevices,hpoj,bluetooth,openibd,avahi-daemon,avahi-dnsconfd,hidd,hplip,pcscd
@@ -159,23 +163,12 @@ realm join --one-time-password='<%= @host.otp || "$HOST[OTP]" %>' <%= @host.real
 repo --name="Server-Mysql"
 <% end -%>
 
-
 <% if @host.operatingsystem.name == 'Fedora' && os_major <= 16 -%>
-<% if host_param('grubmenu_pass') -%>
 # Bootloader exception for Fedora 16:
-bootloader --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %> <%= ks_console %>" --iscrypted --password=<%= host_param('grubmenu_pass') %>
+bootloader --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %> <%= ks_console %>" <%= grub_pass %>
 part biosboot --fstype=biosboot --size=1
 <% else -%>
-# Bootloader exception for Fedora 16:
-bootloader --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %> <%= ks_console %>"
-part biosboot --fstype=biosboot --size=1
-<% end -%>
-<% else -%>
-<% if host_param('grubmenu_pass') -%>
-bootloader --location=mbr --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %>" --iscrypted --password=<%= host_param('grubmenu_pass') %>
-<% else -%>
-bootloader --location=mbr --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %>"
-<% end -%>
+bootloader --location=mbr --append="<%= host_param('bootloader-append') || 'nofb quiet splash=quiet' %>" <%= grub_pass %>
 <% if os_major == 5 -%>
 key --skip
 <% end -%>
@@ -186,6 +179,7 @@ key --skip
 <% else -%>
 <%= @host.diskLayout %>
 <% end -%>
+<%= snippet('kickstart_rhsm') if use_rhsm -%>
 
 <% if host_param_true?('use_graphical_installer') -%>
 graphical
@@ -196,15 +190,9 @@ text
 reboot<% if host_param_true?('install_reboot_kexec') %> --kexec<% end %>
 
 %packages
-<% if host_param('install_environment_group') -%>
-@^<%= host_param('install_environment_group') %>
-<% else -%>
-@^minimal-environment
-<% end -%>
-
 <%= snippet_if_exists(template_name + " custom packages") %>
 yum
-<% if (rhel_compatible && os_major < 8) -%>
+<% if os_major < 8 -%>
 dhclient
 <% end -%>
 <% if use_ntp -%>
@@ -217,13 +205,11 @@ chrony
 <% if rhel_compatible && os_major < 9 -%>
 wget
 <% end -%>
-
 <% if host_param_true?('fips_enabled') -%>
 <%=   snippet 'fips_packages' %>
 <% end -%>
-
-<% if host_param('host_packages').present? -%>
-<%= host_param('host_packages').split(" ").join("\n") %>
+<% if host_param('additional-packages').present? -%>
+<%= host_param('additional-packages').split(" ").join("\n") %>
 <% end -%>
 <%= section_end %>
 
@@ -261,37 +247,13 @@ logger "Starting anaconda <%= @host %> postinstall"
 
 <%= snippet 'yum_proxy' %>
 
-# Move all firewalld configuration to ansible callback
-# Issues between NM + firewalld during build make first boot the proper place to configure
-
-<% if host_param_true?('use_foreman_users') %>
-  <%= snippet 'soe_create_users_selinux' %>
-<% end -%>
-
-<% if rhel_compatible && !host_param_false?('disable-non-sat-repos') -%>
-<%= snippet 'soe_disable_non_sat_repos' -%>
-<% end -%>
-
 <% if rhel_compatible && host_param_true?('enable-epel') -%>
 <%= snippet 'epel' -%>
 <% end -%>
 
-<%= snippet 'redhat_register' %>
-subscription-manager refresh
-subscription-manager repos 
-<%= snippet 'soe_ensure_python' %>
-<% if (is_fedora && os_major > 29) || (rhel_compatible && os_major > 6) -%>
-<%= snippet 'soe_install_cockpit' %>
-<% end -%>
-
-<%= snippet 'remote_execution_ssh_keys' %>
-<%= snippet 'blacklist_kernel_modules' %>
+<%= snippet 'redhat_register' if rhel_compatible && !use_rhsm -%>
 
 <% if host_enc['parameters']['realm'] && @host.realm && (@host.realm.realm_type == 'FreeIPA' || @host.realm.realm_type == 'Red Hat Identity Management') -%>
-<% if (rhel_compatible && os_major = 8) -%>
-# yum module enable and yum module install to pull in the idm client
-yum -y module enable idm:client
-<% end -%>
 <%= snippet 'freeipa_register' %>
 <% end -%>
 
@@ -304,14 +266,25 @@ else
 fi
 <% end -%>
 
+<%= snippet('remote_execution_ssh_keys') %>
+
 <% if plugin_present?('katello') && host_param_true?('enable-remote-execution-pull') -%>
 <%= save_to_file('/root/remote_execution_pull_setup.sh', snippet('remote_execution_pull_setup'), verbatim: true) %>
 chmod +x /root/remote_execution_pull_setup.sh
 /root/remote_execution_pull_setup.sh
 <% end -%>
 
+<%= snippet "blacklist_kernel_modules" %>
+
 <% if chef_enabled %>
 <%= snippet 'chef_client' %>
+<% end -%>
+
+<% if puppet_enabled %>
+<% if host_param_true?('enable-puppetlabs-repo') || host_param_true?('enable-official-puppet8-repo') || host_param_true?('enable-official-puppet7-repo') || host_param_true?('enable-puppetlabs-puppet6-repo')|| host_param_true?('enable-puppetlabs-puppet5-repo') -%>
+<%= snippet 'puppetlabs_repo' %>
+<% end -%>
+<%= snippet 'puppet_setup' %>
 <% end -%>
 
 <% if salt_enabled %>
@@ -331,11 +304,7 @@ sed -e 's/DEFAULTKERNEL=kernel-uek/DEFAULTKERNEL=kernel/g' -i /etc/sysconfig/ker
 <%= snippet_if_exists(template_name + " custom post") %>
 
 <%= snippet 'insights' if host_param_true?('host_registration_insights') && os_major < 9 -%>
-
-# before disk_enc_clevis_tang and better - supports SSS and TPM as well
-<% if host_param_true?('use_NBDE') %>
-<%= snippet 'soe_use_NBDE' %>
-<% end -%>
+<%= snippet 'disk_enc_clevis_tang' if host_param('disk_enc_tang_servers') -%>
 
 touch /tmp/foreman_built
 
@@ -365,10 +334,10 @@ The last post section halts Anaconda to prevent endless loop in case HTTP reques
 
 if test -f /tmp/foreman_built; then
   echo "calling home: build is done!"
-  <%= indent(2, skip1: true) { snippet('built', :variables => { :endpoint => 'built', :method => 'POST', :body_file => '/root/install.post.log' }) } -%>
+  <%= indent(2, skip1: true, skip_content: 'EOF') { snippet('built', :variables => { :endpoint => 'built', :method => 'POST', :body_file => '/root/install.post.log' }) } -%>
 else
   echo "calling home: build failed!"
-  <%= indent(2, skip1: true) { snippet('built', :variables => { :endpoint => 'failed', :method => 'POST', :body_file => '/root/install.post.log' }) } -%>
+  <%= indent(2, skip1: true, skip_content: 'EOF') { snippet('built', :variables => { :endpoint => 'failed', :method => 'POST', :body_file => '/root/install.post.log' }) } -%>
 fi
 
 sync
