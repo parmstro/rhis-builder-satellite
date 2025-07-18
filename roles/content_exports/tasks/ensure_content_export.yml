@@ -1,0 +1,19 @@
+---
+
+# perform a library or repository export
+
+- name: "Perform library export for {{ content_export.name }}"
+  when: content_export.type == 'library'
+  ansible.builtin.include_tasks: "perform_library_export.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_exports
+    - tags_library_export
+
+- name: "Perform repository export for {{ content_export.name }}"
+  when: content_export.type == 'repository'
+  ansible.builtin.include_tasks: "perform_repository_export.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_exports
+    - tags_repository_export

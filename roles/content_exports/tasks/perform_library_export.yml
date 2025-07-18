@@ -1,0 +1,19 @@
+---
+
+# Export the Satellite Library for the organization
+
+- name: "Performing library export using format {{ content_export.format }} and {{ content_export.chunk_size_gb }}" # noqa: name[template]
+  redhat.satellite.content_export_library:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ activation_key.organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    ca_path: "{{ content_export.ca_path | default(omit) }}"
+    chunk_size_gb: "{{ content_export.chunk_size_gb | default(omit) }}"
+    destination_server: "{{ content_export.destination_server | default(omit) }}"
+    fail_on_missing_content: "{{ content_export.fail_on_missing_content | default(omit) }}"
+    format: "{{ content_export.format | default(omit) }}"
+    from_history_id: "{{ content_export.from_history_id | default(omit) }}"
+    incremental: "{{ content_export.incremental | default(omit) }}"

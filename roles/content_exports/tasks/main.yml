@@ -1,0 +1,17 @@
+---
+
+# This role implements content exports for Organizations within Satellite
+# define a content_exports entity in the host_vars directory for your satellite,
+# see host_vars/satellite.example.ca/content_exports.yml
+
+- name: "Perform the content_exports"
+  when: content_exports is defined and (content_exports | length) > 0
+  ansible.builtin.include_tasks: "ensure_content_export.yml"
+  loop: "{{ content_exports }}"
+  loop_control:
+    loop_var: content_export
+  no_log: true
+  tags:
+    - tags_rhisam
+    - tags_content_config
+    - tags_content_exports

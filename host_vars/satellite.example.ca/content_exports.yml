@@ -1,0 +1,36 @@
+---
+
+# content_exports definition
+
+content_exports:
+  - name: "Library"
+    type: "library"
+    organization: "{{ satellite_orgainzation }}" # required - If supporting multiple organizations this can be set to an organization hosted on the satellite.
+    format: "importable"
+    # ca_path: # we will use the ipa ca for rhis idm integrated satellites
+    chunk_size_gb: "2"  # format *must* be 'importable', 'syncable' format exports cannot be chunked (they are rpms)
+    destination_server: "satellite_disconnected.example.ca"
+    fail_on_missing_content: true
+    incremental: false
+  - name: "Repository"
+    type: "repository"
+    organization: "{{ satellite_orgainzation }}" # required - If supporting multiple organizations this can be set to an organization hosted on the satellite.
+    format: "importable"
+    product: "EPEL8"      # required
+    repository: "EPEL8"   # required
+    # ca_path: # we will use the ipa ca for rhis idm integrated satellites
+    chunk_size_gb: "2"  # format *must* be 'importable', 'syncable' format exports cannot be chunked (they are rpms)
+    destination_server: "satellite_disconnected.example.ca"
+    fail_on_missing_content: true
+    incremental: false
+  - name: "Content_View_Version"
+    type: "cv_version"
+    organization: "{{ satellite_orgainzation }}" # required - If supporting multiple organizations this can be set to an organization hosted on the satellite.
+    format: "importable"
+    product: "EPEL8"      # required
+    repository: "EPEL8"   # required
+    # ca_path: # we will use the ipa ca for rhis idm integrated satellites
+    chunk_size_gb: "2"  # format *must* be 'importable', 'syncable' format exports cannot be chunked (they are rpms)
+    destination_server: "satellite_disconnected.example.ca"
+    fail_on_missing_content: true
+    incremental: false
