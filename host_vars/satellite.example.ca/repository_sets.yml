@@ -338,6 +338,19 @@ repository_sets:
   - name: "Red Hat Ansible Engine 2.9 RPMs for Red Hat Enterprise Linux 7 Server"
     product: "Red Hat Ansible Engine"
 
+  - name: "Red Hat Enterprise Linux 7 Server - Extended Life Cycle Support (RPMs)"
+    product: "Red Hat Enterprise Linux Server - Extended Life Cycle Support"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
+
+  - name: "Red Hat Enterprise Linux 7 Server - Extended Life Cycle Support - Optional (RPMs)"
+    product: "Red Hat Enterprise Linux Server - Extended Life Cycle Support"
+    repository_list:
+      - releasever: "7Server"
+        basearch: "x86_64"
+
+
 # Please see custom products for:
 # CentOS79
 # CentOS9
