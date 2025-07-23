@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Create sync plans and attach products to the sync plans"
+  standalone: false

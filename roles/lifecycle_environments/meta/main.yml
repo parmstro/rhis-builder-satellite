@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage and configure a list of satellite lifecycle environments"
+  standalone: false

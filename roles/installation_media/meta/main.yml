@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage and configure a list of non-RHEL installation media. Include kickstart repos in content views for products that support it."
+  standalone: false

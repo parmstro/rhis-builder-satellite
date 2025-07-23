@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Configure Satellite with all the global parameters necessary, including sensible defaults, for using the standard provisioning templates"
+  standalone: false

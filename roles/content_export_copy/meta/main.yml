@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Copy a defined list of exported Satellite content to a destination for transfer"
+  standalone: false

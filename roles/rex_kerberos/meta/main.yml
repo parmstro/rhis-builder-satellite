@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Configure Kerberos based remote execution for the Satellite"
+  standalone: false

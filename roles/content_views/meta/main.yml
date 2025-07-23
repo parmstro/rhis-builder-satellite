@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Configure a list of content views, filters, filter rules and publish a new version"
+  standalone: false

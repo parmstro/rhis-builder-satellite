@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Configure and manage Satellite server run-time configurable settings"
+  standalone: false

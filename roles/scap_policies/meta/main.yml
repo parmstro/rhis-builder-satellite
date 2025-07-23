@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage and configure a set of Open SCAP policies for the Satellite. This requires a FAM module."
+  standalone: false

@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Deploy one or more Satellite Capsule Servers"
+  standalone: false

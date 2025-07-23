@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Perform Satellite Server post installation performance tuning and rerun the installer. For local installed database."
+  standalone: false

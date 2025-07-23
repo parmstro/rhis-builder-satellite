@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Perform pre-deployment configuration on Satellite servers prior to installing a capsule - cert generation"
+  standalone: false

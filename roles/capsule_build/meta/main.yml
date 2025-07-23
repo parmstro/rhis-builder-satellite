@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Build the list of Satellite Capsule servers using satellite hostgroups"
+  standalone: false

@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Configure and run the satellite installation via redhat.satellite_operations"
+  standalone: false

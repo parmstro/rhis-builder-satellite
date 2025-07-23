@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Clone a list of git repositories locally to the Satellite. For Compliance as Code ansible roles."
+  standalone: false

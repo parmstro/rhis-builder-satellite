@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage an AD or IdM Kerberos realm for Satellite hosts."
+  standalone: false

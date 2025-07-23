@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage the list of Red Hat Product repository sets for a Satellite organization"
+  standalone: false

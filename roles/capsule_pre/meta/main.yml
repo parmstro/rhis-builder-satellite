@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Perform host pre-installation configuration Satellite Capsules"
+  standalone: false

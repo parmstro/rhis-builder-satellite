@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Configure the satellite installation prerequisites on the satellite host"
+  standalone: false

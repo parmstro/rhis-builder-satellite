@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage and configure a list of Open SCAP tailoring files to be used in SCAP scanning."
+  standalone: false
