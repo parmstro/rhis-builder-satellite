@@ -1,0 +1,24 @@
+---
+# get information about a resource in satellite
+
+- name: "Get the product info"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    resource: "{{ resource_type }}"
+    search: "{{ search_query }}"
+  register: resource_info
+
+- name: "Debug Print resource info json"
+  when: dbug_print_names_only is not defined or (dbug_print_names_only is defined and not dbug_print_names_only)
+  ansible.builtin.debug:
+    msg: "{{ resource_info }}"
+
+- name: "Debug Print resource names"
+  when: dbug_print_names_only is defined and dbug_print_names_only
+  ansible.builtin.debug:
+    msg: "{{ resource_info | community.general.json_query('resources[*].name') }}"
