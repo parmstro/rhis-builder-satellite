@@ -1,19 +1,5 @@
 ---
 
-- name: "Configure the ansible environment"
-  hosts: provisioner
-  become: true
-  gather_facts: true
-
-  tasks:
-
-    - name: "Update collections"
-      ansible.builtin.command: "ansible-galaxy collection install -r {{ playbook_dir }}/requirements.yml"
-      register: result
-      changed_when: result.rc == 0
-      tags:
-        - tags_init
-
 - name: "Build the satellite primary"
   hosts: sat_primary
   become: true
