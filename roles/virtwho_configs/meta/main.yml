@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Manage maintain and apply a list of virtwho configurations for the Satellite"
+  standalone: false
