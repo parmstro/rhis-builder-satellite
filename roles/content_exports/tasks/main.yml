@@ -4,6 +4,13 @@
 # define a content_exports entity in the host_vars directory for your satellite,
 # see host_vars/satellite.example.ca/content_exports.yml
 
+- ansible.builtin.set_fact:  # noqa name[missing]
+    _start_time: "{{ ansible_date_time.iso8601 }}"
+
+- name: "Log the start time of the operation"
+  ansible.builtin.debug:
+    var: _start_time
+
 - name: "Perform the content_exports"
   when: content_exports is defined and (content_exports | length) > 0
   ansible.builtin.include_tasks: "ensure_content_export.yml"
@@ -15,3 +22,10 @@
     - tags_rhisam
     - tags_content_config
     - tags_content_exports
+
+- ansible.builtin.set_fact:  # noqa name[missing]
+    _end_time: "{{ ansible_date_time.iso8601 }}"
+
+- name: "Log the start time of the operation"
+  ansible.builtin.debug:
+    var: _end_time

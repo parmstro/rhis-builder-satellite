@@ -17,3 +17,11 @@
     - tags_rhisam
     - tags_content_exports
     - tags_repository_export
+
+- name: "Perform content_view export for {{ content_export.name }}"
+  when: content_export.type == 'cv_version'
+  ansible.builtin.include_tasks: "perform_cv_version_export.yml"
+  tags:
+    - tags_rhisam
+    - tags_content_exports
+    - tags_repository_export

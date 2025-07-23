@@ -2,18 +2,19 @@
 
 # Export the Satellite repository for the organization
 
-- name: "Performing repository export using format {{ content_export.format }} and {{ content_export.chunk_size_gb }}" # noqa: name[template]
+- name: "Performing repository export for {{ content_export.name }}" # noqa: name[template]
   redhat.satellite.content_export_repository:
     username: "{{ satellite_username | default(omit) }}"
     password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
     server_url: "{{ satellite_url }}"
-    organization: "{{ activation_key.organization }}"
+    organization: "{{ satellite_organization }}"
     product: "{{ content_export.product }}"
     repository: "{{ content_export.repository }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
     ca_path: "{{ content_export.ca_path | default(omit) }}"
     chunk_size_gb: "{{ content_export.chunk_size_gb | default(omit) }}"
+    destination_server: "{{ content_export.destination_server | default(omit) }}"  # The underlying module primitive supports this
     format: "{{ content_export.format | default(omit) }}"
     from_history_id: "{{ content_export.from_history_id | default(omit) }}"
     incremental: "{{ content_export.incremental | default(omit) }}"
