@@ -169,6 +169,10 @@ satellite_repositories:
     product: "Red Hat Enterprise Linux for ARM 64"
     content_type: "yum"
     download_policy: "immediate"
+  - name: "Red Hat CodeReady Linux Builder for RHEL 9 x86_64 RPMs 9"
+    product: "Red Hat CodeReady Linux Builder for x86_64"
+    content_type: "yum"
+    download_policy: "immediate"
 
   - name: "Red Hat Enterprise Linux 8 for x86_64 - AppStream Kickstart 8.10"
     product: "Red Hat Enterprise Linux for x86_64"
@@ -413,41 +417,62 @@ satellite_repositories:
   - name: "EPEL8"
     product: "EPEL8"
     content_type: "yum"
+    gpg_key: "EPEL8GPG"
     download_policy: "immediate"
     unprotected: false
 
   - name: "EPEL8_Stream"
     product: "EPEL8"
     content_type: "yum"
+    gpg_key: "EPEL8GPG"
     download_policy: "immediate"
     unprotected: false
 
   - name: "EPEL9"
     product: "EPEL9"
     content_type: "yum"
+    gpg_key: "EPEL9GPG"
     download_policy: "immediate"
     unprotected: false
 
   - name: "msqltools2022_rhel8"
     product: "Microsoft SQL Server for Linux 2022 for RHEL 8"
     content_type: "yum"
+    gpg_key: "MicrosoftGPG"
     download_policy: "immediate"
     unprotected: false
 
   - name: "msqltools2022_rhel9"
     product: "Microsoft SQL Server for Linux 2022 for RHEL 9"
     content_type: "yum"
+    gpg_key: "MicrosoftGPG"
     download_policy: "immediate"
     unprotected: false
 
   - name: "mssqlserver2022_rhel8"
     product: "Microsoft SQL Server for Linux 2022 for RHEL 8"
     content_type: "yum"
+    gpg_key: "MicrosoftGPG"
     download_policy: "immediate"
     unprotected: false
 
   - name: "mssqlserver2022_rhel9"
     product: "Microsoft SQL Server for Linux 2022 for RHEL 9"
     content_type: "yum"
+    gpg_key: "MicrosoftGPG"
+    download_policy: "immediate"
+    unprotected: false
+
+  - name: "postgresql15"
+    product: "postgresql_org"
+    content_type: "yum"
+    gpg_key: "POSTGRESQL-ORG-GPG-KEY-RHEL"
+    download_policy: "immediate"
+    unprotected: false
+
+  - name: "postgresql_common"
+    product: "postgresql_org"
+    content_type: "yum"
+    gpg_key: "POSTGRESQL-ORG-GPG-KEY-RHEL"
     download_policy: "immediate"
     unprotected: false

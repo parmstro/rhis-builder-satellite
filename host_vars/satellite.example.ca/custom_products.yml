@@ -22,6 +22,31 @@ custom_products:
         password: ""
         download_policy: "on_demand"
 
+  - name: "Postgresql_Org"
+    desc: "Official Content from postgresql.org"
+    org: "{{ satellite_organization }}"
+    label: "postgresql_org"
+    repositories:
+      - name: "postgresql15"
+        upstream_name: ""
+        content_type: "yum"
+        gpg_key: "POSTGRESQL-ORG-GPG-KEY-RHEL"
+        verify_ssl_on_sync: true
+        url: "https://download.postgresql.org/pub/repos/yum/15/redhat/rhel-9-x86_64/"
+        username: ""
+        password: ""
+        download_policy: "immediate"
+      - name: "postgresql_common"
+        upstream_name: ""
+        content_type: "yum"
+        gpg_key: "POSTGRESQL-ORG-GPG-KEY-RHEL"
+        verify_ssl_on_sync: true
+        url: "https://download.postgresql.org/pub/repos/yum/common/redhat/rhel-9-x86_64/"
+        username: ""
+        password: ""
+        download_policy: "immediate"
+
+
   - name: "CentOS79"
     desc: "CentOS 7.9 from vault.centos.org to support convert2rhel demonstration"
     org: "{{ satellite_organization }}"

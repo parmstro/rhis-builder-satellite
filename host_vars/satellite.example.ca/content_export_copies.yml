@@ -1,0 +1,10 @@
+---
+
+# content_exports definition
+
+content_export_copies:
+  - name: "Library"
+    type: "library"
+    destination_server: "satellite_disconnected.example.ca"
+    export_version: "1.0"
+    destination_folder: "/run/media/ansiblerunner/export"

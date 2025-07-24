@@ -194,6 +194,10 @@ repository_sets:
   - name: "Red Hat Satellite 6 Client 2 for RHEL 9 aarch64 (RPMs)"
     product: "Red Hat Enterprise Linux for ARM 64"
 
+  - name: "Red Hat CodeReady Linux Builder for RHEL 9 x86_64 RPMs 9"
+    product: "Red Hat CodeReady Linux Builder for x86_64"
+
+
 ############## RHEL 8 ##################
 # RHEL 8.x kickstarts
   - name: "Red Hat Enterprise Linux 8 for x86_64 - BaseOS (Kickstart)"
@@ -249,6 +253,7 @@ repository_sets:
     product: "Red Hat Enterprise Linux for x86_64"
     repository_list:
       - releasever: "8.10"
+
 
 ############## AAP ##################
 # Ansible Automation Platform 2.4 and 2.5

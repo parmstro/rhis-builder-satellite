@@ -468,6 +468,44 @@ content_views:
       - "Qualification"
       - "Production"
 
+  - name: "CodeReadyBuilder9"
+    desc: "Red Hat CodeReady Builder for RHEL9 Standard Operating Environment Content"
+    org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
+    repositories:
+      - name: "Red Hat CodeReady Linux Builder for RHEL 9 x86_64 RPMs 9"
+        product: "Red Hat CodeReady Linux Builder for x86_64"
+    filters:
+      - name: "Include_All_Packages_No_Errata"
+        type: "rpm"
+        inclusion: true
+        description: "Include all rpms with no errata for all repositories"
+        original_packages: true
+        repositories: "[]"
+      - name: "Include_All_Streams_No_Errata"
+        type: "modulemd"
+        inclusion: true
+        description: "Include all module streams with no errata for all repositories"
+        original_module_streams: true
+        repositories: "[]"
+      - name: "Include_Errata_By_Date"
+        type: "erratum"
+        inclusion: true
+        description: "Include all errata updated as of {{ errata_end_date }}"
+        repositories: "[]"
+        rules:
+          - name: "errata-by-date-{{ errata_end_date }}"
+            end_date: "{{ errata_end_date }}"
+            date_type: "updated"
+            types:
+              - "enhancement"
+              - "bugfix"
+              - "security"
+    date_filter_name: "Include_Errata_By_Date"
+    environments:
+      - "Library"
+
 # RHEL8 for lots of things
   - name: "SOE8"
     desc: "Red Hat Enterprise Linux 8 Standard Operating Environment Content"
@@ -730,6 +768,40 @@ content_views:
         product: "Microsoft SQL Server for Linux 2022 for RHEL 9"
       - name: "msqltools2022_rhel9"
         product: "Microsoft SQL Server for Linux 2022 for RHEL 9"
+    filters:
+      - name: "Include_Packages_No_Errata"
+        type: "rpm"
+        inclusion: true
+        description: "Include all rpms with no errata for all repositories"
+        original_packages: true
+        repositories: "[]"
+      - name: "Include_Errata_By_Date"
+        type: "erratum"
+        inclusion: true
+        description: "Include all errata updated as of the 1st of the month"
+        repositories: "[]"
+        rules:
+          - name: "errata-by-date-{{ errata_end_date }}"
+            enddate: "{{ errata_end_date }}"
+            datetype: "updated"
+            types:
+              - "enhancement"
+              - "bugfix"
+              - "security"
+    date_filter_name: "Include_Errata_By_Date"
+    environments:
+      - "Library"
+
+  - name: "postgresql15_postgis"
+    desc: "Postgresql 15 with PostGIS for geospacial data management"
+    org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
+    repositories:
+      - name: "postgresql15"
+        product: "postgresql_org"
+      - name: "postgresql_common"
+        product: "postgresql_org"
     filters:
       - name: "Include_Packages_No_Errata"
         type: "rpm"
@@ -1129,6 +1201,25 @@ composite_content_views:
       - content_view: "SOE9"
         latest: true
       - content_view: "mssqlserver2022_rhel9"
+        latest: true
+    environments:
+      - "Library"
+      - "Development"
+      - "Qualification"
+
+  - name: "SOE9_postgis"
+    desc: "Postgresql15 postgis SOE"
+    org: "{{ satellite_organization }}"
+    force_publish: false
+    publication_threshold_hours: 24
+    components:
+      - content_view: "SOE9"
+        latest: true
+      - content_view: "EPEL9"
+        latest: true
+      - content_view: "CodeReadyBuilder9"
+        latest: true
+      - content_view: "postgresql15_postgis"
         latest: true
     environments:
       - "Library"

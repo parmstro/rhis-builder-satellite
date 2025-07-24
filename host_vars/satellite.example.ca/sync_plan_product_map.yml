@@ -52,6 +52,10 @@ product_plans:
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"
 
+  - name: "postgresql_org"
+    plan: "nightly_third_party"
+    organization: "{{ satellite_organization }}"
+
   - name: "CentOS79"
     plan: "nightly_third_party"
     organization: "{{ satellite_organization }}"

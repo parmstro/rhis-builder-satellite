@@ -445,3 +445,23 @@ activation_keys:
     content_view: "SOE10"
     lifecycle_environment: "Production"
     unlimited_hosts: true
+
+  - name: "SOE9_postgis"
+    state: "present"
+    description: "Activate a RHEL 9 Postgresql 15 system for PostGIS"
+    organization: "{{ satellite_organization }}"
+    auto_attach: false
+    content_overrides:
+      - label: "satellite-client-6-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "codeready-builder-for-rhel-9-x86_64-rpms"
+        override: "enabled"
+      - label: "Default_Organization_EPEL9_EPEL9"
+        override: "enabled"
+      - label: "Default_Organization_postgresql_org_postgresql15"
+        override: "enabled"
+      - label: "Default_Organization_postgresql_org_postgresql_common"
+        override: "enabled"
+    content_view: "SOE9"
+    lifecycle_environment: "Development"
+    unlimited_hosts: true
