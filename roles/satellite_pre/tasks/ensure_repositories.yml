@@ -4,13 +4,23 @@
 
 
 - name: "Ensure the proper repositories are enabled"
+  when: satellite_pre_use_subman
   community.general.rhsm_repository:
     name: "{{ repository_ids }}"
     state: enabled
     purge: true
 
-- name: "Ensure the release is not set" # noqa: no-changed-when
-  ansible.builtin.command: "subscription-manager release --unset"
+- name: "Please ensure proper repositories are enabled when not using subscription-manager"
+  when: satellite_pre_use_subman
+  ansible.builtin.debug:
+    msg: "satellite_pre_use_subman is false. Verify repos if play fails"
 
-- name: "Clean the yum metadata" # noqa: no-changed-when
+- name: "Ensure the release is not set"
+  ansible.builtin.command: "subscription-manager release --unset"
+  register: unset_result
+  changed_when: unset_result.rc == 0
+
+- name: "Clean the yum metadata"
   ansible.builtin.command: "yum clean all"
+  register: clean_all_result
+  changed_when: clean_all_result.rc == 0

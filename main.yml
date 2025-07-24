@@ -42,6 +42,9 @@
         - tags_satellite_pre
         - tags_pre_sync
 
+# confirm cds are mounted after reboot in disconnected environment
+# figure out foreman discovery images installation for disconnected
+
     - name: "Apply role of satellite to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
         name: satellite

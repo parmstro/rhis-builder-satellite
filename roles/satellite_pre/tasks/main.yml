@@ -2,13 +2,16 @@
 # setup the server for the installation of Satellite or Capsule
 # Supports RHEL8 running Satellite 6.11 or greater
 
+# We need to check whether we are actually registering to the CDN
 - name: "Ensure CDN registration"
+  when: satellite_pre_use_subman
   ansible.builtin.import_tasks: "ensure_cdn_registration.yml"
   tags:
     - tags_rhisam
     - tags_satellite_pre
     - tags_satellite_pre_cdn_registration
 
+# We need to see if the repos are provided already and not via a subscription
 - name: "Ensure satellite reposistories are enabled"
   ansible.builtin.import_tasks: "ensure_repositories.yml"
   tags:
