@@ -1,18 +1,7 @@
 ---
-
-- name: "Configure the ansible environment"
-  hosts: provisioner
-  become: true
-  gather_facts: true
-
-  tasks:
-
-    - name: "Update collections"
-      ansible.builtin.command: "ansible-galaxy collection install -r {{ playbook_dir }}/requirements.yml"
-      register: result
-      changed_when: result.rc == 0
-      tags:
-        - tags_init
+# This is the main rhis-builder-satellite entry point.
+# This play is expected to be run from inside the rhis-provisioner container.
+# If running independently, please ensure that all requirements and prerequisites for executing the play are met.
 
 - name: "Build the satellite primary"
   hosts: sat_primary
