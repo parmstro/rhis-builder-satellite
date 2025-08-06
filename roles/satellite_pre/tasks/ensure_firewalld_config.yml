@@ -24,8 +24,11 @@
     name: "redhat.rhel_system_roles.firewall"
   vars:
     firewall:                                                                     # noqa: var-naming[no-role-prefix]
-      - { set_default_zone: "{{ sat_firewalld_zone }}", state: enabled }
-      - { interface: eth0, zone: "{{ sat_firewalld_zone }}", state: enabled }
+      - { set_default_zone: "{{ sat_firewalld_zone }}",
+          state: enabled }
+      - { interface: "{{ sat_firewalld_interface }}",
+          zone: "{{ sat_firewalld_zone }}",
+          state: enabled }
       - { service: "RH-Satellite-6",
           port: ["5646/tcp", "8888/tcp", "8889/tcp", "5671/tcp", "5671/udp"],
           permanent: true,
