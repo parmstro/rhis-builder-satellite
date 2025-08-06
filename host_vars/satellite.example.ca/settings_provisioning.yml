@@ -142,7 +142,7 @@ settings_provisioning:
     description: "Global Registration template"
     settings_type: "string"
     default: "Global Registration"
-    value: ""
+    value: "Global Registration"
 
   - name: "default_host_init_config_template"
     full_name: "Default 'Host initial configuration' template"
