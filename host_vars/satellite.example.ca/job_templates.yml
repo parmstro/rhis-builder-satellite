@@ -1,0 +1,20 @@
+job_templates:
+  - name: "Provisioning Action - Re-init baremetal Linux Host"
+    audit_comment: "RHIS builder created"
+    path: "job_template_provisioning_wipe_host.j2"
+    job_category: "Provisioning"
+    locations: "{{ satellite_location }}"
+    organizations: "{{ satellite_organization }}"
+    locked: false
+    provider_type: "script"
+    snippet: false
+    state: present
+    template_inputs:
+      - name: "action"
+        advanced: false
+        default: ""
+        description: "WARNING: This is descructive and cannot be undone. Provide action=wipe to proceed."
+        input_type: "user"
+        options: [wipe]
+        required: true
+        value_type: "plain"

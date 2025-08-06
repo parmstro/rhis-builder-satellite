@@ -1,0 +1,36 @@
+---
+# This task creates an individual job template from specified paramters
+# Call this task with loop_var: job_template
+- name: "Apply any ansible templating defined in the configuration template"
+  ansible.builtin.template:
+    src: "{{ job_template.path }}"
+    dest: "{{ job_template.path }}.out"
+    owner: root
+    group: root
+    mode: "0744"
+
+# state defaults to present
+# we are always builtin from templates
+
+- name: "Ensure state of provisioning template - {{ job_template.name }}"
+  redhat.satellite.job_template:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs }}"
+    audit_comment: "{{ job_template.audit_comment | default(omit) }}"
+    file_name: "{{ job_template.path }}.out"
+    job_category: "{{ job_template.job_category | default(omit) }}"
+    locked: "{{ job_template.locked | default(omit) }}"
+    locations: "{{ job_template.locations }}"
+    name: "{{ job_template.name }}"
+    organizations: "{{ job_template.organizations }}"
+    provider_type: "{{ job_template.provider_type }}"
+    state: "{{ job_template.state | default(omit) }}"
+    template_inputs: "{{ job_template.template_inputs | default(omit) }}"
+
+- name: "Remove the temporary file"
+  ansible.builtin.file:
+    path: "{{ job_template.path }}.out"
+    state: absent

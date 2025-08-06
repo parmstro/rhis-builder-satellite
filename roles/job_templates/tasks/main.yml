@@ -1,0 +1,22 @@
+---
+# This playbook configures the rhisam job templates
+# NOTE: If you are providing templates that will be used with
+# ansible downstream, ensure the downstream ansible is properly
+# encapsulated. This also applies to any foreman templating
+# that may be incompatible with anisble template parsing,
+# these occurences should be rare.
+
+# NOTE: we are working to ensure that there are no name collisions.
+# There will be updates to the list names in the future
+
+- name: "Ensure the state of the provisioning templates"
+  when: job_templates is defined and (job_templates | length) > 0
+  ansible.builtin.include_tasks: "ensure_job_template.yml"
+  loop: "{{ job_templates }}"
+  loop_control:
+    loop_var: job_template
+  no_log: true
+  tags:
+    - tags_rhisam
+    - tags_provisioning_config
+    - tags_job_templates
