@@ -68,9 +68,24 @@
         - tags_satellite_pre_idm_integration
         - tags_satellite_before_sync
 
+    - name: "Determine keytab download file"
+      ansible.builtin.set_fact:
+        freeipa_keytab_file: "{{ fpr_prepare_realm.stdout_lines[-1].split()[-1] }}"
+
     - name: "Wait for keytab generation and retrieval"
       ansible.builtin.wait_for:
-        path: "~/freeipa.keytab"
+        path: "{{ freeipa_keytab_file }}"
+      tags:
+        - tags_satellite_pre
+        - tags_satellite_pre_idm_integration
+        - tags_satellite_before_sync
+
+    - name: "Move the keytab to a known location"
+      ansible.builtin.copy:
+        src: "{{ freeipa_keytab_file }}"
+        dest: "/root/freeipa.keytab"
+        mode: "0600"
+        remote_src: true
       tags:
         - tags_satellite_pre
         - tags_satellite_pre_idm_integration
@@ -90,7 +105,7 @@
 
 - name: "Move the keytab to the foreman-proxy directory"
   ansible.builtin.copy:
-    src: "~/freeipa.keytab"
+    src: "/root/freeipa.keytab"
     dest: /etc/foreman-proxy/freeipa.keytab
     owner: foreman-proxy
     group: foreman-proxy
