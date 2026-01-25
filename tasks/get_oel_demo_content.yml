@@ -1,0 +1,81 @@
+---
+
+# download and configure OEL kickstart media
+
+- name: "Fetch the iso to the satellite server"
+  ansible.builtin.get_url:
+    url: "https://yum.oracle.com/ISOS/OracleLinux/OL7/u9/x86_64/OracleLinux-R7-U9-Server-x86_64-dvd.iso"
+    dest: "/var/www/html/pub/.oel79dvd.iso"
+    force: false
+    owner: "root"
+    group: "root"
+    mode: "0744"
+
+- name: "Create the directory for the kickstart files"
+  ansible.builtin.file:
+    path: "/var/www/html/pub/oel79"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: "Ensure the dvd isnt mounted"
+  ansible.posix.mount:
+    path: "/var/www/html/pub/.dvd_mount"
+    src: "/var/www/html/pub/.oel79dvd.iso"
+    opts: "ro,loop"
+    state: unmounted
+
+- name: "Create a mount for the iso"
+  ansible.builtin.file:
+    path: "/var/www/html/pub/.dvd_mount"
+    state: directory
+    owner: "root"
+    group: "root"
+    mode: "0755"
+
+- name: "Mount the dvd"
+  ansible.posix.mount:
+    path: "/var/www/html/pub/.dvd_mount"
+    src: "/var/www/html/pub/.oel79dvd.iso"
+    fstype: "iso9660"
+    opts: "ro,loop"
+    state: mounted
+
+- name: "Copy all the contents to the permanent kickstart repo directory"
+  ansible.builtin.copy:
+    src: "/var/www/html/pub/.dvd_mount/"  # Absolute path to the ISO file on the target host
+    dest: "/var/www/html/pub/.oel79"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    remote_src: true
+
+- name: "Ensure the directories have execute flags necessary for booting"
+  ansible.builtin.shell:
+    cmd: "sudo find /var/www/html/pub -type d -exec chmod 755 {} \\;"
+  register: chmod_result
+  changed_when: chmod_result == 0
+
+- name: "Ensure the proper selinux context on the directory and contents"
+  ansible.builtin.command:
+    cmd: "restorecon -Rv /var/www/html/pub/oel79"
+  register: restorecon_result
+  changed_when: restorecon_result.rc == 0
+
+- name: "Umount the dvd"
+  ansible.posix.mount:
+    path: "/var/www/html/pub/.dvd_mount"
+    src: "/var/www/html/pub/.oel79dvd.iso"
+    opts: "ro,loop"
+    state: unmounted
+
+- name: "Cleanup"
+  ansible.builtin.file:
+    path: "/var/www/html/pub/.dvd_mount"
+    state: absent
+
+- name: "Cleanup"
+  ansible.builtin.file:
+    path: "/var/www/html/pub/.oel79dvd.iso"
+    state: absent
