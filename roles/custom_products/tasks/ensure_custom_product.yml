@@ -11,9 +11,15 @@
     server_url: "{{ satellite_url }}"
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    description: "{{ custom_product.description | default(omit) }}"
+    gpg_key: "{{ custom_product.gpg_key | default(omit) }}"
+    label: "{{ custom_product.label | default(omit) }}"
     name: "{{ custom_product.name }}"
+    ssl_ca_cert: "{{ custom_product.ssl_ca_cert | default(omit) }}"
+    ssl_client_cert: "{{ custom_product.ssl_client_cert | default(omit) }}"
+    ssl_client_key: "{{ custom_product.ssl_client_key | default(omit) }}"
+    sync_plan: "{{ custom_product.sync_plan | default(omit) }}"
     state: "{{ custom_product.state | default(omit) }}"
-
 
 - name: "Ensure the state the repositories required for the custom product."
   when: custom_product.repositories is defined and (custom_product.repositories | length) > 0
