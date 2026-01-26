@@ -1,0 +1,68 @@
+---
+
+# This is the main rhis-builder-satellite entry point for capsule builds.
+# This play is expected to be run from inside the rhis-provisioner container.
+# If running independently, please ensure that all requirements and prerequisites for executing the play are met.
+
+- name: "Build the satellite capsules"
+  hosts: sat_capsules
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: "Load the vault variables"
+      when: vault_path is defined
+      ansible.builtin.include_vars:
+        file: "{{ vault_path }}"
+      tags:
+        - always
+
+    - name: "Load the other variables"
+      when: vars_path is defined
+      ansible.builtin.include_vars:
+        file: "{{ vars_path }}"
+      tags:
+        - always
+
+    - name: "Load the vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+      tags:
+        - always
+
+    - name: "Load the other variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
+      tags:
+        - always
+
+    - name: "Apply role of capsule_pre to {{ ansible_fqdn }}"
+      ansible.builtin.include_role:
+        name: caspule_pre
+      tags:
+        - tags_capsule_pre
+        - tags_capsule_before_sync
+
+    - name: "Apply role of capsule to {{ ansible_fqdn }}"
+      ansible.builtin.include_role:
+        name: capsule
+      tags:
+        - tags_capsule_install
+        - tags_capsule_before_sync
+
+    - name: "Apply role of capsule_post to {{ ansible_fqdn }}"
+      ansible.builtin.include_role:
+        name: capsule_post
+      tags:
+        - tags_capsule_post
+        - tags_capsule_before_sync
+
+    - name: "Ensure capsule synchronization"
+      ansible.builtin.import_tasks: "tasks/capsule_start_sync.yml"
+      tags:
+        - tags_capsule_sync
+
+# End of Capsule Configuration
