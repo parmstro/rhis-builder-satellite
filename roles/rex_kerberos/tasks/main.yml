@@ -19,7 +19,7 @@
     state: directory
     owner: "{{ rex_executor }}"
     group: "{{ rex_executor }}"
-    mode: "0640"
+    mode: "0750"
 
 # the keytab file *must* always be named client.keytab
 # and be located in the path below related to the impersonating users uid, in our case foreman-proxy
@@ -39,7 +39,7 @@
     remote_src: true
     owner: "{{ rex_executor }}"
     group: "{{ rex_executor }}"
-    mode: "0640"
+    mode: "0750"
 
 - name: "Validate the keytab" # noqa: no-changed-when risky-shell-pipe
   ansible.builtin.command: "kinit -kt {{ rex_keytab_path }} {{ foreman_proxy_realm_principal }}"
