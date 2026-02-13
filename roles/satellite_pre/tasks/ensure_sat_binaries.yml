@@ -34,6 +34,29 @@
         - tags_satellite_pre
         - tags_satellite_before_sync
 
+    - name: "Ensure ansible-core"
+      ansible.builtin.dnf:
+        name: "ansible-core"
+        state: present
+      tags:
+        - tags_satellite_pre
+        - tags_satellite_before_sync
+
+    - name: "Ensure ansible collections in global configuration"
+      community.general.ansible_galaxy_install:
+        type: collection
+        name: "{{ collection_name }}"
+        dest: "/usr/share/ansible/collections"
+        force: true
+      loop:
+        - "community.general"
+        - "ansible.posix"
+      loop_control:
+        loop_var: collection_name
+      tags:
+        - tags_satellite_pre
+        - tags_satellite_before_sync
+
     - name: "Reset the Ruby module" # noqa: no-changed-when
       ansible.builtin.command: "dnf -y module reset ruby"
       tags:
