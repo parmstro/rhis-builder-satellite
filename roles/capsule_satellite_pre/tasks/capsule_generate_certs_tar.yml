@@ -11,10 +11,11 @@
     capsule_key_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.key"
     capsule_csr_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.csr"
     capsule_private_key_pem_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.pem"
+    capsule_ca_crt_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.CA.crt"
 
 - name: "Generate the certificate bundle on the Satellite"
   ansible.builtin.command:
-    cmd: "capsule-certs-generate --no-colors --foreman-proxy-fqdn {{ cert_capsule.fqdn }} --certs-tar '{{ cert_capsule.fqdn }}-certs.tar' --server-cert {{ capsule_crt_path }} --server-key  {{ capsule_key_path }} --server-ca-cert /etc/ipa/ca.crt" # noqa yaml[line-length]
+    cmd: "capsule-certs-generate --no-colors --foreman-proxy-fqdn {{ cert_capsule.fqdn }} --certs-tar '{{ cert_capsule.fqdn }}-certs.tar' --server-cert {{ capsule_crt_path }} --server-key  {{ capsule_key_path }} --server-ca-cert {{ capsule_ca_crt_path }}" # noqa yaml[line-length]
   changed_when: true
   register: certs_gen
 
