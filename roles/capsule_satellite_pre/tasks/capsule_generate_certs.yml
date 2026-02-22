@@ -69,7 +69,7 @@
         path: "{{ passfile }}"
         state: present
         create: true
-        line: "{{ sat_ssl_rsa_key_pass }}"
+        line: "{{ capsule_ssl_rsa_key_pass }}"
         owner: "root"
         mode: "0740"
       tags:
@@ -121,7 +121,7 @@
         path: "{{ passfile }}"
         state: present
         create: true
-        line: "{{ sat_ssl_rsa_key_pass }}"
+        line: "{{ capsule_ssl_rsa_key_pass }}"
         owner: "root"
         mode: "0740"
       tags:
@@ -135,7 +135,7 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - ansible.builtin.command: "openssl rsa -in {{ ssl_private_key_pem_path }} -out {{ sat_ssl_key_path }} -passin file:/{{ passfile }}" # noqa: name[missing]
+    - ansible.builtin.command: "openssl rsa -in {{ ssl_private_key_pem_path }} -out {{ capsule_key_path }} -passin file:/{{ passfile }}" # noqa: name[missing]
       register: gc_gen_key_result
       changed_when: gc_gen_key_result.rc == 0
       tags:
@@ -200,7 +200,7 @@
         - tags_capsule_pre
 
     - name: "Stop tracking cert with certmonger" # noqa: no-changed-when risky-shell-pipe ignore-errors
-      ansible.builtin.shell: "kinit -kt {{ sat_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -i {{ cert_capsule.fqdn }}" # noqa: yaml[line-length]
+      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -i {{ cert_capsule.fqdn }}" # noqa: yaml[line-length]
       register: gc_stop_tracking_result
       changed_when: gc_stop_tracking_result.rc == 0
       failed_when:
@@ -262,7 +262,7 @@
         path: "{{ passfile }}"
         state: present
         create: true
-        line: "{{ capsule_rsa_key_pass }}"
+        line: "{{ capsule_ssl_rsa_key_pass }}"
         owner: "root"
         mode: "0740"
       tags:
@@ -292,7 +292,7 @@
         - tags_capsule_pre
 
     - name: "Generate the certificate for the service"
-      ansible.builtin.shell: "kinit -kt {{ sat_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ capsule_csr_path }} --certificate-out={{ capsule_crt_path }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ capsule_csr_path }} --certificate-out={{ capsule_crt_path }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_gen_crt_result
       changed_when: gc_gen_crt_result.rc ==0
       tags:
@@ -300,7 +300,7 @@
         - tags_capsule_pre
 
     - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"
-      ansible.builtin.shell: "kinit -kt {{ sat_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_start_tracking_result
       changed_when: gc_start_tracking_result.rc ==0
       tags:

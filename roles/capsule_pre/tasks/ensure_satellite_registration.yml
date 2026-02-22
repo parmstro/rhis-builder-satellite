@@ -1,5 +1,10 @@
 ---
 
+- name: "Enforce the proper content view and Organization"
+  community.general.redhat_subscription:
+    org_id: "{{ satellite_initial_organization_label }}"
+    activationkey: "{{ capsule_pre_activation_key }}"
+
 - name: "Gather the subscription registration information"
   ansible.builtin.command: "subscription-manager config"
   register: subscription_config

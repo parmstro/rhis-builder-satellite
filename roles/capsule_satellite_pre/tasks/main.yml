@@ -5,17 +5,17 @@
 # generate the certifcate tar file and installer command
 # copy the tar file and command text to the capsule
 
-# - name: "Generate certificates on the Satellite for each Capsule"
-#   ansible.builtin.include_tasks: "capsule_generate_certs.yml"
-#   loop: "{{ capsules }}"
-#   loop_control:
-#     loop_var: cert_capsule
+- name: "Generate certificates on the Satellite for each Capsule"
+  ansible.builtin.include_tasks: "capsule_generate_certs.yml"
+  loop: "{{ capsules }}"
+  loop_control:
+    loop_var: cert_capsule
 
-# - name: "Generate tar file on the Satellite for each Capsule"
-#   ansible.builtin.include_tasks: "capsule_generate_certs_tar.yml"
-#   loop: "{{ capsules }}"
-#   loop_control:
-#     loop_var: cert_capsule
+- name: "Generate tar file on the Satellite for each Capsule"
+  ansible.builtin.include_tasks: "capsule_generate_certs_tar.yml"
+  loop: "{{ capsules }}"
+  loop_control:
+    loop_var: cert_capsule
 
 - name: "Fetch tar and script files on the Satellite for each Capsule"
   when: capsules is defined and (capsules | length) > 0
