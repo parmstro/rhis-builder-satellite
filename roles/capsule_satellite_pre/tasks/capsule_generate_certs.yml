@@ -18,6 +18,18 @@
     capsule_private_key_pem_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.pem"
     capsule_ca_crt_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.CA.crt"
 
+- name: "Debug output - generating certificates"
+  ansible.builtin.debug:
+    var: debug_vars
+  vars:
+    debug_vars:
+      capsule_crt_dir
+      capsule_crt_path
+      capsule_key_path
+      capsule_csr_path
+      capsule_private_key_pem_path
+      capsule_ca_crt_path
+
 - name: "Create a secure directory"
   ansible.builtin.file:
     path: "{{ capsule_crt_dir }}"
@@ -178,16 +190,16 @@
   block:
     - name: "Read existing cert" # noqa: no-changed-when command-instead-of-module
       ansible.builtin.shell: "sed -n 2,$(expr $(wc -l < {{ capsule_crt_path }}) - 1)p {{ capsule_crt_path }}"
-      changed_when: cert.rc == 0
       register: cert
+      changed_when: cert.rc == 0
       tags:
         - tags_capsule
         - tags_capsule_pre
 
     - name: "Get cert serial number"  # noqa: no-changed-when risky-shell-pipe
       ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-find --certificate='{{ cert.stdout }}' --subject={{ ansible_fqdn }} | grep 'Serial number:' | cut -c18-"
+      register: serial_number
       changed_when: serial_number.rc == 0
-      register: serial_num
       tags:
         - tags_capsule
         - tags_capsule_pre

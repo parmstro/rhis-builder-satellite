@@ -4,7 +4,7 @@
 
 - name: "Assign Capsule Organization and Location"
   when: capsules is defined and (capsules | length) > 0
-  ansible.builtin.include_tasks: "assign_capsule_org_loc.yml"
+  ansible.builtin.include_tasks: "capsule_configure.yml"
   loop: "{{ capsules }}"
   loop_control:
     loop_var: capsule

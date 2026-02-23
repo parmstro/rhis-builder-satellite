@@ -3,7 +3,7 @@
 # Start the synchronization of each capsule
 
 - name: "Start capsule synchronization"
-  ansible.builtin.command: "hammer capsule content synchronize --name {{ capsule_name }}"
+  ansible.builtin.command: "hammer capsule content synchronize --async --name {{ capsule_name }}"
   loop: "{{ groups['sat_capsules'] }}"
   loop_control:
     loop_var: capsule_name

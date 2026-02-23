@@ -1,0 +1,20 @@
+---
+
+# A Satellite Capsule server is a Smart Proxy in Foreman parlance
+
+# download_policy: is one of [background, immediate, on_demand, streamed, inherit]
+
+- name: "Assign Host Location and Organization"
+  redhat.satellite.smart_proxy:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    state: "{{ capsule.state | default(omit) }}"
+    name: "{{ capsule.fqdn }}"
+    download_policy: "{{ capsule.download_policy | default(omit) }}"
+    lifecycle_environments: "{{ capsule.lifecycle_environments | default(omit) }}"
+    organizations: "{{ capsule.organizations | default(omit) }}"
+    locations: "{{ capsule.locations | default(omit) }}"
+    url: "https://{{ capsule.fqdn }}:9090"
