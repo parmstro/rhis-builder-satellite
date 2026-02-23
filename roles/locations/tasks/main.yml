@@ -5,5 +5,5 @@
   ansible.builtin.include_tasks: "ensure_location.yml"
   loop: "{{ satellite_locations }}"
   loop_control:
-    loop_var: satellite_location
+    loop_var: sat_location
   no_log: true

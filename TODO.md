@@ -5,11 +5,11 @@
 
 ### Features 
 
-- capsule-build role - build a satellite capsule using a hostgroup 
-- capsule-pre role - install and configure the prerequisites for capsule
-- capsule role - install the capsule server
-- capsule-configure role - configure the capsule content, location, organization, alternate content source
-- capsule-sync task
+# Capsule content implementation complete
+# Next: (much of this may be innate)
+#   - capsule baremetal host discovery
+#   - capsule provisioning
+#   - capsule remote execution
 
 # Windows DNS DHCP https://access.redhat.com/solutions/4236381
 # requirements Bryndis Swan (github:TurtlesRock)(forces.gc.ca)

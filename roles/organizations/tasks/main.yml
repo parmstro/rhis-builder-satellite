@@ -5,5 +5,5 @@
   ansible.builtin.include_tasks: "ensure_organization.yml"
   loop: "{{ satellite_organizations }}"
   loop_control:
-    loop_var: satellite_organization
+    loop_var: sat_organization
   no_log: true
