@@ -8,7 +8,7 @@
 
 - name: "Define the secure directory"
   ansible.builtin.set_fact:
-    capsule_crt_dir: "{{ sat_idm_certs_private }}{{ cert_capsule.fqdn }}/"
+    capsule_crt_dir: "{{ private_crt_dir }}{{ cert_capsule.fqdn }}/"
 
 - name: "Define the capsule_cert_path"
   ansible.builtin.set_fact:
