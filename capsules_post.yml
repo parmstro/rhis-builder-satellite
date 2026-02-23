@@ -1,11 +1,11 @@
 ---
 
-# This is the main rhis-builder-satellite entry point for capsule builds.
-# This play is expected to be run from inside the rhis-provisioner container.
+# This is the post configuration entry point for capsule builds.
+# This play is expected to be run from inside the rhis-provisioner container after running capsule_main.yml.
 # If running independently, please ensure that all requirements and prerequisites for executing the play are met.
 
 - name: "Build the satellite capsules"
-  hosts: sat_capsules
+  hosts: sat_primary
   become: true
   gather_facts: true
 
@@ -38,20 +38,6 @@
         dir: "{{ vars_dir }}"
       tags:
         - always
-
-    - name: "Apply role of capsule_pre to {{ ansible_fqdn }}"
-      ansible.builtin.include_role:
-        name: capsule_pre
-      tags:
-        - tags_capsule_pre
-        - tags_capsule_before_sync
-
-    - name: "Apply role of capsule to {{ ansible_fqdn }}"
-      ansible.builtin.include_role:
-        name: capsule
-      tags:
-        - tags_capsule_install
-        - tags_capsule_before_sync
 
     - name: "Apply role of capsule_post to {{ ansible_fqdn }}"
       ansible.builtin.include_role:
