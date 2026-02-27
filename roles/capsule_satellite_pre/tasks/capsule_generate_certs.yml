@@ -8,29 +8,18 @@
 
 - name: "Define the secure directory for {{ cert_capsule.fqdn }}"
   ansible.builtin.set_fact:
-    capsule_crt_dir: "{{ private_crt_dir }}/{{ cert_capsule.fqdn }}/"
+    capsule_crt_dir: "{{ private_crt_dir }}/{{ cert_capsule.fqdn }}"
 
-- name: "Define the capsule_cert_path"
+- name: "Define the capsule certificate locations for {{ cert_capsule.fqdn }}"
   ansible.builtin.set_fact:
-    capsule_crt_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.crt"
-    capsule_key_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.key"
-    capsule_csr_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.csr"
-    capsule_private_key_pem_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.pem"
-    capsule_ca_crt_path: "{{ capsule_crt_dir }}{{ cert_capsule.fqdn }}.CA.crt"
+    capsule_crt_path: "{{ capsule_crt_dir }}/{{ cert_capsule.fqdn }}.crt"
+    capsule_key_path: "{{ capsule_crt_dir }}/{{ cert_capsule.fqdn }}.key"
+    capsule_csr_path: "{{ capsule_crt_dir }}/{{ cert_capsule.fqdn }}.csr"
+    capsule_private_key_pem_path: "{{ capsule_crt_dir }}/{{ cert_capsule.fqdn }}.pem"
+    capsule_ca_crt_path: "{{ capsule_crt_dir }}/{{ cert_capsule.fqdn }}.CA.crt"
+    _local_keytab: "{{ capsule_crt_dir }}/local.keytab"
 
-- name: "Debug output - generating certificates"
-  ansible.builtin.debug:
-    var: debug_vars
-  vars:
-    debug_vars:
-      capsule_crt_dir
-      capsule_crt_path
-      capsule_key_path
-      capsule_csr_path
-      capsule_private_key_pem_path
-      capsule_ca_crt_path
-
-- name: "Create a secure directory"
+- name: "Create a secure directory for {{ cert_capsule.fqdn }}"
   ansible.builtin.file:
     path: "{{ capsule_crt_dir }}"
     state: "directory"
@@ -45,7 +34,7 @@
     - tags_capsule
     - tags_capsule_pre
 
-- name: "Copy IdM CA crt for use with Satellite Capsules"
+- name: "Copy IdM CA crt for use with Satellite Capsules for {{ cert_capsule.fqdn }}"
   ansible.builtin.copy:
     src: "{{ ipa_server_ca_crt_path }}"
     dest: "{{ capsule_ca_crt_path }}"
@@ -58,14 +47,14 @@
     - tags_capsule_pre
 
 - name: "Authenticate with IdM" # noqa: command-instead-of-shell risky-shell-pipe
-  ansible.builtin.shell: "ipa-getkeytab -p {{ ipa_admin_principal }} -s {{ ipaserver_fqdn }} -r -k {{ capsule_crt_dir }}local.keytab -D '{{ keytab_retrieval_dn }}' -w '{{ keytab_retrieval_password }}'" # noqa: yaml[line-length]
+  ansible.builtin.shell: "ipa-getkeytab -p {{ ipa_admin_principal }} -s {{ ipaserver_fqdn }} -r -k {{ _local_keytab }} -D '{{ keytab_retrieval_dn }}' -w '{{ keytab_retrieval_password }}'" # noqa: yaml[line-length]
   register: gc_get_keytab
   changed_when: gc_get_keytab.rc == 0
   tags:
     - tags_capsule
     - tags_capsule_pre
 
-- name: "Determine if the private key file exists"
+- name: "Determine if the private key file exists for {{ cert_capsule.fqdn }}"
   ansible.builtin.stat:
     path: "{{ capsule_private_key_pem_path }}"
   register: gc_pk_stat
@@ -88,7 +77,7 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Try to access the existing key"
+    - name: "Try to access the existing key for {{ cert_capsule.fqdn }}"
       ansible.builtin.shell: "openssl pkey -in '{{ capsule_private_key_pem_path }}' -noout -passin 'file:{{ passfile }}'" # noqa command-instead-of-shell
       register: gc_pk_access_result
       changed_when: true
@@ -116,7 +105,7 @@
         - tags_capsule_pre
 
 # OK... now check if the private key still exists
-- name: "Determine if the private key file exists"
+- name: "Determine if the private key file exists for {{ cert_capsule.fqdn }}"
   ansible.builtin.stat:
     path: "{{ capsule_private_key_pem_path }}"
   register: gc_pk_stat2
@@ -124,11 +113,11 @@
     - tags_capsule
     - tags_capsule_pre
 
-- name: "Create a new configuration"
+- name: "Create a new configuration for {{ cert_capsule.fqdn }}"
   when: not gc_pk_stat2.stat.exists
   block:
 
-    - name: "Generate configuration files"
+    - name: "Generate configuration files for {{ cert_capsule.fqdn }}"
       ansible.builtin.lineinfile:
         path: "{{ passfile }}"
         state: present
@@ -156,14 +145,14 @@
 
 # At this point we have a valid private key file
 
-- name: "Set target service name"
+- name: "Set target service name for {{ cert_capsule.fqdn }}"
   ansible.builtin.set_fact:
     target_service: "{{ crt_service_type }}/{{ cert_capsule.fqdn }}"
   tags:
     - tags_capsule
     - tags_capsule_pre
 
-- name: "Ensure target service is present"
+- name: "Ensure target service is present for {{ cert_capsule.fqdn }}"
   redhat.rhel_idm.ipaservice:
     ipaadmin_principal: "{{ ipa_admin_principal }}"
     ipaadmin_password: "{{ ipa_admin_password }}"
@@ -177,7 +166,7 @@
     - tags_capsule
     - tags_capsule_pre
 
-- name: "Check for an existing certificate file"
+- name: "Check for an existing certificate file for {{ cert_capsule.fqdn }}"
   ansible.builtin.stat:
     path: "{{ capsule_crt_path }}"
   register: cert_exists
@@ -185,7 +174,7 @@
     - tags_capsule
     - tags_capsule_pre
 
-- name: "Cert exists and regen requested - stop tracking and clean up"
+- name: "Cert exists and regen requested - stop tracking and clean up for {{ cert_capsule.fqdn }}"
   when: cert_exists.stat.exists and cert_capsule.crt_force_regen
   block:
     - name: "Read existing cert" # noqa: no-changed-when command-instead-of-module
@@ -196,8 +185,8 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Get cert serial number"  # noqa: no-changed-when risky-shell-pipe
-      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-find --certificate='{{ cert.stdout }}' --subject={{ ansible_fqdn }} | grep 'Serial number:' | cut -c18-"
+    - name: "Get certificate serial number for {{ cert_capsule.fqdn }}"  # noqa: no-changed-when risky-shell-pipe
+      ansible.builtin.shell: "kinit -kt {{ _local_keytab }} {{ ipa_admin_principal }}; ipa cert-find --certificate='{{ cert.stdout }}' --subject={{ ansible_fqdn }} | grep 'Serial number:' | cut -c18-"
       register: serial_number
       changed_when: serial_number.rc == 0
       tags:
@@ -211,8 +200,8 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Stop tracking cert with certmonger" # noqa: no-changed-when risky-shell-pipe ignore-errors
-      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -i {{ cert_capsule.fqdn }}" # noqa: yaml[line-length]
+    - name: "Ensure certmonger stops tracking old cert for {{ cert_capsule.fqdn }}" # noqa: no-changed-when risky-shell-pipe ignore-errors
+      ansible.builtin.shell: "kinit -kt {{ _local_keytab }} {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -i {{ cert_capsule.fqdn }}" # noqa: yaml[line-length]
       register: gc_stop_tracking_result
       changed_when: gc_stop_tracking_result.rc == 0
       failed_when:
@@ -229,7 +218,7 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Remove the old cert from the service"
+    - name: "Remove the old cert from the service for {{ cert_capsule.fqdn }}"
       redhat.rhel_idm.ipaservice:
         ipaadmin_principal: "{{ ipa_admin_principal }}"
         ipaadmin_password: "{{ ipa_admin_password }}"
@@ -241,7 +230,7 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Revoke the old cert with reason 4 - certificateSuperceded."
+    - name: "Revoke the old cert with reason 4 - certificateSuperceded - for {{ cert_capsule.fqdn }}"
       when: serial_number is defined and (serial_number.stdout_lines | length) == 1
       redhat.rhel_idm.ipacert:
         ipaadmin_principal: "{{ ipa_admin_principal }}"
@@ -253,7 +242,7 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Cert exists, rename old cert .revoked"
+    - name: "Cert exists, rename old cert .revoked for {{ cert_capsule.fqdn }}"
       ansible.builtin.copy:
         src: "{{ capsule_crt_path }}"
         dest: "{{ capsule_crt_path }}.revoked"
@@ -265,11 +254,11 @@
         - tags_capsule
         - tags_capsule_pre
 
-- name: Generating New Certificate
+- name: "Generating New Certificate"
   when: not cert_exists.stat.exists or cert_capsule.crt_force_regen
   block:
 
-    - name: "Generate configuration files"
+    - name: "Generate configuration files for {{ cert_capsule.fqdn }}"
       ansible.builtin.lineinfile:
         path: "{{ passfile }}"
         state: present
@@ -295,7 +284,7 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Create request"
+    - name: "Create certificate signing request for {{ cert_capsule.fqdn }}"
       ansible.builtin.command: "openssl req -new -key {{ capsule_key_path }} -out {{ capsule_csr_path }} -subj \"/C={{ csr_country_name }}/ST={{ csr_state_or_province_name }}/L={{ csr_locality_name }}/O={{ csr_organization_name }}/OU={{ csr_organization_unit_name }}/CN={{ cert_capsule.fqdn }}/subjectAltName=DNS.1={{ cert_capsule.fqdn }}\"" # noqa: yaml[line-length] name[missing] no-changed-when
       register: gc_gen_csr_result
       changed_when: gc_gen_csr_result.rc ==0
@@ -303,16 +292,16 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Generate the certificate for the service"
-      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ capsule_csr_path }} --certificate-out={{ capsule_crt_path }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+    - name: "Generate the certificate for the service for {{ cert_capsule.fqdn }}"
+      ansible.builtin.shell: "kinit -kt {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ capsule_csr_path }} --certificate-out={{ capsule_crt_path }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_gen_crt_result
       changed_when: gc_gen_crt_result.rc ==0
       tags:
         - tags_capsule
         - tags_capsule_pre
 
-    - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"
-      ansible.builtin.shell: "kinit -kt {{ capsule_crt_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+    - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals for {{ cert_capsule.fqdn }}"
+      ansible.builtin.shell: "kinit -kt {{ _local_keytab }} {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_start_tracking_result
       changed_when: gc_start_tracking_result.rc ==0
       tags:
@@ -321,7 +310,7 @@
 
 
   always:
-    - name: Cleanup
+    - name: "Cleanup for {{ cert_capsule.fqdn }}"
       ansible.builtin.file:
         path: "{{ passfile }}"
         state: absent
@@ -329,9 +318,9 @@
         - tags_capsule
         - tags_capsule_pre
 
-    - name: Cleanup
+    - name: "Cleanup for {{ cert_capsule.fqdn }}"
       ansible.builtin.file:
-        path: "{{ capsule_crt_dir }}local.keytab"
+        path: "{{ _local_keytab }}"
         state: absent
       tags:
         - tags_capsule
