@@ -1,4 +1,5 @@
 ---
+
 # currently neither the freeipa.ansible_freeipa collection nor the community collection support certificate management with ansible.
 # we either resort to the IPA API and a URI object or command line for this functionality
 # community certficate commands are not working even with pyOpenSSL > 16.0
