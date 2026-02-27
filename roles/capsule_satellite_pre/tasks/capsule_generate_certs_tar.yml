@@ -33,3 +33,32 @@
 - name: "Add the whole shebang"
   ansible.builtin.command: 'sed -i "1i #!/bin/bash" /root/{{ ansible_fqdn }}-installer.sh' # noqa command-instead-of-module
   changed_when: true
+
+# append additional commandline args to the script
+
+# TODO:
+# enable OpenSCAP scanning on capsules
+# --enable-foreman-proxy-plugin-openscap \
+# --foreman-proxy-plugin-openscap-puppet-module true
+#
+# enable BMC power management
+# --foreman-proxy-bmc "true" \
+# --foreman-proxy-bmc-default-provider "freeipmi"
+#
+# enable dns, dhcp, tftp
+# --foreman-proxy-dns true \
+# --foreman-proxy-dns-managed true \
+# --foreman-proxy-dns-interface eth0 \
+# --foreman-proxy-dns-zone example.com \
+# --foreman-proxy-dns-reverse 2.0.192.in-addr.arpa \
+# --foreman-proxy-dhcp true \
+# --foreman-proxy-dhcp-managed true \
+# --foreman-proxy-dhcp-interface eth0 \
+# --foreman-proxy-dhcp-additional-interfaces eth1 \
+# --foreman-proxy-dhcp-additional-interfaces eth2 \
+# --foreman-proxy-dhcp-range "192.0.2.100 192.0.2.150" \
+# --foreman-proxy-dhcp-gateway 192.0.2.1 \
+# --foreman-proxy-dhcp-nameservers 192.0.2.2 \
+# --foreman-proxy-tftp true \
+# --foreman-proxy-tftp-managed true \
+# --foreman-proxy-tftp-servername 192.0.2.3

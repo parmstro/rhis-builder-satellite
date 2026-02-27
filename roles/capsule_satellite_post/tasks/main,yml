@@ -1,0 +1,30 @@
+---
+
+# Core task is to update the trusted hosts on the Satellite 
+# to ensure provisioning works appropriately
+
+- name: "Ensure Satellite Primary and All Capsules are trusted hosts"
+  ansible.builtin.set_fact:
+    trusted_hosts: "{{ groups['sat_trusted_hosts'] | join(',') }}"
+
+- name: "Validate List"
+  ansible.builtin.debug:
+    var: trusted_hosts
+
+- name: "Update the Satellite configuration using the installer"
+  ansible.builtin.import_role:
+    name: "redhat.satellite_operations.installer"
+  vars:
+    satellite_installer_scenario: "satellite"                   # noqa: var-naming[no-role-prefix]
+    satellite_installer_options:
+      - '--foreman-proxy-trusted-hosts "{{ trusted_hosts }}"'
+
+# - name: "Update the Satellite configuration`"
+#   redhat.satellite.setting:
+#     username: "{{ satellite_username | default(omit) }}"
+#     password: "{{ satellite_password | default(omit) }}"
+#     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+#     server_url: "{{ satellite_url }}"
+#     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+#     name: "http_proxy_except_list"
+#     value: "{{ trusted_hosts }}"

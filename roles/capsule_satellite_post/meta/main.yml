@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Perform  post-deployment configuration on Satellite servers after to installing and configuring capsule servers"
+  standalone: false
