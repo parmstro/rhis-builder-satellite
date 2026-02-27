@@ -20,14 +20,22 @@
   changed_when: true
   register: certs_gen
 
+- name: "Instructions for installing capsule {{ cert_capsule.fqdn }}"
+  ansible.builtin.debug:
+    var: certs_gen.stdout
+
 - name: "Store the results"
   ansible.builtin.copy:
-    content: "{{ certs_gen.stdout }}\n"
+    content: "{{ certs_gen.stdout }}"
     dest: "/root/{{ cert_capsule.fqdn }}-installer.sh"
     mode: "0700"
 
+- name: "File cleaning"
+  ansible.builtin.command: "echo ' ' >>  /root/{{ cert_capsule.fqdn }}-installer.sh"
+  changed_when: true
+
 - name: "Create the command script"
-  ansible.builtin.command: "sed -i -n '1,/^  satellite-installer/,$p' /root/{{ cert_capsule.fqdn }}-installer.sh" # noqa command-instead-of-module
+  ansible.builtin.command: "sed -i -n '/^  satellite-installer/,$p' /root/{{ cert_capsule.fqdn }}-installer.sh" # noqa command-instead-of-module
   changed_when: true
 
 - name: "Add the whole shebang"
