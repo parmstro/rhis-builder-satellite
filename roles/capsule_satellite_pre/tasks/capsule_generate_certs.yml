@@ -6,9 +6,9 @@
 
 # yamllint disable rule:line-length
 
-- name: "Define the secure directory"
+- name: "Define the secure directory for {{ cert_capsule.fqdn }}"
   ansible.builtin.set_fact:
-    capsule_crt_dir: "{{ private_crt_dir }}{{ cert_capsule.fqdn }}/"
+    capsule_crt_dir: "{{ private_crt_dir }}/{{ cert_capsule.fqdn }}/"
 
 - name: "Define the capsule_cert_path"
   ansible.builtin.set_fact:
