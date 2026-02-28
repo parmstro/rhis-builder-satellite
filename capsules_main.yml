@@ -53,16 +53,16 @@
         - tags_capsule_install
         - tags_capsule_before_sync
 
-    - name: "Apply role of capsule_post to {{ ansible_fqdn }}"
-      ansible.builtin.include_role:
-        name: capsule_post
-      tags:
-        - tags_capsule_post
-        - tags_capsule_before_sync
+    # - name: "Apply role of capsule_post to {{ ansible_fqdn }}"
+    #   ansible.builtin.include_role:
+    #     name: capsule_post
+    #   tags:
+    #     - tags_capsule_post
+    #     - tags_capsule_before_sync
 
-    - name: "Ensure capsule synchronization"
-      ansible.builtin.import_tasks: "tasks/capsule_start_sync.yml"
-      tags:
-        - tags_capsule_sync
+    # - name: "Ensure capsule synchronization"
+    #   ansible.builtin.import_tasks: "tasks/capsule_start_sync.yml"
+    #   tags:
+    #     - tags_capsule_sync
 
 # End of Capsule Configuration

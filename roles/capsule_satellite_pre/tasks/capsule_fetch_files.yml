@@ -1,14 +1,14 @@
 ---
 
 # Fetch files
-- name: "Fetch tar the files"
+- name: "Fetch tar the files for {{ cert_capsule.fqdn }}"
   ansible.builtin.fetch:
     src: "/root/{{ cert_capsule.fqdn }}-certs.tar"
     dest: "/tmp/{{ cert_capsule.fqdn }}-certs.tar"
     flat: true
 
 # Fetch files
-- name: "Fetch script the files"
+- name: "Fetch script the files for {{ cert_capsule.fqdn }}"
   ansible.builtin.fetch:
     src: "/root/{{ cert_capsule.fqdn }}-installer.sh"
     dest: "/tmp/{{ cert_capsule.fqdn }}-installer.sh"
