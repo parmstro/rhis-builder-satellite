@@ -39,7 +39,7 @@
   changed_when: true
 
 - name: "Add the whole shebang"
-  ansible.builtin.command: 'sed -i "1i #!/bin/bash" /root/{{ ansible_fqdn }}-installer.sh' # noqa command-instead-of-module
+  ansible.builtin.command: 'sed -i "1i #!/bin/bash" /root/{{ cert_capsule.fqdn }}-installer.sh' # noqa command-instead-of-module
   changed_when: true
 
 # append additional commandline args to the script
