@@ -1,23 +1,30 @@
 ---
 
-# Core task is to update the trusted hosts on the Satellite 
+# Core task is to update the trusted hosts on the Satellite
 # to ensure provisioning works appropriately
 
-- name: "Ensure Satellite Primary and All Capsules are trusted hosts"
+- name: Initialize an empty list
   ansible.builtin.set_fact:
-    trusted_hosts: "{{ groups['sat_trusted_hosts'] | join(',') }}"
+    trusted_hosts_options: []
+
+- name: Populate the list dynamically in a loop
+  ansible.builtin.set_fact:
+    # Concatenate the existing list with a new item (ensuring the new item is a list with '[]')
+    trusted_hosts_options: "{{ trusted_hosts_options + ['--foreman-proxy-trusted-hosts ' + trusted_host] }}"
+  loop: "{{ groups['sat_trusted_hosts'] }}"
+  loop_control:
+    loop_var: trusted_host
 
 - name: "Validate List"
   ansible.builtin.debug:
-    var: trusted_hosts
+    var: trusted_hosts_options
 
 - name: "Update the Satellite configuration using the installer"
   ansible.builtin.import_role:
     name: "redhat.satellite_operations.installer"
   vars:
     satellite_installer_scenario: "satellite"                   # noqa: var-naming[no-role-prefix]
-    satellite_installer_options:
-      - '--foreman-proxy-trusted-hosts "{{ trusted_hosts }}"'
+    satellite_installer_options: "{{ trusted_hosts_options }}"
 
 # - name: "Update the Satellite configuration`"
 #   redhat.satellite.setting:
