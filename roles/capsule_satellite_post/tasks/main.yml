@@ -25,13 +25,3 @@
   vars:
     satellite_installer_scenario: "satellite"                   # noqa: var-naming[no-role-prefix]
     satellite_installer_options: "{{ trusted_hosts_options }}"
-
-# - name: "Update the Satellite configuration`"
-#   redhat.satellite.setting:
-#     username: "{{ satellite_username | default(omit) }}"
-#     password: "{{ satellite_password | default(omit) }}"
-#     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
-#     server_url: "{{ satellite_url }}"
-#     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
-#     name: "http_proxy_except_list"
-#     value: "{{ trusted_hosts }}"

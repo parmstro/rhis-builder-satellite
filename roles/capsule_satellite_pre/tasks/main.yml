@@ -1,4 +1,5 @@
 ---
+
 # This role prepares the satellite for the defined capsules
 
 # create new certificates for the capsules and ensure that they are tracked by certmonger
@@ -6,21 +7,22 @@
 # copy the tar file and command text to the capsule
 
 - name: "Generate certificates on the Satellite for each Capsule"
+  when: satellite_capsules is defined and (satellite_capsules | length) > 0
   ansible.builtin.include_tasks: "capsule_generate_certs.yml"
-  loop: "{{ capsules }}"
+  loop: "{{ satellite_capsules }}"
   loop_control:
     loop_var: cert_capsule
 
 - name: "Generate tar file on the Satellite for each Capsule"
+  when: satellite_capsules is defined and (satellite_capsules | length) > 0
   ansible.builtin.include_tasks: "capsule_generate_certs_tar.yml"
-  loop: "{{ capsules }}"
+  loop: "{{ satellite_capsules }}"
   loop_control:
     loop_var: cert_capsule
 
 - name: "Fetch tar and script files on the Satellite for each Capsule"
-  when: capsules is defined and (capsules | length) > 0
+  when: satellite_capsules is defined and (satellite_capsules | length) > 0
   ansible.builtin.include_tasks: "capsule_fetch_files.yml"
-  loop: "{{ capsules }}"
+  loop: "{{ satellite_capsules }}"
   loop_control:
     loop_var: cert_capsule
-  no_log: true
