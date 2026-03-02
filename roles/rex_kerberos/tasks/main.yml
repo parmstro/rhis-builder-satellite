@@ -1,4 +1,5 @@
 ---
+
 # Configure the system for kerberos rex
 # Determine the id of the rex executor - this is always foreman-proxy (until it isn't) - this sets the path
 # The principal is set in the keytab - foreman-proxy sshs in as the principal
@@ -19,7 +20,11 @@
     state: directory
     owner: "{{ rex_executor }}"
     group: "{{ rex_executor }}"
-    mode: "0750"
+    mode: "0500"
+    # system_u:object_r:krb5_keytab_t:s0
+    seuser: "system_u"
+    serole: "object_r"
+    setype: "krb5_keytab_t"
 
 # the keytab file *must* always be named client.keytab
 # and be located in the path below related to the impersonating users uid, in our case foreman-proxy
@@ -39,10 +44,14 @@
     remote_src: true
     owner: "{{ rex_executor }}"
     group: "{{ rex_executor }}"
-    mode: "0750"
+    mode: "0500"
+    # system_u:object_r:krb5_keytab_t:s0
+    seuser: "system_u"
+    serole: "object_r"
+    setype: "krb5_keytab_t"
 
 - name: "Validate the keytab" # noqa: no-changed-when risky-shell-pipe
-  ansible.builtin.command: "kinit -kt {{ rex_keytab_path }} {{ foreman_proxy_realm_principal }}"
+  ansible.builtin.command: "sudo -u {{ rex_executor }} kinit -kt {{ rex_keytab_path }} {{ foreman_proxy_realm_principal }}"
   register: rex_keytab_result
   changed_when: rex_keytab_result.rc == 0
 

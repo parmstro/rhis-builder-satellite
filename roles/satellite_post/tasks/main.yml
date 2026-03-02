@@ -97,6 +97,12 @@
     - tags_satellite_post
     - tags_satellite_before_sync
 
+- name: "Install global collections"
+  ansible.builtin.include_tasks: "ensure_force_ansible_collections.yml"
+  tags:
+    - tags_satellite_post
+    - tags_satellite_before_sync
+
 - name: "Rerun_installer"
   ansible.builtin.include_role:
     name: satellite
