@@ -7,7 +7,9 @@
 # copy the tar file and command text to the capsule
 
 - name: "Generate certificates on the Satellite for each Capsule"
-  when: satellite_capsules is defined and (satellite_capsules | length) > 0
+  when:
+    - satellite_capsules is defined and (satellite_capsules | length) > 0
+    - capsules_use_idm
   ansible.builtin.include_tasks: "capsule_generate_certs.yml"
   loop: "{{ satellite_capsules }}"
   loop_control:
