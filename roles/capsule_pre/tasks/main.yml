@@ -20,6 +20,7 @@
     - tags_capsule_pre_satellite_registration
 
 - name: "Ensure storage space"
+  when: capsule_data_volume is defined
   ansible.builtin.include_tasks: "ensure_storage_space.yml"
   tags:
     - tags_capsule_pre
