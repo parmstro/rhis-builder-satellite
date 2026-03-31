@@ -103,9 +103,12 @@
     - tags_satellite_post
     - tags_satellite_before_sync
 
-- name: "Rerun_installer"
-  ansible.builtin.include_role:
-    name: satellite
+- name: "Re-run the Satellite installer"
+  ansible.builtin.import_role:
+    name: "redhat.satellite_operations.installer"
+  vars:
+    satellite_installer_scenario: "satellite"                   # noqa: var-naming[no-role-prefix]
+  no_log: true
   tags:
     - tags_satellite_post
     - tags_satellite_before_sync

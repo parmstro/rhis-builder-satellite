@@ -19,14 +19,9 @@
     mode: "0600"
     dest: "/root/.hammer/cli.modules.d/foreman.yml"
 
-- name: "Check hammer"
-  ansible.builtin.command: "hammer ping"
-  register: ping_status
-  changed_when: ping_status.rc == 0
-
-- name: "Assertion: hammer ping"
-  ansible.builtin.assert:
-    that: "'Status:          ok' in ping_status.stdout"
+- name: "Wait for Satellite start up"
+  ansible.builtin.wait_for:
+    timeout: 15
 
 - name: "Check health"
   ansible.builtin.command: "satellite-maintain health check --label server-ping"
@@ -36,3 +31,14 @@
 - name: "Assertion: Health"
   ansible.builtin.assert:
     that: "'[OK]' in health_status.stdout"
+
+- name: "Check hammer"
+  ansible.builtin.command: "hammer ping"
+  register: ping_status
+  changed_when: ping_status.rc == 0
+
+- name: "Assertion: hammer ping"
+  ansible.builtin.assert:
+    that: "'Status:          ok' in ping_status.stdout"
+
+...
