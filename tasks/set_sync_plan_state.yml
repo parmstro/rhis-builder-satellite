@@ -1,0 +1,71 @@
+---
+
+# This task will enable or disble all sync plans for the
+# target satellite, organization and location, based on the value of
+#
+# existing_sync_plan_enabled
+#
+# use this to globally disable (false) sync plans prior to content activity
+# and to re-enable them after the content activity
+#
+# e.g. starting an unscheduled synchronization activity
+
+- name: "Query Satellite for resources"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: "sync_plans"
+  register: sync_plans_info
+
+- name: "Set the sync plan state"
+  redhat.satellite.sync_plan:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    name: "{{ sync_plan.name }}"
+    interval: "{{ sync_plan.interval }}"
+    sync_date: "{{ sync_plan.sync_date }}"
+    enabled: "{{ existing_sync_plan_enabled }}"
+  loop: "{{ sync_plans_info.resources }}"
+  loop_control:
+    loop_var: sync_plan
+
+- name: "Query Satellite for resources"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: "sync_plans"
+  register: sync_plans_state
+
+- name: "Generate sync_plan_list"
+  ansible.builtin.set_fact:
+    sync_plan_state_list: "{{ sync_plans_state | community.general.json_query('resources[*].enabled') | list }}"
+
+- name: "Assertion"
+  when: (existing_sync_plan_enabled | bool)
+  ansible.builtin.assert:
+    that: plan_enabled
+  loop: "{{ sync_plan_state_list }}"
+  loop_control:
+    loop_var: plan_enabled
+
+- name: "Assertion"
+  when: not (existing_sync_plan_enabled | bool)
+  ansible.builtin.assert:
+    that: not plan_enabled
+  loop: "{{ sync_plan_state_list }}"
+  loop_control:
+    loop_var: plan_enabled
+
+...

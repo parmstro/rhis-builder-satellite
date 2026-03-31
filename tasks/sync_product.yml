@@ -61,6 +61,23 @@
   ansible.builtin.debug:
     msg: "We must sync the product {{ product_to_sync }}"
 
+- name: "Ensure the product is not currently syncing"
+  when:
+    - must_sync_product
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: foreman_tasks
+    search: "label=Actions::Katello::Repository::Sync and state=running and action ~ product '{{ product_to_sync }}'"
+  register: active_tasks
+  until: active_tasks.resources | length  == 0
+  retries: 100
+  delay: 15
+
 - name: "Sync product {{ product_to_sync }}"
   when:
     - must_sync_product

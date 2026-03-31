@@ -8,6 +8,7 @@
 # avoid setting skip_sync_all or skip_publish_all in your variable file
 # call it with an extravar instead
 
+
 - name: "Get the unique list of products"
   when: repository_sets is defined and (repository_sets | length) > 0
   ansible.builtin.set_fact:
@@ -41,3 +42,10 @@
   loop_control:
     loop_var: product_to_sync
   no_log: true
+
+- name: "Set global sync plan state to disabled"
+  ansible.builtin.set_fact:
+    existing_sync_plan_enabled: true
+
+- name: "Ensure sync plan state"
+  ansible.builtin.include_tasks: set_sync_plan_state.yml
