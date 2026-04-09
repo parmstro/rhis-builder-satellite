@@ -9,22 +9,12 @@
 
 # ensure libvirt certificates
 - name: "Ensure the libvirt certificates."
+  when: satellite_pre_use_idm
   ansible.builtin.include_tasks: "ensure_libvirt_server_cert.yml"
 
 - name: "Ensure the libvirtclient certificates."
+  when: satellite_pre_use_idm
   ansible.builtin.include_tasks: "ensure_libvirt_client_cert.yml"
-
-- name: "Create the directories"
-  ansible.builtin.file:
-    name: "{{ item.path }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
-  loop:
-    - path: "/etc/pki/CA/"
-    - path: "/etc/pki/libvirt/"
-    - path: "/etc/pki/libvirt/private/"
 
 - name: "Create the required directories"
   ansible.builtin.file:
@@ -39,6 +29,7 @@
     - path: "/etc/pki/libvirt/private/"
 
 - name: "Copy server certificate to the proper directories"
+  when: satellite_pre_use_idm
   ansible.builtin.copy:
     src: "{{ libvirt_server_crt_path }}"
     dest: "/etc/pki/libvirt/servercert.pem"
@@ -48,6 +39,7 @@
     mode: "0644"
 
 - name: "Copy server key to the proper directories"
+  when: satellite_pre_use_idm
   ansible.builtin.copy:
     src: "{{ libvirt_server_key_path }}"
     dest: "/etc/pki/libvirt/private/serverkey.pem"
@@ -57,6 +49,7 @@
     mode: "0600"
 
 - name: "Copy client certificate to the proper directories"
+  when: satellite_pre_use_idm
   ansible.builtin.copy:
     src: "{{ libvirt_client_crt_path }}"
     dest: "/etc/pki/libvirt/clientcert.pem"
@@ -66,6 +59,7 @@
     mode: "0644"
 
 - name: "Copy client key to the proper directories"
+  when: satellite_pre_use_idm
   ansible.builtin.copy:
     src: "{{ libvirt_client_key_path }}"
     dest: "/etc/pki/libvirt/private/clientkey.pem"
@@ -75,6 +69,7 @@
     mode: "0644"
 
 - name: "Copy the IPA CA crt to the libvirt CA directory"
+  when: satellite_pre_use_idm
   ansible.builtin.copy:
     src: "/etc/ipa/ca.crt"
     dest: "/etc/pki/CA/cacert.pem"
@@ -84,15 +79,18 @@
     mode: "0644"
 
 - name: "Validate the libvirt pki configuration"
+  when: satellite_pre_use_idm
   ansible.builtin.command: "virt-pki-validate"
   register: vpv_result
   changed_when: vpv_result.rc == 0
 
 - name: "Validation output"
+  when: satellite_pre_use_idm
   ansible.builtin.debug:
     var: vpv_result.stdout
 
 - name: "Assertion"
+  when: satellite_pre_use_idm
   ansible.builtin.assert:
     that: not "FAILED" in vpv_result.stdout
     fail_msg: "One or more configuration items failed checks"
