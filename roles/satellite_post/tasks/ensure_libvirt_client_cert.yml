@@ -1,0 +1,16 @@
+---
+
+# set the variables to generate the client certificate
+
+- name: "Set the vars for the client cert generation"
+  ansible.builtin.set_fact:
+    ssl_private_key_pem_path: "{{ libvirt_client_private_key_pem_path }}"
+    host_ssl_key_path: "{{ libvirt_client_key_path }}"
+    host_ssl_csr_path: "{{ libvirt_client_csr_path }}"
+    host_ssl_crt_path: "{{ libvirt_client_crt_path }}"
+    crt_service_type: "{{ libvirt_client_crt_service_type }}"
+
+- name: "Generate the libvirt client certificate"
+  ansible.builtin.include_tasks: "ensure_libvirt_cert.yml"
+
+...

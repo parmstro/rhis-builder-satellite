@@ -103,6 +103,12 @@
     - tags_satellite_post
     - tags_satellite_before_sync
 
+- name: "Ensure libvirt prerequisites"
+  ansible.builtin.include_tasks: "ensure_CR_libvirt_prerequisites.yml"
+  tags:
+    - tags_satellite_post
+    - tags_satellite_before_sync
+
 - name: "Re-run the Satellite installer"
   ansible.builtin.import_role:
     name: "redhat.satellite_operations.installer"
