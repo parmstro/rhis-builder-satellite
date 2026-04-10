@@ -1,0 +1,10 @@
+---
+
+
+- name: "Ensure the IdM based libvirt certificates."
+  when: satellite_pre_use_idm
+  ansible.builtin.include_tasks: "ensure_libvirt_server_cert.yml"
+
+- name: "Ensure the IdM based libvirtclient certificates."
+  when: satellite_pre_use_idm
+  ansible.builtin.include_tasks: "ensure_libvirt_client_cert.yml"

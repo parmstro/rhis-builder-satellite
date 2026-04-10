@@ -1,20 +1,12 @@
 ---
 
 # setup libvirt client for libvirt compute resource
+# we want to make sure that Satellite can easily deploy KVM hypervisors
 
 - name: "Ensure that the libvirt client is installed"
   ansible.builtin.command: "satellite-maintain packages install -y libvirt-client"
   register: smpi_result
   changed_when: smpi_result.rc == 0
-
-# ensure libvirt certificates
-- name: "Ensure the libvirt certificates."
-  when: satellite_pre_use_idm
-  ansible.builtin.include_tasks: "ensure_libvirt_server_cert.yml"
-
-- name: "Ensure the libvirtclient certificates."
-  when: satellite_pre_use_idm
-  ansible.builtin.include_tasks: "ensure_libvirt_client_cert.yml"
 
 - name: "Create the required directories"
   ansible.builtin.file:
@@ -28,71 +20,92 @@
     - path: "/etc/pki/libvirt/"
     - path: "/etc/pki/libvirt/private/"
 
-- name: "Copy server certificate to the proper directories"
-  when: satellite_pre_use_idm
-  ansible.builtin.copy:
-    src: "{{ libvirt_server_crt_path }}"
-    dest: "/etc/pki/libvirt/servercert.pem"
-    remote_src: true
-    owner: root
-    group: root
-    mode: "0644"
+# ensure certificates for libvirt services if we want qemu+tls
+# to use IdM ensure satellite_pre_use_idm: true (we need satellite pre to perform its work too)
+# to use NON-IdM certs that have been previously provisioned and stored in the files directory in your inventory, ensure use_non_idm_certs: true
+# setting both to false disables the ability to connect via qemu+tls
+# setting both to true generates an error
 
-- name: "Copy server key to the proper directories"
+- name: "Ensure the IdM based certificates."
   when: satellite_pre_use_idm
-  ansible.builtin.copy:
-    src: "{{ libvirt_server_key_path }}"
-    dest: "/etc/pki/libvirt/private/serverkey.pem"
-    remote_src: true
-    owner: root
-    group: root
-    mode: "0600"
+  ansible.builtin.include_tasks: "ensure_idm_based_certs.yml"
 
-- name: "Copy client certificate to the proper directories"
-  when: satellite_pre_use_idm
-  ansible.builtin.copy:
-    src: "{{ libvirt_client_crt_path }}"
-    dest: "/etc/pki/libvirt/clientcert.pem"
-    remote_src: true
-    owner: root
-    group: root
-    mode: "0644"
+- name: "Ensure the non-IdM certificates."
+  when: use_non_idm_certs
+  ansible.builtin.include_tasks: "ensure_non_idm_based_certs.yml"
 
-- name: "Copy client key to the proper directories"
-  when: satellite_pre_use_idm
-  ansible.builtin.copy:
-    src: "{{ libvirt_client_key_path }}"
-    dest: "/etc/pki/libvirt/private/clientkey.pem"
-    remote_src: true
-    owner: root
-    group: root
-    mode: "0644"
+- name: "Copy certificates to the proper directories"
+  when: satellite_pre_use_idm OR use_non_idm_certs
+  block:
 
-- name: "Copy the IPA CA crt to the libvirt CA directory"
-  when: satellite_pre_use_idm
-  ansible.builtin.copy:
-    src: "/etc/ipa/ca.crt"
-    dest: "/etc/pki/CA/cacert.pem"
-    remote_src: true
-    owner: root
-    group: root
-    mode: "0644"
+    - name: "Copy server certificate to the proper directories"
+      ansible.builtin.copy:
+        src: "{{ libvirt_server_crt_path }}"
+        dest: "/etc/pki/libvirt/servercert.pem"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
 
-- name: "Validate the libvirt pki configuration"
-  when: satellite_pre_use_idm
-  ansible.builtin.command: "virt-pki-validate"
-  register: vpv_result
-  changed_when: vpv_result.rc == 0
+    - name: "Copy server key to the proper directories"
+      ansible.builtin.copy:
+        src: "{{ libvirt_server_key_path }}"
+        dest: "/etc/pki/libvirt/private/serverkey.pem"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0600"
 
-- name: "Validation output"
-  when: satellite_pre_use_idm
-  ansible.builtin.debug:
-    var: vpv_result.stdout
+    - name: "Copy client certificate to the proper directories"
+      ansible.builtin.copy:
+        src: "{{ libvirt_client_crt_path }}"
+        dest: "/etc/pki/libvirt/clientcert.pem"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
 
-- name: "Assertion"
-  when: satellite_pre_use_idm
-  ansible.builtin.assert:
-    that: not "FAILED" in vpv_result.stdout
-    fail_msg: "One or more configuration items failed checks"
+    - name: "Copy client key to the proper directories"
+      ansible.builtin.copy:
+        src: "{{ libvirt_client_key_path }}"
+        dest: "/etc/pki/libvirt/private/clientkey.pem"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: "Copy the IdM CA crt to the libvirt CA directory"
+      when: satellite_pre_use_idm
+      ansible.builtin.copy:
+        src: "/etc/ipa/ca.crt"
+        dest: "/etc/pki/CA/cacert.pem"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: "Copy the non-IdM CA crt to the libvirt CA directory"
+      when: use_non_idm_certs
+      ansible.builtin.copy:
+        src: "{{ libvirt_non_idm_ca_crt_path }}"
+        dest: "/etc/pki/CA/cacert.pem"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: "Validate the libvirt pki configuration"
+      ansible.builtin.command: "virt-pki-validate"
+      register: vpv_result
+      changed_when: vpv_result.rc == 0
+
+    - name: "Validation output"
+      ansible.builtin.debug:
+        var: vpv_result.stdout
+
+    - name: "Assertion"
+      ansible.builtin.assert:
+        that: not "FAILED" in vpv_result.stdout
+        fail_msg: "One or more configuration items failed checks"
 
 ...
