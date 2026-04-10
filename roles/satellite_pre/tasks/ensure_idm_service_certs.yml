@@ -314,7 +314,7 @@
         - tags_satellite_before_sync
 
     - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"
-      ansible.builtin.shell: "kinit -kt {{ sat_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ sat_ssl_key_path }} -f {{ sat_ssl_crt_path }} -I {{ crt_service_type }}.{{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      ansible.builtin.shell: "kinit -kt {{ sat_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ sat_ssl_key_path }} -f {{ sat_ssl_crt_path }} -I {{ target_service }}.{{ crt_service_type }}.{{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_start_tracking_result
       changed_when: gc_start_tracking_result.rc ==0
       tags:
