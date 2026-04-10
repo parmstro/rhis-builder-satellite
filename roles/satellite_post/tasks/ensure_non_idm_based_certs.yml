@@ -1,0 +1,55 @@
+---
+
+- name: "Create a secure directory"
+  ansible.builtin.file:
+    path: "{{ sat_ssl_certs_dir }}"
+    state: "directory"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+    seuser: "system_u"
+    serole: "object_r"
+    setype: "cert_t"
+    selevel: "s0"
+
+- name: "Copy the libvirt server certificate to the satellite"
+  ansible.builtin.copy:
+    src: "{{ ansible_fqdn }}.libvirt.server.crt"
+    dest: "{{ libvirt_server_crt_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+- name: "Copy the libvirt server key to the satellite"
+  ansible.builtin.copy:
+    src: "{{ ansible_fqdn }}.libvirt.server.key"
+    dest: "{{ libvirt_server_key_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+- name: "Copy the libvirt client certificate to the satellite"
+  ansible.builtin.copy:
+    src: "{{ ansible_fqdn }}.libvirt.client.crt"
+    dest: "{{ libvirt_client_crt_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+- name: "Copy the libvirt client key to the satellite"
+  ansible.builtin.copy:
+    src: "{{ ansible_fqdn }}.libvirt.client.key"
+    dest: "{{ libvirt_client_key_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+- name: "Copy the libvirt CA cert to the server"
+  ansible.builtin.copy:
+    src: "{{ ansible_fqdn }}.libvirt.non_idm_ca.crt"
+    dest: "{{ libvirt_non_idm_ca_crt_path }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+
+...

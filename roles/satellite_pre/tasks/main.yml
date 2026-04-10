@@ -2,6 +2,13 @@
 # setup the server for the installation of Satellite or Capsule
 # Supports RHEL8 running Satellite 6.11 or greater
 
+- name: "Ensure a valid Satellite configuration"
+  ansible.builtin.import_tasks: "ensure_valid_config.yml"
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_pre_validate_config
+    - tags_satellite_before_sync
+
 - name: "Ensure CDN registration"
   when: not satellite_disconnected
   ansible.builtin.import_tasks: "ensure_cdn_registration.yml"
@@ -52,7 +59,7 @@
   when:
     - not satellite_pre_use_idm
     - use_non_idm_certs
-  ansible.builtin.include_tasks: "ensure_non_idm_certs.yml"
+  ansible.builtin.import_tasks: "ensure_non_idm_certs.yml"
   tags:
     - tags_satellite_pre
     - tags_satellite_pre_non_idm_certs
@@ -60,7 +67,7 @@
 
 - name: "Validate certificates for use with satellite"
   when: satellite_pre_use_idm or use_non_idm_certs
-  ansible.builtin.include_tasks: "check_satellite_certs.yml"
+  ansible.builtin.import_tasks: "check_satellite_certs.yml"
   tags:
     - tags_satellite_pre
     - tags_satellite_pre_non_idm_certs

@@ -1,0 +1,11 @@
+---
+
+# rhis-builder-inventory validation for satellite goes here.
+
+- name: "Assert that satellite_pre_use_idm and use_non_idm_certs are not both true"
+  ansible.builtin.assert:
+    that:
+      - not (satellite_pre_use_idm|bool and use_non_idm_certs|bool)
+    fail_msg: "satellite_pre_use_idm AND use_non_idm_certs cannot both be true at the same time"
+
+...
