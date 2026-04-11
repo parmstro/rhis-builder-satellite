@@ -35,7 +35,7 @@
   ansible.builtin.include_tasks: "ensure_non_idm_based_certs.yml"
 
 - name: "Copy certificates to the proper directories"
-  when: satellite_pre_use_idm OR use_non_idm_certs
+  when: (satellite_pre_use_idm or use_non_idm_certs)
   block:
 
     - name: "Copy server certificate to the proper directories"
