@@ -421,4 +421,18 @@
         - tags_rbac_config
         - tags_user_groups_external
 
+    - name: "Perform final Satellite configuration"
+      ansible.builtin.import_role:
+        name: satellite_final
+      tags:
+        - tags_post_sync
+        - tags_post_publication
+        - tags_satellite_final
+
+    - name: "Congratulations!"
+      ansible.builtin.debug:
+        msg:
+          - "Your satellite build is complete."
+          - "If you have configured discovery, please reboot any bare metal systems to be provisioned."
+
 # End of Satellite Configuration
