@@ -1,0 +1,25 @@
+---
+
+# Run the final tasks for the satellite configuration
+# - build the PXE linux defaults
+
+- name: "Build PXE Linux Defaults"
+  ansible.builtin.uri:
+    url: "{{ satellite_url }}/api/provisioning_templates/build_pxe_default"
+    method: POST
+    user: "{{ satellite_username }}"
+    password: "{{ satellite_password }}"
+    force_basic_auth: true
+    validate_certs: "{{ satellite_validate_certs }}"
+    status_code: 200
+    headers:
+      Content-Type: "application/json"
+      Accept: "application/json"
+  register: pxe_build_result
+  changed_when: '"deployed" in pxe_build_result.json.message'
+
+- name: "Result"
+  ansible.builtin.debug:
+    var: pxe_build_result
+
+...

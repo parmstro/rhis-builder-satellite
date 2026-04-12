@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Run the final tasks for the satellite deployment e.g. Build PXE defaults, etc."
+  standalone: false
