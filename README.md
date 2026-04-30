@@ -34,6 +34,19 @@ There is a mountain of configuration available for Satellite. The good news is t
 
 It is probably best for your first run, to make as few changes to the sample configuration as possible, to get a feel. Then extend. If you have problems, please open an issue. 
 
+## Architecture Documentation
+
+This component is part of the [RHIS (Red Hat Infrastructure Standard)](https://github.com/parmstro/rhis-architecture) platform.
+
+For comprehensive documentation:
+- **[Architecture Overview](https://github.com/parmstro/rhis-architecture/blob/main/ARCHITECTURE.md)** - Complete system architecture and design
+- **[Repository Inventory](https://github.com/parmstro/rhis-architecture/blob/main/REPOSITORIES.md)** - All RHIS components and relationships
+- **[Deployment Guide](https://github.com/parmstro/rhis-architecture/blob/main/DEPLOYMENT.md)** - End-to-end deployment instructions
+- **[Dependencies](https://github.com/parmstro/rhis-architecture/blob/main/DEPENDENCIES.md)** - Component dependencies and integration points
+- **[Contributing](https://github.com/parmstro/rhis-architecture/blob/main/CONTRIBUTING.md)** - Development standards and workflow
+
+---
+
 ## I'm in a hurry, let's just do it.
 
 ### What's new
