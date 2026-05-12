@@ -40,10 +40,37 @@
     - tags_content_config
     - tags_content_exports
 
-- name: "Rewrite the content_imports.yml file"
-  ansible.builtin.template:
-    src: "content_imports.j2"
-    dest: "/var/lib/pulp/exports/{{ destination_server }}/content_imports.yml"
+- name: "Set default destination"
+  ansible.builtin.set_fact:
+    destination: "rhis_import_export_data"
+
+- name: "Determine if destination server value exists"
+  when: destination_server is defined and (destination_server | length) > 0
+  ansible.builtin.set_fact:
+    destination: "{{ destination_server }}"
+
+- name: "Ensure the destination path exists"
+  when: destination is defined and (destination | length) > 0
+  ansible.builtin.file:
+    path: "/var/lib/pulp/exports/{{ destination }}/"
+    state: "directory"
     mode: "0644"
     owner: "pulp"
     group: "pulp"
+    seuser: "system_u"
+    serole: "object_r"
+    setype: "pulpcore_var_lib_t"
+    selevel: "s0"  # system_u:object_r:pulpcore_var_lib_t:s0
+
+- name: "Rewrite the content_imports.yml file"
+  when: destination is defined and (destination | length) > 0
+  ansible.builtin.template:
+    src: "content_imports.j2"
+    dest: "/var/lib/pulp/exports/{{ destination }}/{{ generation_datetime }}_content_imports.yml"
+    mode: "0644"
+    owner: "pulp"
+    group: "pulp"
+    seuser: "system_u"
+    serole: "object_r"
+    setype: "pulpcore_var_lib_t"
+    selevel: "s0"  # system_u:object_r:pulpcore_var_lib_t:s0

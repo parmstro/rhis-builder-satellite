@@ -1,6 +1,26 @@
 ---
 
 # perform a library or repository export
+- name: "Ensure import directory permissions"
+  ansible.builtin.stat:
+    path: "{{ content_import.import_path }}"
+  register: content_import_path_stat
+
+- name: "Assert"
+  ansible.builtin.assert:
+    that: content_import_path_stat.stat.exists
+
+- name: "Ensure the destination path exists"
+  ansible.builtin.file:
+    path: "{{ content_import.import_path }}"
+    state: "directory"
+    mode: "0644"
+    owner: "pulp"
+    group: "pulp"
+    seuser: "system_u"
+    serole: "object_r"
+    setype: "pulpcore_var_lib_t"
+    selevel: "s0"  # system_u:object_r:pulpcore_var_lib_t:s0
 
 - name: "Perform library import for {{ content_import.name }}"
   when: content_import.type == 'library'
