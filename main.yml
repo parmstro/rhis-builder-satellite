@@ -148,7 +148,9 @@
         - tags_sync
 
     - name: "Ensure content import... go grab a meal, this will take a while"
-      when: satellite_disconnected
+      when: 
+        - satellite_disconnected
+        - satellite_import_content          # added to run roles without re-running import
       ansible.builtin.import_role:
         name: "content_imports"
       tags:
