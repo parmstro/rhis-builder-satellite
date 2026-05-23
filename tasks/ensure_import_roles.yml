@@ -6,6 +6,7 @@
 # depending on your server and the number of roles importing, it can take a while
 
 - name: "Call the Satellite ansible import API"
+  when: ansible_roles_import_list is defined and (ansible_roles_import_list | length) > 0
   ansible.builtin.uri:
     url: "{{ satellite_url }}/ansible/api/ansible_roles/sync"
     method: "PUT"
