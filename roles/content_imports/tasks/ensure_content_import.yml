@@ -5,10 +5,11 @@
   ansible.builtin.file:
     path: "{{ content_import.import_path }}"
     state: "directory"
-    mode: "0644"
+    mode: "0770"      # we need excute permissions on the directory and contents for pulp to function
     owner: "pulp"
     group: "pulp"
-    seuser: "system_u"
+    recurse: true
+    seuser: "system_u"     # satellite protects the pulp contents using SELinux
     serole: "object_r"
     setype: "pulpcore_var_lib_t"
     selevel: "s0"  # system_u:object_r:pulpcore_var_lib_t:s0
