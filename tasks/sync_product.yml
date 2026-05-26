@@ -89,6 +89,6 @@
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
     product: "{{ product_to_sync }}"
-  async: "{{ async_timeout }}"
-  poll: "{{ async_delay }}"
+  async: "{{ satellite_async_timeout }}"
+  poll: "{{ satellite_async_delay }}"
   register: async_update

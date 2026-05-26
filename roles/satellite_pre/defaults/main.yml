@@ -1,4 +1,9 @@
 ---
 
-async_timeout: 14400 # noqa: var-naming[no-role-prefix]
-async_delay: 15      # noqa: var-naming[no-role-prefix]
+satellite_async_timeout: 14400
+satellite_async_delay: 15
+
+# DEPRECATED 2026-05-26: async_timeout renamed to satellite_async_timeout;
+# async_delay renamed to satellite_async_delay. If your inventory overrides
+# these values, update to the new names. The old names will be removed in a
+# future release. See schema/variable_migration.md for the migration script.

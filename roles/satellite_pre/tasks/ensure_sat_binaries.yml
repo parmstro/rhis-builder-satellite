@@ -16,7 +16,7 @@
       ansible.builtin.dnf:
         name: '*'
         state: latest
-      async: "{{ async_timeout }}"
+      async: "{{ satellite_async_timeout }}"
       poll: 0
       register: async_update
       tags:
@@ -28,8 +28,8 @@
         jid: "{{ async_update.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: "{{ (async_timeout / async_delay) | int }}"
-      delay: "{{ async_delay }}"
+      retries: "{{ (satellite_async_timeout / satellite_async_delay) | int }}"
+      delay: "{{ satellite_async_delay }}"
       tags:
         - tags_satellite_pre
         - tags_satellite_before_sync
@@ -87,7 +87,7 @@
       ansible.builtin.dnf:
         name: satellite
         state: present
-      async: "{{ async_timeout }}"
+      async: "{{ satellite_async_timeout }}"
       poll: 0
       register: async_update
       tags:
@@ -99,8 +99,8 @@
         jid: "{{ async_update.ansible_job_id }}"
       register: job_result
       until: job_result.finished
-      retries: "{{ (async_timeout / async_delay) | int }}"
-      delay: "{{ async_delay }}"
+      retries: "{{ (satellite_async_timeout / satellite_async_delay) | int }}"
+      delay: "{{ satellite_async_delay }}"
       tags:
         - tags_satellite_pre
         - tags_satellite_before_sync
