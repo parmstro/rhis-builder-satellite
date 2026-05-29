@@ -1,22 +1,9 @@
 ---
 
-- name: "Ensure /etc/hosts"
-  ansible.builtin.lineinfile:
-    path: "/etc/hosts"
-    line: "{{ ipa_client_dns_servers }}    {{ ipa_server_fqdn }}"
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_pre_idm_integration
-    - tags_satellite_before_sync
-
-- name: "Ensure idm server is our DNS resolver"
-  ansible.builtin.lineinfile:
-    path: "/etc/resolv.conf"
-    line: "nameserver {{ ipa_client_dns_servers }}"
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_pre_idm_integration
-    - tags_satellite_before_sync
+# DNS resolver and /etc/hosts for IdM are set at kickstart time via bootstrap_init.
+# ipa_client_dns_servers is set centrally in group_vars/all/main.yml.j2 and
+# inherited here — no host-level override required.
+# Adding entries here creates duplicates on re-runs; trust the kickstart DNS.
 
 # role will install client
 - name: "Ensure the client configuration"
