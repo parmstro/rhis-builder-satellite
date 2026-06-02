@@ -1,0 +1,130 @@
+# RHIS Disconnected Export — Transfer and Import Checklist
+
+**Generated:** {{ _export_timestamp }}
+**Source Satellite:** {{ _satellite_fqdn }}
+**Bundle Directory:** `{{ _bundle_path }}`
+**Library Export Directory:** `{{ _pulp_path }}`
+
+---
+
+## What Is Included in This Bundle
+
+| Artifact | Location | Notes |
+|---|---|---|
+| Ansible compliance roles | `ansible_roles/` | Synced from `/etc/ansible/roles/` |
+{% if _discovery_count | int > 0 %}
+| Foreman discovery images | `discovery_images/` | {{ _discovery_count }} image file(s) |
+{% else %}
+| Foreman discovery images | `discovery_images/` | ⚠️ NONE FOUND — verify manually |
+{% endif %}
+| Highside subscription manifests | `manifests/` | {{ _manifest_list | length }} manifest ZIP(s) |
+| Inventory archive | `inventory/` | Rendered inventory tar.gz |
+| rhis-provisioner container | `container/` | Saved container image tar |
+| Bundle integrity manifest | `rhis_disconnected_manifest.yml` | SHA256 checksums + git SHAs |
+| This checklist | `RHIS_Export_Checklist_*.md` | |
+
+**NOT INCLUDED — Library export chunks:**
+The Pulp library export is at `{{ _pulp_path }}` and is copied separately
+by `copy_rhis_to_transfer_media.sh` at transfer time.
+
+---
+
+## What You Must Source Separately
+
+> ⚠️ The following are **NOT** included in this bundle. They must be obtained
+> through your Red Hat entitlements or existing media.
+
+### Required Installation Media
+
+| Media | Purpose |
+|---|---|
+| RHEL 9.x BaseOS DVD ISO | Bare-metal OS installation on highside hosts |
+| Red Hat Satellite 6.18+ installer ISO | Satellite installation on highside |
+
+### Required Out-of-Band Transmission
+
+| Item | How to transmit |
+|---|---|
+| **Vault password** | Separate trusted channel — never with the bundle |
+
+### Highside Subscription Manifests
+
+{% if _manifest_list | length > 0 %}
+The following manifests are included in `manifests/`:
+{% for m in _manifest_list %}
+- `{{ m }}`
+{% endfor %}
+
+Ensure each manifest corresponds to the correct highside satellite hostname.
+{% else %}
+> ⚠️ **WARNING: No manifests found.** Copy highside subscription manifest ZIP files
+> to `files/manifests/` and re-run the export before transfer.
+{% endif %}
+
+---
+
+## Pre-Transfer Validation
+
+Before transferring to the highside, verify:
+
+- [ ] `rhis_disconnected_manifest.yml` exists in the bundle directory
+- [ ] `copy_rhis_to_transfer_media.sh` will verify checksums — review any failures before transfer
+- [ ] All required ISOs are available at the highside (see above)
+- [ ] Vault password has been communicated via a separate trusted channel
+- [ ] Transfer media has sufficient capacity (see Stage 1 output)
+- [ ] Highside satellite host is provisioned with RHEL and accessible via SSH
+
+---
+
+## Stage 2 — Copy to Transfer Media
+
+Once transfer media is mounted, run:
+
+```bash
+./copy_rhis_to_transfer_media.sh \
+    --bundle-dir {{ _bundle_path }} \
+    --pulp-export-dir {{ _pulp_path }} \
+    --media-path <mount_point>
+```
+
+---
+
+## Highside Import Sequence
+
+After mounting transfer media on the highside provisioner:
+
+1. **Load the container image:**
+   ```bash
+   podman load -i <media>/rhis_transfer_*/container/rhis-provisioner_*.tar
+   ```
+
+2. **Extract the inventory:**
+   ```bash
+   tar -xzf <media>/rhis_transfer_*/inventory/rhis_inventory_*.tar.gz -C /rhis/vars/
+   ```
+
+3. **Copy `content_imports.yml` into your discosatellite host_vars:**
+   ```bash
+   cp <media>/rhis_transfer_*/content_imports.yml \
+       /rhis/vars/host_vars/<discosatellite_hostname>/
+   ```
+
+4. **Upload each highside manifest from `manifests/`** to the appropriate
+   discosatellite host_vars `files/manifests/` directory.
+
+5. **Run the import:**
+   ```bash
+   ./build_sat_disconnected_import.sh \
+       --bundle-path <media>/rhis_transfer_*/ \
+       --sshuser ansiblerunner
+   ```
+
+---
+
+## Notes
+
+- AAP installation files (RPMs and setup bundle) are included in the Library export
+  via the AAP content views — no separate AAP ISO required.
+- SCAP tailoring files are included in the inventory archive.
+- The `rhis_disconnected_manifest.yml` checksums cover bundle artifacts only,
+  not the Pulp library export chunks (those are validated by Satellite during import).
