@@ -1,5 +1,29 @@
 ---
 
+# When satellite_disconnected is true, compliance-as-code Ansible roles arrive
+# via the export bundle rather than being cloned from GitHub.
+# satellite_roles_source_path points to the pre-extracted roles directory in the bundle.
+# ansible.posix.synchronize (rsync) is used to populate /etc/ansible/roles/ on the
+# highside satellite before the git verification step runs.
+# The git_repos entries in discosatellite host_vars must use clone: false so that
+# ansible.builtin.git verifies the local repo state without reaching GitHub.
+
+- name: "Sync compliance roles from bundle source (disconnected)"
+  when:
+    - satellite_disconnected | default(false)
+    - satellite_roles_source_path is defined
+    - satellite_roles_source_path | length > 0
+  ansible.posix.synchronize:
+    src: "{{ satellite_roles_source_path }}/"
+    dest: "/etc/ansible/roles/"
+    recursive: true
+    delete: false
+    mode: push
+  delegate_to: "{{ inventory_hostname }}"
+  tags:
+    - tags_provisioning_config
+    - tags_import_git_repos
+
 - name: "Configure the git repos to replicate"
   when: "git_repos is defined and (git_repos | length) > 0"
   ansible.builtin.include_tasks: "ensure_clone_git_repos.yml"
