@@ -7,6 +7,33 @@
 
 ---
 
+## Disk Space Requirements
+
+> ⚠️ These requirements must be verified BEFORE starting the import on the highside.
+
+### Lowside (Connected Satellite) — Already consumed
+
+| Space | Purpose |
+|---|---|
+| 1x library size | Pulp library content (`/var/lib/pulp/`) |
+| 1x library size | Export chunks (`/var/lib/pulp/exports/`) |
+| **Total: 2x library size** | Both must fit on the lowside satellite storage |
+
+### Highside (Disconnected Satellite) — Required before import
+
+| Space | Purpose |
+|---|---|
+| 1x library size | Transferred import tar.gz chunks |
+| 1x library size | Temporary extraction directory (Satellite extracts before importing) |
+| 1x library size | Imported Pulp library (`/var/lib/pulp/`) |
+| **Total: 3x library size** | All three must fit on the highside satellite storage simultaneously |
+
+> The highside Satellite extracts import chunks to a temporary directory before
+> ingesting content into Pulp. Both the chunks AND the extracted content exist
+> on disk at the same time during import. Ensure sufficient storage before starting.
+
+---
+
 ## What Is Included in This Bundle
 
 | Artifact | Location | Notes |
