@@ -2,8 +2,18 @@
 
 # This role prepares a disconnected satellite for installation
 # Configure offline base OS repos
+#
+# Variables:
+#   satellite_disconnected_iso_prestaged (bool, default: false)
+#     Set to true if ISOs are already present at satellite_disconnected_root.
+#     Skips the synchronize (copy) tasks.
+#
+#   satellite_disconnected_iso_mounted (bool, default: false)
+#     Set to true if ISOs are already mounted at their mount paths.
+#     Skips the mount tasks. Useful for re-runs after a failed build.
 
-- name: "Ensure that the target mounts are not yet mounted"
+- name: "Ensure that the OS ISO is not yet mounted"
+  when: not (satellite_disconnected_iso_mounted | default(false))
   ansible.posix.mount:
     src: "{{ satellite_disconnected_root }}/{{ satellite_os_iso_source }}"
     path: "{{ satellite_os_repo_mount }}"
@@ -12,7 +22,8 @@
     - tags_satellite_pre
     - tags_satellite_before_sync
 
-- name: "Ensure that the target mounts are not yet mounted"
+- name: "Ensure that the Satellite ISO is not yet mounted"
+  when: not (satellite_disconnected_iso_mounted | default(false))
   ansible.posix.mount:
     src: "{{ satellite_disconnected_root }}/{{ satellite_install_iso_source }}"
     path: "{{ satellite_install_repo_mount }}"
@@ -30,25 +41,28 @@
     - tags_satellite_pre
     - tags_satellite_before_sync
 
-- name: "Copy the OS iso - validates and overwrites if necessary - Please wait..."
-  ansible.builtin.copy:
+- name: "Synchronize the OS ISO to target - Please wait..."
+  when: not (satellite_disconnected_iso_prestaged | default(false))
+  ansible.posix.synchronize:
     src: "{{ satellite_os_iso_source }}"
     dest: "{{ satellite_disconnected_root }}/{{ satellite_os_iso_source }}"
-    mode: "0655"
+    mode: "push"
   tags:
     - tags_satellite_pre
     - tags_satellite_before_sync
 
-- name: "Copy the Satellite iso - validates and overwrites if necessary - Please wait..."
-  ansible.builtin.copy:
+- name: "Synchronize the Satellite ISO to target - Please wait..."
+  when: not (satellite_disconnected_iso_prestaged | default(false))
+  ansible.posix.synchronize:
     src: "{{ satellite_install_iso_source }}"
     dest: "{{ satellite_disconnected_root }}/{{ satellite_install_iso_source }}"
-    mode: "0655"
+    mode: "push"
   tags:
     - tags_satellite_pre
     - tags_satellite_before_sync
 
 - name: "Mount the OS source"
+  when: not (satellite_disconnected_iso_mounted | default(false))
   ansible.posix.mount:
     src: "{{ satellite_disconnected_root }}/{{ satellite_os_iso_source }}"
     path: "{{ satellite_os_repo_mount }}"
@@ -60,6 +74,7 @@
     - tags_satellite_before_sync
 
 - name: "Mount the Satellite source"
+  when: not (satellite_disconnected_iso_mounted | default(false))
   ansible.posix.mount:
     src: "{{ satellite_disconnected_root }}/{{ satellite_install_iso_source }}"
     path: "{{ satellite_install_repo_mount }}"
@@ -119,7 +134,7 @@
     - tags_satellite_before_sync
 
 # We are done the disconnected pre section
-- name: "Disconnected Satellite prepartion complete"
+- name: "Disconnected Satellite preparation complete"
   ansible.builtin.assert:
     that: true
   tags:
