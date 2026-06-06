@@ -10,35 +10,35 @@
 
   tasks:
 
-    - name: "Load the vault variables"
+    - name: "Load the vault variables file"
       when: vault_path is defined
       ansible.builtin.include_vars:
         file: "{{ vault_path }}"
       tags:
         - always
 
-    - name: "Load the other variables"
+    - name: "Load the other variables file"
       when: vars_path is defined
       ansible.builtin.include_vars:
         file: "{{ vars_path }}"
       tags:
         - always
 
-    - name: "Load the vault variables"
+    - name: "Load the vault variables directory"
       when: vault_dir is defined
       ansible.builtin.include_vars:
         dir: "{{ vault_dir }}"
       tags:
         - always
 
-    - name: "Load the other variables"
+    - name: "Load the other variables directory"
       when: vars_dir is defined
       ansible.builtin.include_vars:
         dir: "{{ vars_dir }}"
       tags:
         - always
 
-    - name: "Apply role of satellite_pre to {{ ansible_fqdn }}"
+    - name: "Apply role of satellite_pre to disconnected satellite {{ ansible_fqdn }}"
       when: satellite_disconnected
       ansible.builtin.include_role:
         name: satellite_disconnected_pre
@@ -148,7 +148,7 @@
         - tags_sync
 
     - name: "Ensure content import... go grab a meal, this will take a while"
-      when: 
+      when:
         - satellite_disconnected
         - satellite_import_content          # added to run roles without re-running import
       ansible.builtin.import_role:

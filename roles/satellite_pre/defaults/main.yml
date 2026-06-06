@@ -1,6 +1,11 @@
 ---
 
-satellite_async_timeout: 14400
+# satellite_async_timeout must be long enough to cover the slowest product sync on a
+# fresh install. Red Hat Enterprise Linux for x86_64 takes ~4 hours (14400s+) on first
+# sync against the CDN. 12 hours (43200s) provides safe headroom for all products.
+# Setting this too low causes "Timeout exceeded" failures mid-sync even though the
+# underlying Pulp sync is still running successfully on the satellite.
+satellite_async_timeout: 43200
 satellite_async_delay: 15
 
 # DEPRECATED 2026-05-26: async_timeout renamed to satellite_async_timeout;
