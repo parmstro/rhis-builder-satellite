@@ -8,6 +8,23 @@
 # The git_repos entries in discosatellite host_vars must use clone: false so that
 # ansible.builtin.git verifies the local repo state without reaching GitHub.
 
+- name: "Assert satellite_roles_source_path is set for disconnected build"
+  when: satellite_disconnected | default(false)
+  ansible.builtin.assert:
+    that:
+      - satellite_roles_source_path is defined
+      - satellite_roles_source_path | length > 0
+    fail_msg: >
+      satellite_disconnected is true but satellite_roles_source_path is not set.
+      On a disconnected satellite, compliance roles must arrive via the export bundle.
+      Set satellite_roles_source_path to the path of the extracted ansible_roles/
+      directory from the transfer bundle (e.g. /home/ansiblerunner/rhis_export/<bundle>/ansible_roles).
+      The export playbook places roles at <bundle_dir>/ansible_roles/ on the lowside satellite.
+    success_msg: "satellite_roles_source_path is set — roles will be synced from bundle"
+  tags:
+    - tags_provisioning_config
+    - tags_import_git_repos
+
 - name: "Sync compliance roles from bundle source (disconnected)"
   when:
     - satellite_disconnected | default(false)
