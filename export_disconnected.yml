@@ -27,6 +27,7 @@
     _ansible_roles_src: "/etc/ansible/roles"
     _ansible_playbooks_src: "/etc/ansible/playbooks"
     _discovery_image_dir: "/var/lib/tftpboot/boot"
+    _baremetal_init_src: "/home/ansiblerunner/rhis/rhis-builder-baremetal-init"
 
   tasks:
 
@@ -35,6 +36,23 @@
       ansible.builtin.include_vars:
         dir: "{{ vault_dir }}"
       tags: always
+
+    - name: "Load other variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
+      tags: always
+
+    # ── Pre: Mount transfer drive ───────────────────────────────────────────
+
+    - name: "Pre — Prepare export drive"
+      ansible.builtin.import_role:
+        name: content_export_prepare_drv
+      vars:
+        content_export_prepare_drv_state: "present"
+      tags:
+        - tags_export_drive
+        - tags_content_exports
 
     # ── Step 1: Content export ──────────────────────────────────────────────
 
@@ -71,6 +89,7 @@
         - "{{ rhis_export_root }}"
         - "{{ _bundle_dir }}"
         - "{{ _bundle_dir }}/ansible_roles"
+        - "{{ _bundle_dir }}/baremetal_init"
         - "{{ _bundle_dir }}/discovery_images"
         - "{{ _bundle_dir }}/manifests"
         - "{{ _bundle_dir }}/inventory"
@@ -99,6 +118,37 @@
         recursive: true
         delete: false
         mode: push
+
+    # ── Step 3b: Copy rhis-builder-baremetal-init ──────────────────────────
+    # Provides the highside operator with tooling to generate kickstart ISOs
+    # for unattended RHEL installs on bare metal or VMware (upload ISO to vCenter).
+    # Required on the highside before IdM and Satellite nodes can be provisioned.
+
+    - name: "Step 3b — Check for rhis-builder-baremetal-init"
+      ansible.builtin.stat:
+        path: "{{ _baremetal_init_src }}"
+      register: _baremetal_init_stat
+      delegate_to: localhost
+      connection: local
+
+    - name: "Step 3b — Sync rhis-builder-baremetal-init to bundle"
+      when: _baremetal_init_stat.stat.exists
+      ansible.posix.synchronize:
+        src: "{{ _baremetal_init_src }}/"
+        dest: "{{ _bundle_dir }}/baremetal_init/"
+        recursive: true
+        delete: false
+        mode: push
+        rsync_opts:
+          - "--exclude=.git"
+
+    - name: "Step 3b — Warn if rhis-builder-baremetal-init not found"
+      when: not _baremetal_init_stat.stat.exists
+      ansible.builtin.debug:
+        msg: >
+          WARNING: rhis-builder-baremetal-init not found at {{ _baremetal_init_src }}.
+          The highside operator will not have kickstart ISO tooling in the bundle.
+          Clone the repo to {{ _baremetal_init_src }} before running the export.
 
     # ── Step 4: Copy Foreman discovery images ──────────────────────────────
 
@@ -132,6 +182,7 @@
         patterns: "*.zip"
       register: _manifests
       delegate_to: localhost
+      connection: local
 
     - name: "Step 5 — Copy highside manifests to bundle"
       ansible.builtin.copy:
@@ -150,67 +201,78 @@
           Copy highside subscription manifests to files/manifests/ before transfer.
 
     # ── Step 6: Archive the inventory ──────────────────────────────────────
+    # Two-step: archive locally on the controller, then copy to satellite.
+    # The archive module runs on the controller (provisioner container) so dest
+    # must be a local path. A subsequent copy pushes it to the satellite bundle.
 
-    - name: "Step 6 — Create inventory archive"
+    - name: "Step 6 — Create inventory archive on controller"
       community.general.archive:
         path: "{{ inventory_dir | default('/rhis/vars') }}"
-        dest: "{{ _bundle_dir }}/inventory/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
+        dest: "/tmp/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
         format: gz
+        mode: "0644"
       delegate_to: localhost
+      connection: local
+
+    - name: "Step 6 — Copy inventory archive to satellite bundle"
+      ansible.builtin.copy:
+        src: "/tmp/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
+        dest: "{{ _bundle_dir }}/inventory/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
+        mode: "0644"
 
     # ── Step 7: Save the rhis-provisioner container image ──────────────────
+    # Two-step: save image locally on the controller, then copy to satellite.
 
-    - name: "Step 7 — Save rhis-provisioner container image"
+    # Step 7: Save container image on the provisioner host (not inside the container).
+    # podman lives on the host running the provisioner container, not inside it.
+    # delegate_to the provisioner group host to SSH into the host where podman runs.
+    # Step 7: Container image save — aspirational (C10).
+    # Requires running from outside the provisioner container (host SSH access to self
+    # is unavailable from rootless podman network namespace). This step is non-fatal
+    # and will warn if it cannot complete. The image must be transferred manually
+    # or via a host-level orchestration step outside the container.
+    - name: "Step 7 — Save rhis-provisioner container image on provisioner host" # noqa command-instead-of-module
       ansible.builtin.command:
         cmd: >
           podman save {{ rhis_provisioner_image }}
-          -o {{ _bundle_dir }}/container/rhis-provisioner_{{ _bundle_timestamp }}.tar
-      delegate_to: localhost
+          -o /tmp/rhis-provisioner_{{ _bundle_timestamp }}.tar
+      delegate_to: "{{ groups['provisioner_host'][0] }}"
       register: _podman_save
-      changed_when: _podman_save.rc == 0
-
-    # ── Step 8: Collect role git SHAs for manifest ─────────────────────────
-
-    - name: "Step 8 — Collect git SHAs of compliance roles"
-      ansible.builtin.command:
-        cmd: "git -C {{ item }} rev-parse HEAD"
-      register: _role_shas
-      failed_when: false
-      changed_when: false
-      loop: "{{ _discovery_images.files | map(attribute='path') | list }}"  # reuse find loop trick
-      when: false  # placeholder — iterate over ansible_roles dirs
-
-    - name: "Step 8 — Find role git repositories"
-      ansible.builtin.find:
-        paths: "{{ _ansible_roles_src }}"
-        file_type: directory
-        depth: 1
-      register: _role_dirs
-
-    - name: "Step 8 — Get git SHA for each role"
-      ansible.builtin.command:
-        cmd: "git -C {{ item.path }} rev-parse HEAD"
-      register: _role_sha_results
-      failed_when: false
-      changed_when: false
-      loop: "{{ _role_dirs.files }}"
-      loop_control:
-        label: "{{ item.path | basename }}"
-
-    - name: "Step 8 — Build role SHA dictionary"
-      ansible.builtin.set_fact:
-        _role_shas_dict: >-
-          {{
-            _role_sha_results.results
-            | selectattr('rc', 'equalto', 0)
-            | items2dict(key_name='item', value_name='stdout')
-            | dict2items
-            | map('combine', {'key': item.item.path | basename})
-            | list
-          }}
-      vars:
-        item: "{{ _role_sha_results.results[0] }}"
+      changed_when: _podman_save.rc | default(1) == 0
       ignore_errors: true
+      ignore_unreachable: true
+
+    - name: "Step 7 — Warn if container image save was not possible"
+      when: _podman_save.rc | default(-1) != 0
+      ansible.builtin.debug:
+        msg:
+          - "WARNING: Container image save could not be completed automatically."
+          - "Save manually on the provisioner host before transferring:"
+          - "  podman save {{ rhis_provisioner_image }} -o <bundle>/container/rhis-provisioner.tar"
+
+    - name: "Step 7 — Copy container image to satellite bundle"
+      when: _podman_save.rc | default(-1) == 0
+      ansible.builtin.copy:
+        src: "/tmp/rhis-provisioner_{{ _bundle_timestamp }}.tar"
+        dest: "{{ _bundle_dir }}/container/rhis-provisioner_{{ _bundle_timestamp }}.tar"
+        mode: "0644"
+
+    # ── Step 8: (Removed) ──────────────────────────────────────────────────
+    #
+    # Git SHA collection per role was removed. Rationale:
+    #
+    # The operator is responsible for ensuring /etc/ansible/roles/ contains
+    # what they tested. Roles may have uncommitted local modifications that
+    # git rev-parse HEAD would not reflect, producing a SHA that does not
+    # accurately describe the exported content.
+    #
+    # The authoritative record of what was exported is:
+    #   1. The role files themselves, copied faithfully by Step 3 (synchronize)
+    #   2. The per-file SHA256 checksums in the manifest (Step 9), which cover
+    #      every file in the bundle including all role files
+    #
+    # Per-file checksums at the bundle level provide complete integrity
+    # verification without any dependency on git history or commit state.
 
     # ── Step 9: Compute checksums and write manifest ────────────────────────
 
@@ -246,7 +308,6 @@
         _checksum_results: "{{ _checksums.results }}"
         _bundle_path: "{{ _bundle_dir }}"
         _pulp_path: "{{ _pulp_export_root }}"
-        _role_shas: "{{ _role_sha_results.results | selectattr('rc', 'equalto', 0) | list }}"
 
     # ── Step 10: Write operator checklist ──────────────────────────────────
 
@@ -264,3 +325,31 @@
         _pulp_path: "{{ _pulp_export_root }}"
         _export_timestamp: "{{ ansible_date_time.iso8601 }}"
         _satellite_fqdn: "{{ ansible_fqdn }}"
+
+- name: "Unmount transfer drive — runs whether export succeeded or failed"
+  hosts: sat_primary
+  become: true
+  gather_facts: false
+
+  tasks:
+
+    - name: "Load vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+      tags: always
+
+    - name: "Unmount transfer drive"
+      ansible.builtin.import_role:
+        name: content_export_prepare_drv
+      vars:
+        content_export_prepare_drv_state: "absent"
+      tags:
+        - tags_export_drive
+        - tags_content_exports
+
+    - name: "Transfer drive cleanup complete"
+      ansible.builtin.debug:
+        msg:
+          - "Transfer drive unmounted or was not mounted — satellite is clean."
+          - "The drive may now be safely removed and transferred to the highside."

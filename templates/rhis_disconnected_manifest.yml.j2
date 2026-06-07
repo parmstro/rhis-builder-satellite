@@ -21,12 +21,12 @@ highside_manifests:
 {% endif %}
 
 ansible_roles:
-{% for result in _role_shas %}
-{% if result.rc == 0 %}
-  - role: "{{ result.item.path | basename }}"
-    sha: "{{ result.stdout | trim }}"
-{% endif %}
-{% endfor %}
+  # Role files were copied as-is from /etc/ansible/roles/ on the source satellite.
+  # The operator is responsible for ensuring that directory contained what they tested.
+  # Per-file SHA256 checksums below provide complete integrity verification.
+  # Git SHAs are not recorded — they do not reliably reflect uncommitted local changes.
+  source_path: "/etc/ansible/roles/"
+  integrity: "Verified via bundle_checksums below (ansible_roles/ subtree)"
 
 bundle_checksums:
 {% for result in _checksum_results %}

@@ -13,7 +13,12 @@ _content_export_prepare_drv_selinux_context: "system_u:object_r:pulpcore_var_lib
 _content_export_prepare_drv_supported_fstypes:
   - "ext4"
   - "xfs"
-_content_export_prepare_drv_mount_opts: "defaults,fscontext={{ _content_export_prepare_drv_selinux_context }}"
+# context= forces the SELinux context on ALL files regardless of xattr labels.
+# fscontext= only sets the default for files without an existing xattr label — on a
+# fresh ext4 drive the root directory has unlabeled_t in its xattr which overrides
+# fscontext. For a transfer drive used exclusively for export, context= is correct:
+# we do not need per-file SELinux labels, we need Pulp to write to the drive.
+_content_export_prepare_drv_mount_opts: "defaults,context={{ _content_export_prepare_drv_selinux_context }}"
 _content_export_prepare_drv_mount_owner: "pulp"
 _content_export_prepare_drv_mount_group: "pulp"
 _content_export_prepare_drv_mount_mode: "0750"

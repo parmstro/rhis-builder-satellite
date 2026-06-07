@@ -50,7 +50,7 @@
     state: directory
     mode: "{{ _content_export_prepare_drv_mount_mode }}"
 
-- name: "Mount drive (ephemeral — no fstab entry)"
+- name: "Mount drive (ephemeral — no fstab entry)" # noqa command-instead-of-module
   when: not _content_export_already_mounted or content_export_prepare_drv_force_remount
   ansible.builtin.command:
     cmd: >
@@ -67,3 +67,8 @@
     group: "{{ _content_export_prepare_drv_mount_group }}"
     mode: "{{ _content_export_prepare_drv_mount_mode }}"
     state: directory
+
+- name: "Explicitly set SELinux context on mount root"
+  ansible.builtin.command:
+    cmd: "chcon {{ _content_export_prepare_drv_selinux_context }} {{ content_export_prepare_drv_mount }}"
+  changed_when: true

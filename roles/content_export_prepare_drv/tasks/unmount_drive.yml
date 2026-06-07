@@ -10,7 +10,7 @@
   changed_when: false
   failed_when: false
 
-- name: "Unmount transfer drive"
+- name: "Unmount transfer drive" # noqa command-instead-of-module
   when: _unmount_check.rc == 0
   ansible.builtin.command:
     cmd: "umount {{ content_export_prepare_drv_mount }}"

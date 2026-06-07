@@ -8,27 +8,60 @@
 # somewhere, you will need to replace it or merge it.
 # by default we will write out the file to host_vars/{{ ansible_fqdn }}/content_imports.yml
 
+# Retrieve the export path from the Satellite API using the export history ID.
+# Different export types (library, cv_version, repository) write to different
+# path structures — querying the API by history ID gives the correct path
+# regardless of type.
+- name: "Get export path from Satellite API"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: content_exports
+    search: "id = {{ export_result.task.output.export_history_id }}"
+  register: _export_history
+  tags:
+    - tags_content_config
+    - tags_content_exports
+
+- name: "Set export path fact"
+  ansible.builtin.set_fact:
+    _export_path: "{{ _export_history.resources[0].path }}"
+  tags:
+    - tags_content_config
+    - tags_content_exports
+
+# Reset content_imports to an empty list before building it.
+# vars_dir loading may pre-populate content_imports from a host_vars file (e.g.
+# satellite/content_imports.yml). Without this reset, the template would iterate
+# over stale pre-loaded items that lack the 'type' key and fail.
+- name: "Reset content_imports to empty list for this export"
+  ansible.builtin.set_fact:
+    content_imports: []
+  tags:
+    - tags_content_config
+    - tags_content_exports
+
+# Build the dict in a single task with direct assignment — NOT with a loop and combine().
+# Ansible's set_fact + combine() in a loop silently drops keys due to variable
+# scoping behaviour across iterations. Direct assignment is unambiguous and atomic.
 - name: "Create the content_import dictionary item"
   ansible.builtin.set_fact:
-    content_import_dict: "{{ content_import_dict | default({}) | combine({fact.key: fact.value}) }}"
-  loop:
-    - key: "name"
-      value: "{{ content_export.name }}"
-    - key: "type"
-      value: "{{ content_export.type }}"
-    - key: "import_path"
-      value: "{{ export_result.task.input.export_action_output.export_path }}"
-    - key: "metadata_file"
-      value: "{{ export_result.task.input.export_action_output.export_path }}/metadata.json"
-  loop_control:
-    loop_var: fact
+    content_import_dict:
+      name: "{{ content_export.name }}"
+      type: "{{ content_export.type }}"
+      import_path: "{{ _export_path }}"
+      metadata_file: "{{ _export_path }}/metadata.json"
   tags:
     - tags_content_config
     - tags_content_exports
 
 - name: "Append the content_import item to content_imports list"
   ansible.builtin.set_fact:
-    content_imports: "{{ content_imports | default([]) + content_import_dict }}"
+    content_imports: "{{ content_imports | default([]) + [content_import_dict] }}"
   tags:
     - tags_content_config
     - tags_content_exports
