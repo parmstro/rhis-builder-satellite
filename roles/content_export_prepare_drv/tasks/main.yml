@@ -1,0 +1,35 @@
+---
+- name: "Unmount transfer drive"
+  when: content_export_prepare_drv_state == "absent"
+  ansible.builtin.include_tasks: unmount_drive.yml
+
+- name: "Discover transfer drive by label"
+  when: content_export_prepare_drv_state == "present"
+  ansible.builtin.include_tasks: discover_drive.yml
+
+- name: "Validate transfer drive"
+  when: content_export_prepare_drv_state == "present"
+  ansible.builtin.include_tasks: validate_drive.yml
+
+- name: "Mount transfer drive"
+  when:
+    - content_export_prepare_drv_state == "present"
+    - not content_export_prepare_drv_dry_run
+  ansible.builtin.include_tasks: mount_drive.yml
+
+- name: "Validate mount"
+  when:
+    - content_export_prepare_drv_state == "present"
+    - not content_export_prepare_drv_dry_run
+  ansible.builtin.include_tasks: validate_mount.yml
+
+- name: "Dry run summary"
+  when:
+    - content_export_prepare_drv_state == "present"
+    - content_export_prepare_drv_dry_run
+  ansible.builtin.debug:
+    msg:
+      - "DRY RUN COMPLETE — drive validated, not mounted"
+      - "Device:  {{ _content_export_drv_device }}"
+      - "UUID:    {{ _content_export_drv_uuid }}"
+      - "Re-run with content_export_prepare_drv_dry_run: false to mount"

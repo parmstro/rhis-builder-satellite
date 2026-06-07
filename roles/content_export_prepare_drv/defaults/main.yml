@@ -1,0 +1,52 @@
+---
+# content_export_prepare_drv role defaults
+#
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  INSTALLATION-MANDATED VARIABLES — DO NOT CHANGE                        │
+# │  These values are determined by the Satellite/Pulp installation and      │
+# │  SELinux policy. Changing them will prevent Pulp from reading or         │
+# │  writing content and will break exports. They are prefixed with _ to     │
+# │  signal they are internal to this role and not operator-configurable.    │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+_content_export_prepare_drv_selinux_context: "system_u:object_r:pulpcore_var_lib_t:s0"
+_content_export_prepare_drv_supported_fstypes:
+  - "ext4"
+  - "xfs"
+_content_export_prepare_drv_mount_opts: "defaults,fscontext={{ _content_export_prepare_drv_selinux_context }}"
+_content_export_prepare_drv_mount_owner: "pulp"
+_content_export_prepare_drv_mount_group: "pulp"
+_content_export_prepare_drv_mount_mode: "0750"
+
+# ┌─────────────────────────────────────────────────────────────────────────┐
+# │  OPERATOR DEFAULTS                                                       │
+# │  Override these in inventory_template/host_vars/satellite/              │
+# │  content_export_prepare_drv.yml — do not change here.                   │
+# └─────────────────────────────────────────────────────────────────────────┘
+
+# Label used to auto-discover the transfer drive.
+content_export_prepare_drv_label: "TRANSFER_DRV"
+
+# Mount point — must match the Pulp allowed export paths.
+# Default is the standard Pulp export path. Change only if your Satellite
+# installation uses a non-standard pulp_export_path setting.
+content_export_prepare_drv_mount: "/var/lib/pulp/exports"
+
+# Validate and report only — do not mount. Useful for pre-flight checks
+# before committing to a long export run.
+content_export_prepare_drv_dry_run: false
+
+# If the mount point is already mounted with an incorrect SELinux context,
+# unmount and remount with the correct context.
+# WARNING: this will briefly interrupt any in-progress export operations.
+content_export_prepare_drv_force_remount: false
+
+# Role state:
+#   present — discover, validate, mount, and verify the drive (default)
+#   absent  — unmount the drive
+#
+# The mount is NEVER added to /etc/fstab. It is a runtime-only ephemeral
+# mount that does not survive a reboot. This is intentional — the transfer
+# drive is a temporary operational attachment and must not create a boot
+# dependency on an external device.
+content_export_prepare_drv_state: "present"

@@ -1,0 +1,69 @@
+---
+# Mount the transfer drive at the export path WITHOUT touching /etc/fstab.
+# This is an intentional, runtime-only ephemeral mount. The drive must not
+# create a boot dependency — if the satellite reboots without the drive
+# attached, it must boot cleanly.
+
+- name: "Check current mount status of {{ content_export_prepare_drv_mount }}"
+  ansible.builtin.command:
+    cmd: "findmnt -n -o SOURCE {{ content_export_prepare_drv_mount }}"
+  register: _current_mount
+  changed_when: false
+  failed_when: false
+
+- name: "Set mount status facts"
+  ansible.builtin.set_fact:
+    _content_export_already_mounted: "{{ _current_mount.rc == 0 }}"
+
+- name: "Validate SELinux context if already mounted"
+  when:
+    - _content_export_already_mounted
+    - not content_export_prepare_drv_force_remount
+  block:
+    - name: "Get SELinux context of existing mount"
+      ansible.builtin.command:
+        cmd: "ls -dZ {{ content_export_prepare_drv_mount }}"
+      register: _existing_secontext
+      changed_when: false
+
+    - name: "Fail if mounted with incorrect SELinux context"
+      ansible.builtin.assert:
+        that: "'pulpcore_var_lib_t' in _existing_secontext.stdout"
+        fail_msg: >
+          {{ content_export_prepare_drv_mount }} is already mounted but has incorrect
+          SELinux context: {{ _existing_secontext.stdout }}.
+          Set content_export_prepare_drv_force_remount: true to unmount and remount
+          with the correct context.
+        success_msg: "Existing mount has correct SELinux context — skipping remount"
+
+- name: "Unmount for forced remount"
+  when:
+    - _content_export_already_mounted
+    - content_export_prepare_drv_force_remount
+  ansible.builtin.command:
+    cmd: "umount {{ content_export_prepare_drv_mount }}"
+  changed_when: true
+
+- name: "Ensure mount point exists"
+  ansible.builtin.file:
+    path: "{{ content_export_prepare_drv_mount }}"
+    state: directory
+    mode: "{{ _content_export_prepare_drv_mount_mode }}"
+
+- name: "Mount drive (ephemeral — no fstab entry)"
+  when: not _content_export_already_mounted or content_export_prepare_drv_force_remount
+  ansible.builtin.command:
+    cmd: >
+      mount -t {{ _content_export_drv_fstype }}
+      -o {{ _content_export_prepare_drv_mount_opts }}
+      /dev/disk/by-uuid/{{ _content_export_drv_uuid }}
+      {{ content_export_prepare_drv_mount }}
+  changed_when: true
+
+- name: "Set ownership on mounted drive root"
+  ansible.builtin.file:
+    path: "{{ content_export_prepare_drv_mount }}"
+    owner: "{{ _content_export_prepare_drv_mount_owner }}"
+    group: "{{ _content_export_prepare_drv_mount_group }}"
+    mode: "{{ _content_export_prepare_drv_mount_mode }}"
+    state: directory

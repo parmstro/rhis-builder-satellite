@@ -1,0 +1,30 @@
+---
+- name: "Discover drive with label {{ content_export_prepare_drv_label }}"
+  ansible.builtin.command:
+    cmd: "blkid -L {{ content_export_prepare_drv_label }}"
+  register: _drv_discovery
+  changed_when: false
+  failed_when: >
+    _drv_discovery.rc != 0 or
+    _drv_discovery.stdout | trim == ""
+
+- name: "Set discovered device fact"
+  ansible.builtin.set_fact:
+    _content_export_drv_device: "{{ _drv_discovery.stdout | trim }}"
+
+- name: "Get drive UUID"
+  ansible.builtin.command:
+    cmd: "blkid -o value -s UUID {{ _content_export_drv_device }}"
+  register: _drv_uuid
+  changed_when: false
+
+- name: "Set drive UUID fact"
+  ansible.builtin.set_fact:
+    _content_export_drv_uuid: "{{ _drv_uuid.stdout | trim }}"
+
+- name: "Display discovered drive"
+  ansible.builtin.debug:
+    msg:
+      - "Label:  {{ content_export_prepare_drv_label }}"
+      - "Device: {{ _content_export_drv_device }}"
+      - "UUID:   {{ _content_export_drv_uuid }}"

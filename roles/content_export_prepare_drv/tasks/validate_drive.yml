@@ -1,0 +1,53 @@
+---
+- name: "Get drive filesystem type"
+  ansible.builtin.command:
+    cmd: "blkid -o value -s TYPE {{ _content_export_drv_device }}"
+  register: _drv_fstype
+  changed_when: false
+
+- name: "Set filesystem type fact"
+  ansible.builtin.set_fact:
+    _content_export_drv_fstype: "{{ _drv_fstype.stdout | trim }}"
+
+- name: "Assert drive filesystem is a supported type (ext4 or xfs)"
+  ansible.builtin.assert:
+    that: _content_export_drv_fstype in _content_export_prepare_drv_supported_fstypes
+    fail_msg: >
+      Drive {{ _content_export_drv_device }} has filesystem '{{ _content_export_drv_fstype }}'
+      which is not supported. Supported filesystems: {{ _content_export_prepare_drv_supported_fstypes | join(', ') }}.
+    success_msg: "Drive filesystem: {{ _content_export_drv_fstype }} (supported)"
+
+- name: "Get Pulp content directory size in bytes"
+  ansible.builtin.command:
+    cmd: "du -sb /var/lib/pulp"
+  register: _pulp_size
+  changed_when: false
+
+- name: "Set Pulp content size fact"
+  ansible.builtin.set_fact:
+    _content_export_pulp_used_bytes: "{{ _pulp_size.stdout.split()[0] | int }}"
+
+- name: "Get drive capacity in bytes"
+  ansible.builtin.command:
+    cmd: "blockdev --getsize64 {{ _content_export_drv_device }}"
+  register: _drv_size
+  changed_when: false
+
+- name: "Set drive size fact"
+  ansible.builtin.set_fact:
+    _content_export_drv_size_bytes: "{{ _drv_size.stdout | trim | int }}"
+
+- name: "Display size comparison"
+  ansible.builtin.debug:
+    msg:
+      - "Pulp content size (conservative export estimate): {{ (_content_export_pulp_used_bytes | int / 1073741824) | round(2) }} GiB"
+      - "Drive capacity:                                   {{ (_content_export_drv_size_bytes | int / 1073741824) | round(2) }} GiB"
+
+- name: "Assert drive capacity is sufficient"
+  ansible.builtin.assert:
+    that: _content_export_drv_size_bytes | int >= _content_export_pulp_used_bytes | int
+    fail_msg: >
+      Drive capacity ({{ (_content_export_drv_size_bytes | int / 1073741824) | round(2) }} GiB)
+      is insufficient for estimated export size
+      ({{ (_content_export_pulp_used_bytes | int / 1073741824) | round(2) }} GiB)
+    success_msg: "Drive capacity is sufficient for estimated export size"

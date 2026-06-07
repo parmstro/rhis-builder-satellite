@@ -1,0 +1,65 @@
+---
+- name: "Verify mount point is mounted"
+  ansible.builtin.command:
+    cmd: "mountpoint -q {{ content_export_prepare_drv_mount }}"
+  changed_when: false
+
+- name: "Get SELinux context of mount point"
+  ansible.builtin.command:
+    cmd: "ls -dZ {{ content_export_prepare_drv_mount }}"
+  register: _mount_secontext
+  changed_when: false
+
+- name: "Assert correct SELinux context"
+  ansible.builtin.assert:
+    that: "'pulpcore_var_lib_t' in _mount_secontext.stdout"
+    fail_msg: >
+      Mount point has incorrect SELinux context: {{ _mount_secontext.stdout }}.
+      Expected: {{ _content_export_prepare_drv_selinux_context }}
+    success_msg: "SELinux context correct: {{ _mount_secontext.stdout | trim }}"
+
+- name: "Verify ownership is pulp:pulp"
+  ansible.builtin.stat:
+    path: "{{ content_export_prepare_drv_mount }}"
+  register: _mount_stat
+
+- name: "Assert correct ownership"
+  ansible.builtin.assert:
+    that:
+      - _mount_stat.stat.pw_name == _content_export_prepare_drv_mount_owner
+      - _mount_stat.stat.gr_name == _content_export_prepare_drv_mount_group
+    fail_msg: >
+      Mount point ownership is {{ _mount_stat.stat.pw_name }}:{{ _mount_stat.stat.gr_name }}
+      — expected {{ _content_export_prepare_drv_mount_owner }}:{{ _content_export_prepare_drv_mount_group }}
+    success_msg: "Ownership correct: {{ _content_export_prepare_drv_mount_owner }}:{{ _content_export_prepare_drv_mount_group }}"
+
+- name: "Verify pulp user write access"
+  become_user: pulp
+  ansible.builtin.file:
+    path: "{{ content_export_prepare_drv_mount }}/.write_test"
+    state: touch
+    mode: "0600"
+  register: _write_test
+
+- name: "Remove write test file"
+  ansible.builtin.file:
+    path: "{{ content_export_prepare_drv_mount }}/.write_test"
+    state: absent
+
+- name: "Get available space on mount"
+  ansible.builtin.command:
+    cmd: "df -h {{ content_export_prepare_drv_mount }}"
+  register: _df_result
+  changed_when: false
+
+- name: "Display mount summary"
+  ansible.builtin.debug:
+    msg:
+      - "============================================"
+      - " EXPORT DRIVE READY"
+      - " Device: {{ _content_export_drv_device }}"
+      - " UUID:   {{ _content_export_drv_uuid }}"
+      - " Mount:  {{ content_export_prepare_drv_mount }}"
+      - "{{ _df_result.stdout_lines | last }}"
+      - " Run: build_sat_disconnected_export.sh"
+      - "============================================"
