@@ -1,0 +1,153 @@
+---
+# copy_to_transfer_media.yml
+# Stage 2 of the disconnected satellite export process.
+# Copies the prepared bundle artifacts and Pulp library export to mounted
+# transfer media. Uses become: true throughout — the transfer drive is mounted
+# with pulpcore_var_lib_t SELinux context which requires privilege escalation.
+#
+# Usage (from provisioner container or host):
+#   ansible-playbook --inventory <inventory> \
+#     --user ansiblerunner \
+#     --private-key /root/.ssh/id_ed25519 \
+#     --vault-password-file /root/.ssh/vault.txt \
+#     --extra-vars "vault_dir=/rhis/vars/vault vars_dir=/rhis/vars/host_vars" \
+#     --extra-vars "bundle_dir=<path> media_path=<mount>" \
+#     --limit=sat_primary \
+#     copy_to_transfer_media.yml
+#
+# Required extra vars:
+#   bundle_dir   — bundle staging directory (Stage 1 output on the satellite)
+#   media_path   — transfer media mount point on the satellite
+
+- name: "Copy RHIS export bundle to transfer media"
+  hosts: sat_primary
+  become: true
+  gather_facts: true
+
+  vars:
+    bundle_dir: ""
+    media_path: "/mnt/rhis_transfer"
+    _transfer_name: "rhis_transfer_{{ bundle_dir | basename }}"
+    _dest: "{{ media_path }}/{{ _transfer_name }}"
+    _imports_dir: "{{ media_path }}/rhis_import_export_data"
+    # NOTE: Pulp export content is NOT copied — Satellite already wrote it to the
+    # drive during Stage 1 (export_disconnected.yml). The drive contains both the
+    # Pulp content (at the drive root) and the bundle artifacts (in _transfer_name/).
+    # On the highside, mount the drive and the content_imports.yml will reference
+    # the correct absolute paths to the Pulp content.
+
+  tasks:
+
+    - name: "Load vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+      tags: always
+
+    - name: "Validate required variables"
+      ansible.builtin.assert:
+        that:
+          - bundle_dir | length > 0
+          - media_path | length > 0
+        fail_msg: "bundle_dir and media_path must be specified via --extra-vars"
+
+    - name: "Verify bundle directory exists on satellite"
+      ansible.builtin.stat:
+        path: "{{ bundle_dir }}"
+      register: _bundle_stat
+
+    - name: "Assert bundle directory exists"
+      ansible.builtin.assert:
+        that: _bundle_stat.stat.exists and _bundle_stat.stat.isdir
+        fail_msg: "Bundle directory not found: {{ bundle_dir }}"
+
+    - name: "Verify transfer media is mounted"
+      ansible.builtin.command:
+        cmd: "mountpoint -q {{ media_path }}"
+      changed_when: false
+      register: _mountpoint_check
+      failed_when: _mountpoint_check.rc != 0
+
+    - name: "Check available space on transfer media"
+      ansible.builtin.command:
+        cmd: "df -B1 --output=avail {{ media_path }}"
+      register: _avail
+      changed_when: false
+
+    - name: "Get bundle size"
+      ansible.builtin.command:
+        cmd: "du -sb {{ bundle_dir }}"
+      register: _bundle_size
+      changed_when: false
+
+    - name: "Assert sufficient space for bundle artifacts"
+      ansible.builtin.assert:
+        that: >
+          (_avail.stdout_lines[-1] | int) >= (_bundle_size.stdout.split()[0] | int)
+        fail_msg: "Insufficient space on {{ media_path }} for bundle artifacts"
+        success_msg: "Sufficient space available on transfer media"
+
+    # ── Create destination directories ────────────────────────────────────────
+
+    - name: "Create bundle destination directory"
+      ansible.builtin.file:
+        path: "{{ _dest }}"
+        state: directory
+        mode: "0755"
+        owner: "ansiblerunner"
+        group: "ansiblerunner"
+
+    # ── Copy content_imports.yml ──────────────────────────────────────────────
+
+    - name: "Find latest content_imports.yml"
+      ansible.builtin.find:
+        paths: "{{ _imports_dir }}"
+        patterns: "*content_imports.yml"
+      register: _imports_files
+      failed_when: false
+
+    - name: "Copy content_imports.yml to bundle"
+      when: _imports_files.files | length > 0
+      ansible.builtin.copy:
+        src: "{{ (_imports_files.files | sort(attribute='mtime') | last).path }}"
+        dest: "{{ _dest }}/content_imports.yml"
+        remote_src: true
+        mode: "0644"
+        owner: "ansiblerunner"
+        group: "ansiblerunner"
+
+    - name: "Warn if content_imports.yml not found"
+      when: _imports_files.files | length == 0
+      ansible.builtin.debug:
+        msg: "WARNING: content_imports.yml not found in {{ _imports_dir }}"
+
+    # ── Copy bundle artifacts ─────────────────────────────────────────────────
+
+    - name: "Sync bundle artifacts to transfer media"
+      ansible.posix.synchronize:
+        src: "{{ bundle_dir }}/"
+        dest: "{{ _dest }}/"
+        recursive: true
+        delete: false
+        mode: push
+        rsync_opts:
+          - "--exclude=library_export"
+      delegate_to: "{{ inventory_hostname }}"
+
+    # ── Summary ───────────────────────────────────────────────────────────────
+
+    - name: "Transfer complete"
+      ansible.builtin.debug:
+        msg:
+          - "========================================================"
+          - " RHIS Export Copy Complete"
+          - "========================================================"
+          - " Transfer bundle at: {{ _dest }}"
+          - ""
+          - " On the highside, run:"
+          - "   validate_import_bundle.sh -d <media_mount>"
+          - "   then: run_import.sh -b <highside_basevars>"
+          - ""
+          - " IMPORTANT: Vault password must travel via a separate"
+          - " trusted channel. ISOs are NOT included in this bundle."
+          - "========================================================"

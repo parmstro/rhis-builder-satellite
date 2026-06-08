@@ -63,12 +63,12 @@
         - tags_content_config
         - tags_content_exports
 
-    # Resolve the Pulp export path from the export result and destination_server
+    # Resolve the Pulp export path — destination_server is optional
     - name: "Resolve bundle destination name"
       ansible.builtin.set_fact:
-        _destination_server: "{{ content_exports[0].destination_server }}"
-        _bundle_dir: "{{ rhis_export_root }}/{{ content_exports[0].destination_server }}_{{ _bundle_timestamp }}"
-        _pulp_export_root: "/var/lib/pulp/exports/{{ content_exports[0].destination_server }}"
+        _destination_server: "{{ content_exports[0].destination_server | default(content_exports[0].name) }}"
+        _bundle_dir: "{{ rhis_export_root }}/{{ content_exports[0].destination_server | default(content_exports[0].name) }}_{{ _bundle_timestamp }}"
+        _pulp_export_root: "/var/lib/pulp/exports/{{ content_exports[0].destination_server | default('') }}"
 
     - name: "Show bundle staging directory"
       ansible.builtin.debug:
