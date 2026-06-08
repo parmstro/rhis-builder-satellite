@@ -27,7 +27,7 @@
     _ansible_roles_src: "/etc/ansible/roles"
     _ansible_playbooks_src: "/etc/ansible/playbooks"
     _discovery_image_dir: "/var/lib/tftpboot/boot"
-    _baremetal_init_src: "/home/ansiblerunner/rhis/rhis-builder-baremetal-init"
+    _bootstrap_init_src: "/home/ansiblerunner/rhis/rhis-builder-bootstrap-init"
 
   tasks:
 
@@ -89,7 +89,7 @@
         - "{{ rhis_export_root }}"
         - "{{ _bundle_dir }}"
         - "{{ _bundle_dir }}/ansible_roles"
-        - "{{ _bundle_dir }}/baremetal_init"
+        - "{{ _bundle_dir }}/bootstrap_init"
         - "{{ _bundle_dir }}/discovery_images"
         - "{{ _bundle_dir }}/manifests"
         - "{{ _bundle_dir }}/inventory"
@@ -119,36 +119,36 @@
         delete: false
         mode: push
 
-    # ── Step 3b: Copy rhis-builder-baremetal-init ──────────────────────────
+    # ── Step 3b: Copy rhis-builder-bootstrap-init ─────────────────────────
     # Provides the highside operator with tooling to generate kickstart ISOs
     # for unattended RHEL installs on bare metal or VMware (upload ISO to vCenter).
     # Required on the highside before IdM and Satellite nodes can be provisioned.
 
-    - name: "Step 3b — Check for rhis-builder-baremetal-init"
+    - name: "Step 3b — Check for rhis-builder-bootstrap-init"
       ansible.builtin.stat:
-        path: "{{ _baremetal_init_src }}"
-      register: _baremetal_init_stat
+        path: "{{ _bootstrap_init_src }}"
+      register: _bootstrap_init_stat
       delegate_to: localhost
       connection: local
 
-    - name: "Step 3b — Sync rhis-builder-baremetal-init to bundle"
-      when: _baremetal_init_stat.stat.exists
+    - name: "Step 3b — Sync rhis-builder-bootstrap-init to bundle"
+      when: _bootstrap_init_stat.stat.exists
       ansible.posix.synchronize:
-        src: "{{ _baremetal_init_src }}/"
-        dest: "{{ _bundle_dir }}/baremetal_init/"
+        src: "{{ _bootstrap_init_src }}/"
+        dest: "{{ _bundle_dir }}/bootstrap_init/"
         recursive: true
         delete: false
         mode: push
         rsync_opts:
           - "--exclude=.git"
 
-    - name: "Step 3b — Warn if rhis-builder-baremetal-init not found"
-      when: not _baremetal_init_stat.stat.exists
+    - name: "Step 3b — Warn if rhis-builder-bootstrap-init not found"
+      when: not _bootstrap_init_stat.stat.exists
       ansible.builtin.debug:
         msg: >
-          WARNING: rhis-builder-baremetal-init not found at {{ _baremetal_init_src }}.
+          WARNING: rhis-builder-bootstrap-init not found at {{ _bootstrap_init_src }}.
           The highside operator will not have kickstart ISO tooling in the bundle.
-          Clone the repo to {{ _baremetal_init_src }} before running the export.
+          Clone the repo to {{ _bootstrap_init_src }} before running the export.
 
     # ── Step 4: Copy Foreman discovery images ──────────────────────────────
 
