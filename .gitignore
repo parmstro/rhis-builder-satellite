@@ -7,3 +7,5 @@ parmstrong.ca.*
 files/ssg-rhel7-ds-tailoring.xml
 files/ssg-rhel8-ds-tailoring.xml
 files/ssg-rhel9-ds-tailoring.xml
+.vscode/
+.claude/
