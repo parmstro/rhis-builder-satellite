@@ -27,6 +27,30 @@
         - tags_satellite_post
         - tags_satellite_before_sync
 
+    - name: "Stage Foreman discovery images from transfer bundle"
+      when:
+        - satellite_disconnected_discovery_images_src is defined
+        - satellite_disconnected_discovery_images_src | length > 0
+      tags:
+        - tags_satellite_post
+        - tags_satellite_before_sync
+      block:
+        - name: "Ensure TFTP boot directory exists"
+          ansible.builtin.file:
+            path: "/var/lib/tftpboot/boot"
+            state: directory
+            mode: "0755"
+            owner: "foreman-proxy"
+            group: "foreman-proxy"
+
+        - name: "Copy discovery images to TFTP boot directory"
+          ansible.posix.synchronize:
+            src: "{{ satellite_disconnected_discovery_images_src }}/"
+            dest: "/var/lib/tftpboot/boot/"
+            recursive: true
+            delete: false
+          delegate_to: "{{ inventory_hostname }}"
+
 # hammer organization configure-cdn --name="My_Organization" --type=export_sync
     # - name: "Get the organization info"
     #   redhat.satellite.organization_info:

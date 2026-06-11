@@ -2,6 +2,37 @@
 
 # Export the Satellite repository for the organization
 
+# Pre-export check: verify only the specific repository being exported is immediate.
+# Scoping to product + name avoids false positives from unrelated repos in the org.
+- name: "Pre-export check — Query target repository for non-immediate download policy"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: repositories
+    search: 'name = "{{ content_export.repository }}" and product = "{{ content_export.product }}" and download_policy != immediate'
+  register: _repo_policy_check
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_repository_exports
+
+- name: "Pre-export check — Fail if target repository is not immediate"
+  ansible.builtin.fail:
+    msg: >-
+      Repository export aborted: '{{ content_export.repository }}'
+      (product: '{{ content_export.product }}') is not set to immediate
+      download policy. Set the repository to immediate in repositories.yml,
+      re-sync, then re-run the export.
+  when: _repo_policy_check.resources | length > 0
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_repository_exports
+
 - name: "Performing repository export for {{ content_export.name }}" # noqa: name[template]
   redhat.satellite.content_export_repository:
     username: "{{ satellite_username | default(omit) }}"

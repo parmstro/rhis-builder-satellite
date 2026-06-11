@@ -1,0 +1,29 @@
+---
+- name: "Assert delivery method is supported"
+  ansible.builtin.assert:
+    that: bundle_delivery_method in ['usb', 'virtual_disk', 'rsync']
+    fail_msg: >
+      bundle_delivery_method must be one of: usb, virtual_disk, rsync.
+      Got: {{ bundle_delivery_method }}
+  tags:
+    - tags_bundle_delivery
+
+- name: "Stage bundle via USB drive (mounted directly on satellite)"
+  when: bundle_delivery_method == "usb"
+  ansible.builtin.include_tasks: usb.yml
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_usb
+
+- name: "Stage bundle via push from provisioner (virtual_disk or rsync)"
+  when: bundle_delivery_method in ['virtual_disk', 'rsync']
+  ansible.builtin.include_tasks: push.yml
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+- name: "Validate staged bundle"
+  ansible.builtin.include_tasks: validate.yml
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate

@@ -11,6 +11,32 @@
     - tags_content_config
     - tags_content_imports
 
+# ── Finalize bundle staging (disconnected builds only) ────────────────────────
+# When bundle_delivery staged Pulp chunks to satellite_bundle_stage_path before
+# the satellite installer ran, move them now to /var/lib/pulp/imports/ where Pulp
+# expects them. The pulp user and pulpcore_var_lib_t SELinux context now exist.
+# ensure_content_import.yml sets correct ownership/SELinux on the import_path dirs.
+
+- name: "Move staged Pulp chunks to Pulp import path"
+  when: satellite_bundle_stage_path is defined and satellite_bundle_stage_path | length > 0
+  ansible.builtin.command:
+    cmd: "rsync -a {{ satellite_bundle_stage_path }}/ /var/lib/pulp/imports/"
+  become: true
+  changed_when: true
+  tags:
+    - tags_content_config
+    - tags_content_imports
+
+- name: "Remove Pulp chunk staging directory"
+  when: satellite_bundle_stage_path is defined and satellite_bundle_stage_path | length > 0
+  ansible.builtin.file:
+    path: "{{ satellite_bundle_stage_path }}"
+    state: absent
+  become: true
+  tags:
+    - tags_content_config
+    - tags_content_imports
+
 - name: "Log the start time of the operation"
   ansible.builtin.debug:
     var: _start_time

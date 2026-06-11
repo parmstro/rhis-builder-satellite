@@ -2,6 +2,47 @@
 
 # Export the Satellite Library for the organization
 
+# Pre-export check: a library export includes ALL repositories in the organization.
+# Any repository not set to immediate will produce an export archive with complete
+# repodata XML but missing RPM artifacts — silent failure surfacing only when clients
+# on the highside try to install packages.
+# Note: 'download_policy' (immediate/on_demand) and 'mirroring_policy' (mirror_complete/additive)
+# are distinct Pulp concepts. download_policy controls when artifacts are fetched from CDN;
+# mirroring_policy controls whether upstream deletions propagate locally. Only download_policy
+# affects export completeness. The resource_info index response omits download_policy — this
+# should be fixed upstream in foreman-ansible-modules.
+- name: "Pre-export check — Query all repos with non-immediate download policy"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: repositories
+    search: "download_policy != immediate"
+  register: _non_immediate_repos
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_library_exports
+
+- name: "Pre-export check — Fail if any repos are not immediate"
+  ansible.builtin.fail:
+    msg: >-
+      Library export aborted: {{ _non_immediate_repos.resources | length }}
+      repositor{{ 'y' if _non_immediate_repos.resources | length == 1 else 'ies' }}
+      in organization '{{ satellite_organization }}'
+      {{ 'is' if _non_immediate_repos.resources | length == 1 else 'are' }}
+      not set to immediate download policy. Set all repositories to immediate
+      in repositories.yml, re-sync, then re-run the export.
+      Affected: {{ _non_immediate_repos.resources | map(attribute='name') | list | join(', ') }}
+  when: _non_immediate_repos.resources | length > 0
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_library_exports
+
 - name: "Performing library export {{ content_export.name }}" # noqa: name[template]
   redhat.satellite.content_export_library:
     username: "{{ satellite_username | default(omit) }}"

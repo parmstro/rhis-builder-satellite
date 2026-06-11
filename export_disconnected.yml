@@ -23,7 +23,7 @@
     rhis_export_root: "/home/ansiblerunner/rhis_export"
     rhis_provisioner_image: "quay.io/parmstro/rhis-provisioner-9-2.5:latest"
     _bundle_timestamp: "{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
-    _manifests_src: "files/manifests"
+    _manifests_src: "files/manifests"    # override with --extra-vars when running via export_deployment.sh
     _ansible_roles_src: "/etc/ansible/roles"
     _ansible_playbooks_src: "/etc/ansible/playbooks"
     _discovery_image_dir: "/var/lib/tftpboot/boot"
@@ -220,42 +220,27 @@
         dest: "{{ _bundle_dir }}/inventory/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
         mode: "0644"
 
-    # ── Step 7: Save the rhis-provisioner container image ──────────────────
-    # Two-step: save image locally on the controller, then copy to satellite.
-
-    # Step 7: Save container image on the provisioner host (not inside the container).
-    # podman lives on the host running the provisioner container, not inside it.
-    # delegate_to the provisioner group host to SSH into the host where podman runs.
-    # Step 7: Container image save — aspirational (C10).
-    # Requires running from outside the provisioner container (host SSH access to self
-    # is unavailable from rootless podman network namespace). This step is non-fatal
-    # and will warn if it cannot complete. The image must be transferred manually
-    # or via a host-level orchestration step outside the container.
-    - name: "Step 7 — Save rhis-provisioner container image on provisioner host" # noqa command-instead-of-module
-      ansible.builtin.command:
-        cmd: >
-          podman save {{ rhis_provisioner_image }}
-          -o /tmp/rhis-provisioner_{{ _bundle_timestamp }}.tar
-      delegate_to: "{{ groups['provisioner_host'][0] }}"
-      register: _podman_save
-      changed_when: _podman_save.rc | default(1) == 0
-      ignore_errors: true
-      ignore_unreachable: true
-
-    - name: "Step 7 — Warn if container image save was not possible"
-      when: _podman_save.rc | default(-1) != 0
-      ansible.builtin.debug:
-        msg:
-          - "WARNING: Container image save could not be completed automatically."
-          - "Save manually on the provisioner host before transferring:"
-          - "  podman save {{ rhis_provisioner_image }} -o <bundle>/container/rhis-provisioner.tar"
+    # ── Step 7: Copy container image into the satellite bundle ─────────────
+    # The image tar is saved by export_deployment.sh on the provisioner host
+    # BEFORE launching the container (Option A — avoids the chicken-and-egg
+    # problem of calling podman from inside the provisioner container).
+    # export_deployment.sh passes provisioner_image_tar as an extra-var and
+    # mounts the tar into the container at that path.
 
     - name: "Step 7 — Copy container image to satellite bundle"
-      when: _podman_save.rc | default(-1) == 0
+      when: provisioner_image_tar is defined and provisioner_image_tar | length > 0
       ansible.builtin.copy:
-        src: "/tmp/rhis-provisioner_{{ _bundle_timestamp }}.tar"
+        src: "{{ provisioner_image_tar }}"
         dest: "{{ _bundle_dir }}/container/rhis-provisioner_{{ _bundle_timestamp }}.tar"
         mode: "0644"
+
+    - name: "Step 7 — Warn if container image tar not provided"
+      when: provisioner_image_tar is not defined or provisioner_image_tar | length == 0
+      ansible.builtin.debug:
+        msg:
+          - "WARNING: provisioner_image_tar not set — container image not included in bundle."
+          - "Use export_deployment.sh to run the export, or save manually before transferring:"
+          - "  podman save {{ rhis_provisioner_image }} -o <bundle>/container/rhis-provisioner.tar"
 
     # ── Step 8: (Removed) ──────────────────────────────────────────────────
     #

@@ -2,6 +2,76 @@
 
 # Export a specific content view version
 
+# Pre-export check: verify only the repositories included in this content view
+# are set to immediate download policy. Two-step: get the CV's repo list, then
+# check each repo individually so the scope is limited to what this export covers.
+# The content_views API response embeds repos as {id, name, label, content_type}
+# only — no download_policy — so a second per-repo query is required.
+- name: "Pre-export check — Get repositories in content view '{{ content_export.content_view }}'"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: content_views
+    search: 'name = "{{ content_export.content_view }}"'
+  register: _cv_info
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_content_view_exports
+
+- name: "Pre-export check — Query each CV repo for non-immediate download policy"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: repositories
+    search: 'name = "{{ item.name }}" and download_policy != immediate'
+  register: _cv_repo_policy_checks
+  loop: "{{ _cv_info.resources[0].repositories }}"
+  loop_control:
+    label: "{{ item.name }}"
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_content_view_exports
+
+- name: "Pre-export check — Collect non-immediate repos from CV"
+  ansible.builtin.set_fact:
+    _non_immediate_cv_repos: >-
+      {{ _cv_repo_policy_checks.results
+         | map(attribute='resources')
+         | flatten
+         | map(attribute='name')
+         | list }}
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_content_view_exports
+
+- name: "Pre-export check — Fail if CV contains repos with non-immediate download policy"
+  ansible.builtin.fail:
+    msg: >-
+      CV version export aborted: {{ _non_immediate_cv_repos | length }}
+      repositor{{ 'y' if _non_immediate_cv_repos | length == 1 else 'ies' }}
+      in content view '{{ content_export.content_view }}'
+      {{ 'is' if _non_immediate_cv_repos | length == 1 else 'are' }}
+      not set to immediate download policy. Set the
+      {{ 'repository' if _non_immediate_cv_repos | length == 1 else 'repositories' }}
+      to immediate in repositories.yml, re-sync, then re-run the export.
+      Affected: {{ _non_immediate_cv_repos | join(', ') }}
+  when: _non_immediate_cv_repos | length > 0
+  tags:
+    - tags_content_config
+    - tags_content_exports
+    - tags_content_view_exports
+
 - name: "Performing cv_version export using format {{ content_export.name }}" # noqa: name[template]
   redhat.satellite.content_export_version:
     username: "{{ satellite_username | default(omit) }}"

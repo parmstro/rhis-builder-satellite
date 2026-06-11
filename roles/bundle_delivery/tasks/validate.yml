@@ -1,0 +1,176 @@
+---
+# Validate the staged bundle structure.
+# Failures: missing manifest or Pulp chunks (import cannot proceed without them).
+# Warnings: missing optional artifacts (ansible_roles, discovery_images, ISOs).
+# The import script is responsible for setting satellite_roles_source_path,
+# satellite_disconnected_discovery_images_src, and satellite_disconnected_root in
+# host_vars using the bundle_delivery_bundle_path fact reported here.
+
+- name: "Assert bundle path is known"
+  ansible.builtin.assert:
+    that:
+      - bundle_delivery_bundle_path is defined
+      - bundle_delivery_bundle_path | length > 0
+    fail_msg: >
+      bundle_delivery_bundle_path was not set — bundle discovery failed in
+      usb.yml or push.yml. Check earlier task output for errors.
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Stat bundle manifest"
+  ansible.builtin.stat:
+    path: "{{ bundle_delivery_bundle_path }}/rhis_disconnected_manifest.yml"
+  register: _bd_manifest_stat
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Assert bundle manifest present"
+  ansible.builtin.assert:
+    that: _bd_manifest_stat.stat.exists
+    fail_msg: >
+      Bundle manifest not found at:
+        {{ bundle_delivery_bundle_path }}/rhis_disconnected_manifest.yml
+      The bundle may be incomplete or corrupted. Re-run copy_rhis_to_transfer_media.sh
+      to regenerate the bundle on the lowside.
+    success_msg: "Bundle manifest found"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Find Pulp content chunks under staging path"
+  ansible.builtin.find:
+    paths: "{{ bundle_delivery_pulp_stage_path }}"
+    patterns: "*.tar.*"
+    recurse: true
+  register: _bd_chunks_found
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Assert Pulp chunks are present"
+  ansible.builtin.assert:
+    that: _bd_chunks_found.matched > 0
+    fail_msg: >
+      No Pulp export chunks (*.tar.*) found under {{ bundle_delivery_pulp_stage_path }}.
+      The content import will fail without these files. Verify the bundle was copied
+      completely by copy_rhis_to_transfer_media.sh and that all chunk files transferred.
+    success_msg: "{{ _bd_chunks_found.matched }} Pulp chunk(s) present"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Find metadata.json under staging path"
+  ansible.builtin.find:
+    paths: "{{ bundle_delivery_pulp_stage_path }}"
+    patterns: "metadata.json"
+    recurse: true
+  register: _bd_metadata_found
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Assert metadata.json is present"
+  ansible.builtin.assert:
+    that: _bd_metadata_found.matched > 0
+    fail_msg: >
+      metadata.json not found under {{ bundle_delivery_pulp_stage_path }}.
+      Satellite requires this file to process the import. The export bundle is incomplete.
+    success_msg: "metadata.json found"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Check ansible_roles directory"
+  ansible.builtin.stat:
+    path: "{{ bundle_delivery_bundle_path }}/ansible_roles"
+  register: _bd_roles_stat
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Warn if ansible_roles missing"
+  when: not _bd_roles_stat.stat.exists or not _bd_roles_stat.stat.isdir
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: ansible_roles/ not found at {{ bundle_delivery_bundle_path }}/ansible_roles.
+      Compliance roles will not be available on the highside satellite.
+      satellite_roles_source_path in host_vars must point to a valid path before main.yml runs.
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Check discovery_images directory"
+  ansible.builtin.stat:
+    path: "{{ bundle_delivery_bundle_path }}/discovery_images"
+  register: _bd_discovery_stat
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Warn if discovery_images missing"
+  when: not _bd_discovery_stat.stat.exists or not _bd_discovery_stat.stat.isdir
+  ansible.builtin.debug:
+    msg: >-
+      WARNING: discovery_images/ not found at {{ bundle_delivery_bundle_path }}/discovery_images.
+      Foreman discovery will have no PXE boot images.
+      The satellite_post role will skip discovery image staging if
+      satellite_disconnected_discovery_images_src is not set or empty.
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+# ── Write outputs to provisioner for bash wrapper consumption ─────────────────
+
+- name: "Write bundle path to provisioner"
+  ansible.builtin.copy:
+    content: "{{ bundle_delivery_bundle_path }}"
+    dest: "/tmp/rhis_bundle_path.txt"
+    mode: "0600"
+  delegate_to: localhost
+  connection: local
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Fetch _content_imports.yml from bundle to provisioner"
+  ansible.builtin.fetch:
+    src: "{{ bundle_delivery_bundle_path }}/_content_imports.yml"
+    dest: "/tmp/rhis_content_imports_fetch.yml"
+    flat: true
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Report bundle delivery complete"
+  ansible.builtin.debug:
+    msg:
+      - "══════════════════════════════════════════════════════════════"
+      - " BUNDLE DELIVERY COMPLETE"
+      - "══════════════════════════════════════════════════════════════"
+      - " Bundle artifacts:  {{ bundle_delivery_bundle_path }}"
+      - " Pulp chunks staged: {{ bundle_delivery_pulp_stage_path }}"
+      - " Pulp chunks found:  {{ _bd_chunks_found.matched }}"
+      - " Chunks move to:     {{ bundle_delivery_pulp_import_path }} (post-installer, via content_imports)"
+      - "──────────────────────────────────────────────────────────────"
+      - " Set these in host_vars/{{ inventory_hostname }}/ before main.yml:"
+      - ""
+      - "   satellite_disconnected: true"
+      - "   satellite_disconnected_iso_prestaged: true"
+      - "   satellite_disconnected_root: {{ bundle_delivery_bundle_path }}"
+      - "   satellite_import_content: true"
+      - "   satellite_roles_source_path: {{ bundle_delivery_bundle_path }}/ansible_roles"
+      - "   satellite_disconnected_discovery_images_src: {{ bundle_delivery_bundle_path }}/discovery_images"
+      - ""
+      - "   content_imports:"
+      - "     - name: Library"
+      - "       type: library"
+      - "       import_path: {{ bundle_delivery_pulp_import_path }}/<org>/<timestamp>/<id>"
+      - "       (copy _content_imports.yml from bundle with /exports/ → /imports/ prefix remap)"
+      - "   satellite_bundle_stage_path: {{ bundle_delivery_pulp_stage_path }}"
+      - "       (content_imports role moves chunks to /var/lib/pulp/imports/ post-installer)"
+      - "══════════════════════════════════════════════════════════════"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate

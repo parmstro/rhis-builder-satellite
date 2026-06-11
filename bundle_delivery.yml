@@ -1,0 +1,64 @@
+---
+# bundle_delivery.yml
+#
+# Stage a RHIS transfer bundle onto the highside satellite in preparation for
+# running main.yml (build_sat_primary.sh).
+#
+# Called by build_sat_disconnected_import.sh from inside the rhis-provisioner container.
+# Must run BEFORE main.yml — it ensures all content that main.yml's disconnected roles
+# need is present at the correct paths on the satellite.
+#
+# Three delivery methods (set bundle_delivery_method in extra-vars or host_vars):
+#
+#   usb          — Transfer drive physically plugged into satellite baremetal.
+#                  Role discovers drive by label, mounts at /var/lib/pulp/imports.
+#                  Drive stays mounted through main.yml (satellite_disconnected_pre
+#                  needs it for ISO access).
+#
+#   virtual_disk — Operator created a QCOW2/VMDK from the USB drive and attached
+#                  it to the provisioner VM. Bash (in build_sat_disconnected_import.sh)
+#                  mounts the image at bundle_delivery_source_path on the provisioner
+#                  BEFORE this playbook runs.
+#
+#   rsync        — Operator rsync'd the USB drive to bundle_delivery_source_path on
+#                  the provisioner over the highside network.
+#
+# After this playbook completes, the satellite has:
+#   - Pulp content chunks at /var/lib/pulp/imports/  (from USB drive or pushed by Ansible)
+#   - Bundle artifacts at bundle_delivery_stage_path/rhis_transfer_<timestamp>/
+#     (ISOs, ansible_roles, discovery_images, bootstrap_init, manifests)
+#
+# The import script writes these paths into the satellite's host_vars before running
+# this playbook and main.yml:
+#   satellite_disconnected_root:                bundle_delivery_stage_path/rhis_transfer_<ts>
+#   satellite_roles_source_path:                bundle_delivery_stage_path/rhis_transfer_<ts>/ansible_roles
+#   satellite_disconnected_discovery_images_src: bundle_delivery_stage_path/rhis_transfer_<ts>/discovery_images
+#   satellite_disconnected_iso_prestaged:       true   (ISOs already on satellite after this play)
+#   satellite_import_content:                   true   (enable content_imports role in main.yml)
+#   content_imports.yml:                        _content_imports.yml from bundle with
+#                                               /exports/ → /imports/ prefix remap applied
+
+- name: "Stage RHIS transfer bundle on highside satellite"
+  hosts: sat_primary
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: "Load vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+      tags: always
+
+    - name: "Load host variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
+      tags: always
+
+    - name: "Run bundle_delivery role"
+      ansible.builtin.import_role:
+        name: bundle_delivery
+      tags:
+        - tags_bundle_delivery

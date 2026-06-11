@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Stage RHIS transfer bundle content to a highside satellite for disconnected import"
+  standalone: false

@@ -1,0 +1,68 @@
+---
+# bundle_delivery role defaults
+#
+# How the transfer bundle reaches the highside satellite. Three methods:
+#
+#   usb          — physical drive plugged into satellite baremetal;
+#                  role discovers it by label and mounts at pulp_import_path.
+#
+#   virtual_disk — disk image attached to provisioner VM by the operator;
+#                  bash has already mounted it on the provisioner host;
+#                  role pushes chunks and artifacts from provisioner to satellite.
+#
+#   rsync        — operator rsync'd bundle from workstation to a staging path
+#                  on the provisioner over the highside network;
+#                  role pushes chunks and artifacts from provisioner to satellite.
+
+bundle_delivery_method: "usb"
+
+# ── USB settings ──────────────────────────────────────────────────────────────
+
+# Drive label used to discover the transfer device on the satellite
+bundle_delivery_drv_label: "TRANSFER_DRV"
+
+# Safe mount point for the USB drive on the satellite.
+# Mounted here during bundle_delivery (before the satellite installer runs).
+# pulp user and /var/lib/pulp/imports do not exist yet at this stage.
+bundle_delivery_usb_mount_path: "/mnt/rhis_transfer_drv"
+
+# ── push settings (virtual_disk and rsync) ────────────────────────────────────
+
+# Source path on the provisioner (Ansible controller inside the container).
+#   virtual_disk: mount point of the attached disk image (e.g. /mnt/rhis_transfer)
+#   rsync:        staging dir where operator rsync'd the bundle
+bundle_delivery_source_path: "/mnt/rhis_transfer"
+
+# Temporary incoming area on the satellite (ansiblerunner-writable, must be on /var).
+# Chunks land here first via SSH push, then root local-rsync moves them to pulp_stage_path.
+# Cleaned up automatically after delivery. Requires ~1x the Pulp export size in free space.
+bundle_delivery_incoming_path: "/var/satellite_stage/rhis_bundle_incoming"
+
+# Permanent satellite-side staging path for bundle artifacts
+# (ISOs, ansible_roles, discovery_images — NOT Pulp chunks).
+# Must match satellite_disconnected_root in host_vars.
+bundle_delivery_stage_path: "/var/satellite_stage"
+
+# Pre-installer staging path for Pulp export chunks (all scenarios).
+# Chunks are moved here during bundle_delivery because /var/lib/pulp/imports does not
+# exist and the pulp user has not been created until the satellite installer runs.
+# The content_imports role moves chunks to /var/lib/pulp/imports/ post-installer.
+bundle_delivery_pulp_stage_path: "/var/satellite_stage/pulp_stage"
+
+# Final Pulp import path — where chunks must reside when content_imports runs.
+# Referenced in validate output only; the move happens inside the content_imports role.
+bundle_delivery_pulp_import_path: "/var/lib/pulp/imports"
+
+# ── shared settings ───────────────────────────────────────────────────────────
+
+# Bundle directory name (e.g. rhis_transfer_20260601_120000).
+# If empty, auto-discovered from the source (USB: drive mount; push: source path).
+bundle_delivery_bundle_dir: ""
+
+# ── Internal constants ─────────────────────────────────────────────────────────
+
+_bundle_delivery_supported_fstypes:
+  - "ext4"
+  - "xfs"
+_bundle_delivery_mount_opts: "defaults"
+_bundle_delivery_mount_mode: "0755"
