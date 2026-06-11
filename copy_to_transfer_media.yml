@@ -134,6 +134,41 @@
           - "--exclude=library_export"
       delegate_to: "{{ inventory_hostname }}"
 
+    # ── Copy operator import tools to drive root ─────────────────────────────
+    # import_bundle.sh, import_bundle.yml, README_FIRST.md are mounted from
+    # rhis-builder-inventory at /rhis/rhis-builder-inventory/transfer_drive/
+    # inside the container. They land at the drive root so the highside operator
+    # can run ./import_bundle.sh immediately after mounting the drive.
+
+    - name: "Check for operator import tools"
+      ansible.builtin.stat:
+        path: "/rhis/rhis-builder-inventory/transfer_drive/import_bundle.yml"
+      register: _tools_stat
+      delegate_to: localhost
+      connection: local
+
+    - name: "Warn if operator tools not mounted"
+      when: not _tools_stat.stat.exists
+      ansible.builtin.debug:
+        msg: >-
+          WARNING: /rhis/rhis-builder-inventory/transfer_drive/ not found in container.
+          import_bundle.sh, import_bundle.yml, and README_FIRST.md will NOT be written
+          to the drive root. Re-run with rhis-builder-inventory mounted at
+          /rhis/rhis-builder-inventory to include operator tools.
+
+    - name: "Copy operator import tools to drive root"
+      when: _tools_stat.stat.exists
+      ansible.builtin.copy:
+        src: "/rhis/rhis-builder-inventory/transfer_drive/{{ item.name }}"
+        dest: "{{ media_path }}/{{ item.name }}"
+        mode: "{{ item.mode }}"
+        owner: ansiblerunner
+        group: ansiblerunner
+      loop:
+        - {name: import_bundle.sh,  mode: "0755"}
+        - {name: import_bundle.yml, mode: "0644"}
+        - {name: README_FIRST.md,   mode: "0644"}
+
     # ── Summary ───────────────────────────────────────────────────────────────
 
     - name: "Transfer complete"
