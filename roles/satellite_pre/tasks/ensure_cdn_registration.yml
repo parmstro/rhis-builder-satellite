@@ -1,6 +1,10 @@
 ---
 
 - name: "Ensure satellite system registered to CDN"
+  when:
+    - cdn_sat_activation_key is defined
+    - cdn_organization_id is defined
+    - not (satellite_disconnected | default(false) | bool)
   community.general.redhat_subscription:
     activationkey: "{{ cdn_sat_activation_key }}"
     org_id: "{{ cdn_organization_id }}"
