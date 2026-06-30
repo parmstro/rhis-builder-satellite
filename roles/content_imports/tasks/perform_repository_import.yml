@@ -14,7 +14,7 @@
     metadata: "{{ content_import.metadata | default(omit) }}"
     metadata_file: "{{ content_import.metadata_file | default(omit) }}"
     path: "{{ content_import.import_path }}"
-  register: import_repository_result
+  register: import_repository_result # noqa var-naming[no-role-prefix]
   until: import_repository_result.finished
   retries: "{{ (satellite_async_timeout / satellite_async_delay) | int }}"
   delay: "{{ satellite_async_delay }}"

@@ -17,11 +17,24 @@
 - name: "Ensure import directory permissions"
   ansible.builtin.stat:
     path: "{{ content_import.import_path }}"
-  register: content_import_path_stat
+  register: content_import_path_stat # noqa var-naming[no-role-prefix]
 
 - name: "Assert"
   ansible.builtin.assert:
     that: content_import_path_stat.stat.exists
+
+- name: "Important Note: The import task is next"
+  ansible.builtin.debug:
+    msg: >
+      Import Tasks are long running, blocking tasks and may take hours to complete.
+      We do not run async polling for these tasks as a timeout on the async poll will cause the playbook to fail.
+      We just need to wait for the task to complete.
+      The Satellite UI is up. If necessary, you can monitor the progress of the import via the Satellite Tasks status page.
+      https://{{ satellite_url }}/foreman_tasks/tasks
+      Please be patient.
+  tags:
+    - tags_content_config
+    - tags_content_imports
 
 - name: "Perform library import for {{ content_import.name }}"
   when: content_import.type == 'library'
