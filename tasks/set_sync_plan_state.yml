@@ -50,7 +50,7 @@
 
 - name: "Generate sync_plan_list"
   ansible.builtin.set_fact:
-    sync_plan_state_list: "{{ sync_plans_state | community.general.json_query('resources[*].enabled') | list }}"
+    sync_plan_state_list: "{{ sync_plans_state | community.general.json_query('resources[*].enabled') | list }}" # noqa jinja[invalid]
 
 - name: "Assertion"
   when: (existing_sync_plan_enabled | bool)

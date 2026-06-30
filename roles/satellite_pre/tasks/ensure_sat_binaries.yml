@@ -12,7 +12,7 @@
 - name: "Update the system"
   when: not _satpre_satellite_installed
   block:
-    - name: "Patch the system using dnf" # noqa: package-latest
+    - name: "Patch the system using dnf" # noqa: package-latest # noqa var-naming[no-role-prefix]
       ansible.builtin.dnf:
         name: '*'
         state: latest
@@ -23,7 +23,7 @@
         - tags_satellite_pre
         - tags_satellite_before_sync
 
-    - name: "Check on system update"
+    - name: "Check on system update" # noqa var-naming[no-role-prefix]
       ansible.builtin.async_status:
         jid: "{{ async_update.ansible_job_id }}"
       register: job_result
@@ -43,6 +43,7 @@
         - tags_satellite_before_sync
 
     - name: "Ensure ansible collections in global configuration"
+      when: not satellite_disconnected
       community.general.ansible_galaxy_install:
         type: collection
         name: "{{ collection_name }}"
@@ -83,7 +84,7 @@
         - tags_satellite_pre
         - tags_satellite_before_sync
 
-    - name: "Install the Satellite RPM packages"
+    - name: "Install the Satellite RPM packages" # noqa var-naming[no-role-prefix]
       ansible.builtin.dnf:
         name: satellite
         state: present
@@ -94,7 +95,7 @@
         - tags_satellite_pre
         - tags_satellite_before_sync
 
-    - name: "Wait for Satellite binary install to complete"
+    - name: "Wait for Satellite binary install to complete" # noqa var-naming[no-role-prefix]
       ansible.builtin.async_status:
         jid: "{{ async_update.ansible_job_id }}"
       register: job_result

@@ -2,7 +2,7 @@
 
 # set the variables to generate the server certificate
 
-- name: "Set the vars for the server cert generation"
+- name: "Set the vars for the server cert generation" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     ssl_private_key_pem_path: "{{ libvirt_server_private_key_pem_path }}"
     host_ssl_key_path: "{{ libvirt_server_key_path }}"

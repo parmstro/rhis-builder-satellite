@@ -3,7 +3,7 @@
 # setup libvirt client for libvirt compute resource
 # we want to make sure that Satellite can easily deploy KVM hypervisors
 
-- name: "Ensure that the libvirt client is installed"
+- name: "Ensure that the libvirt client is installed" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "satellite-maintain packages install -y libvirt-client"
   register: smpi_result
   changed_when: smpi_result.rc == 0
@@ -94,7 +94,7 @@
         group: root
         mode: "0644"
 
-    - name: "Validate the libvirt pki configuration"
+    - name: "Validate the libvirt pki configuration" # noqa var-naming[no-role-prefix]
       ansible.builtin.command: "virt-pki-validate"
       register: vpv_result
       changed_when: vpv_result.rc == 0

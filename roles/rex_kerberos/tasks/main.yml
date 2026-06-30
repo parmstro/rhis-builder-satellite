@@ -7,7 +7,7 @@
 # copy the keytab for realm-capsule to the proper directory for rex with proper permissions
 # test the keytab
 
-- name: "Get the id of foreman-proxy user"
+- name: "Get the id of foreman-proxy user" # noqa var-naming[no-role-prefix]
   ansible.builtin.command:
     cmd: "id -u {{ rex_executor }}"
   register: result
@@ -28,7 +28,7 @@
 
 # the keytab file *must* always be named client.keytab
 # and be located in the path below related to the impersonating users uid, in our case foreman-proxy
-- name: "Set the path for the deploying the keytab"
+- name: "Set the path for the deploying the keytab" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     rex_keytab_path: "/var/kerberos/krb5/user/{{ result.stdout }}/client.keytab"
 
@@ -50,7 +50,7 @@
     serole: "object_r"
     setype: "krb5_keytab_t"
 
-- name: "Validate the keytab" # noqa: no-changed-when risky-shell-pipe
+- name: "Validate the keytab" # noqa: no-changed-when risky-shell-pipe # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "sudo -u {{ rex_executor }} kinit -kt {{ rex_keytab_path }} {{ foreman_proxy_realm_principal }}"
   register: rex_keytab_result
   changed_when: rex_keytab_result.rc == 0

@@ -1,6 +1,6 @@
 ---
 
-- name: "Fetch existing httpd keytab to server" # noqa: no-changed-when
+- name: "Fetch existing httpd keytab to server" # noqa: no-changed-when # noqa var-naming[no-role-prefix]
   ansible.builtin.command:
     cmd: "ipa-getkeytab -p HTTP/{{ ansible_fqdn }} -s {{ ipaserver_fqdn }} -k /root/httpd.keytab" # noqa: yaml[line-length]
   register: gfhk_getkeytab

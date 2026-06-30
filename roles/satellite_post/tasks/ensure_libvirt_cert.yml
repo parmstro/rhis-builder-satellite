@@ -18,12 +18,12 @@
     setype: "cert_t"
     selevel: "s0"
 
-- name: "Authenticate with IdM" # noqa: command-instead-of-shell risky-shell-pipe
+- name: "Authenticate with IdM" # noqa: command-instead-of-shell risky-shell-pipe # noqa var-naming[no-role-prefix]
   ansible.builtin.shell: "ipa-getkeytab -p {{ ipa_admin_principal }} -s {{ ipaserver_fqdn }} -r -k {{ host_ssl_certs_dir }}local.keytab -D '{{ keytab_retrieval_dn }}' -w '{{ keytab_retrieval_password }}'" # noqa: yaml[line-length]
   register: gc_get_keytab
   changed_when: gc_get_keytab.rc == 0
 
-- name: "Determine if the private key file exists"
+- name: "Determine if the private key file exists" # noqa var-naming[no-role-prefix]
   ansible.builtin.stat:
     path: "{{ ssl_private_key_pem_path }}"
   register: gc_pk_stat
@@ -40,7 +40,7 @@
         owner: "root"
         mode: "0740"
 
-    - name: "Try to access the existing key"
+    - name: "Try to access the existing key" # noqa var-naming[no-role-prefix]
       ansible.builtin.shell: "openssl pkey -in '{{ ssl_private_key_pem_path }}' -noout -passin 'file:{{ passfile }}'" # noqa command-instead-of-shell
       register: gc_pk_access_result
       changed_when: true
@@ -57,7 +57,7 @@
         path: "{{ host_ssl_key_path }}"
         state: absent
 
-- name: "Determine if the private key file exists"
+- name: "Determine if the private key file exists" # noqa var-naming[no-role-prefix]
   ansible.builtin.stat:
     path: "{{ ssl_private_key_pem_path }}"
   register: gc_pk_stat2
@@ -76,20 +76,20 @@
         mode: "0740"
 
     - ansible.builtin.command: "openssl genrsa -{{ ssl_private_key_cipher }} -out {{ ssl_private_key_pem_path }} -passout file:/{{ passfile }} {{ ssl_private_key_size }}" # noqa: name[missing]
-      register: gc_gen_key_result
+      register: gc_gen_key_result  # noqa var-naming[no-role-prefix]
       changed_when: gc_gen_key_result.rc == 0
 
     - ansible.builtin.command: "openssl rsa -in {{ ssl_private_key_pem_path }} -out {{ host_ssl_key_path }} -passin file:/{{ passfile }}" # noqa: name[missing]
-      register: gc_gen_key_result
+      register: gc_gen_key_result  # noqa var-naming[no-role-prefix]
       changed_when: gc_gen_key_result.rc == 0
 
 # At this point we have a valid private key file
 
-- name: "Set target service name"
+- name: "Set target service name" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     target_service: "{{ crt_service_type }}/{{ ansible_fqdn }}"
 
-- name: "Ensure target service is present"
+- name: "Ensure target service is present" # noqa var-naming[no-role-prefix]
   redhat.rhel_idm.ipaservice:
     ipaadmin_principal: "{{ ipa_admin_principal }}"
     ipaadmin_password: "{{ ipa_admin_password }}"
@@ -100,7 +100,7 @@
       - "{{ ansible_fqdn }}"
   register: ts_result
 
-- name: "Check for an existing certificate file"
+- name: "Check for an existing certificate file"  # noqa var-naming[no-role-prefix]
   ansible.builtin.stat:
     path: "{{ host_ssl_crt_path }}"
   register: cert_exists
@@ -108,12 +108,12 @@
 - name: "Cert exists and regen requested - stop tracking and clean up"
   when: cert_exists.stat.exists and crt_force_regen
   block:
-    - name: "Read existing cert" # noqa: command-instead-of-module risky-shell-pipe
+    - name: "Read existing cert" # noqa: command-instead-of-module risky-shell-pipe  # noqa var-naming[no-role-prefix]
       ansible.builtin.shell: "sed -n 2,$(expr $(wc -l < {{ host_ssl_crt_path }}) - 1)p {{ host_ssl_crt_path }} | tr -d '\n'"
       changed_when: cert.rc == 0
       register: cert
 
-    - name: "Get cert serial number"  # noqa: risky-shell-pipe
+    - name: "Get cert serial number"  # noqa: risky-shell-pipe  # noqa var-naming[no-role-prefix]
       ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-find --certificate='{{ cert.stdout }}' --subject={{ ansible_fqdn }} | grep 'Serial number:' | cut -c18-"
       changed_when: serial_number.rc == 0
       register: serial_number
@@ -122,7 +122,7 @@
       ansible.builtin.debug:
         var: serial_number
 
-    - name: "Stop tracking cert with certmonger" # noqa: no-changed-when risky-shell-pipe ignore-errors
+    - name: "Stop tracking cert with certmonger" # noqa: risky-shell-pipe noqa var-naming[no-role-prefix]
       ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert stop-tracking -k {{ host_ssl_key_path }} -f {{ host_ssl_crt_path }} -i {{ crt_service_type }}.{{ ansible_fqdn }}"
       register: gc_stop_tracking_result
       changed_when: gc_stop_tracking_result.rc == 0
@@ -175,25 +175,25 @@
         mode: "0740"
 
     - ansible.builtin.command: "openssl genrsa -{{ ssl_private_key_cipher }} -out {{ ssl_private_key_pem_path }} -passout file:/{{ passfile }} {{ ssl_private_key_size }}" # noqa: name[missing]
-      register: gc_gen_key_result
+      register: gc_gen_key_result # noqa var-naming[no-role-prefix]
       changed_when: gc_gen_key_result.rc ==0
 
     - ansible.builtin.command: "openssl rsa -in {{ ssl_private_key_pem_path }} -out {{ host_ssl_key_path }} -passin file:/{{ passfile }}" # noqa: name[missing]
-      register: gc_gen_key_result
+      register: gc_gen_key_result # noqa var-naming[no-role-prefix]
       changed_when: gc_gen_key_result.rc ==0
 
-    - name: "Create request"
+    - name: "Create request" # noqa var-naming[no-role-prefix]
       ansible.builtin.command: "openssl req -new -key {{ host_ssl_key_path }} -out {{ host_ssl_csr_path }} -subj \"/C={{ csr_country_name }}/ST={{ csr_state_or_province_name }}/L={{ csr_locality_name }}/O={{ csr_organization_name }}/OU={{ csr_organization_unit_name }}/CN={{ ansible_fqdn }}/subjectAltName=DNS.1={{ ansible_fqdn }}\""
       register: gc_gen_csr_result
       changed_when: gc_gen_csr_result.rc ==0
 
-    - name: "Generate the certificate for the service"
+    - name: "Generate the certificate for the service" # noqa var-naming[no-role-prefix]
       ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa cert-request --add --principal={{ target_service }} {{ host_ssl_csr_path }} --certificate-out={{ host_ssl_crt_path }}" # noqa: risky-shell-pipe
       register: gc_gen_crt_result
       changed_when: gc_gen_crt_result.rc ==0
 
-    - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"
-      ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ host_ssl_key_path }} -f {{ host_ssl_crt_path }} -I {{ crt_service_type }}.{{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+    - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"  # noqa var-naming[no-role-prefix]
+      ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking c IPA -k {{ host_ssl_key_path }} -f {{ host_ssl_crt_path }} -I {{ crt_service_type }}.{{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_start_tracking_result
       changed_when: gc_start_tracking_result.rc ==0
 

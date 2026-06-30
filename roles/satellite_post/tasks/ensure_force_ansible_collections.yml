@@ -5,7 +5,7 @@
 # These are required to implement our OpenSCAP roles - they fail to run without these
 # installed to /usr/share/ansible/roles
 
-- name: "Force global location install of ansible collections"
+- name: "Force global location install of ansible collections" # noqa var-naming[no-role-prefix]
   when: force_global_ansible_collections is defined and (force_global_ansible_collection | length) > 0
   ansible.builtin.command: "ansible-galaxy collection install -p /usr/share/ansible/collections --force {{ global_collection }}"
   loop: "{{ force_global_ansible_collections }}"

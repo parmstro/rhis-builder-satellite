@@ -1,6 +1,6 @@
 ---
 
-- name: "Fetch existing foreman-proxy keytab to server"
+- name: "Fetch existing foreman-proxy keytab to server" # noqa var-naming[no-role-prefix]
   ansible.builtin.command:
     cmd: "ipa-getkeytab -p {{ foreman_proxy_realm_principal }} -s {{ ipaserver_fqdn }} -r -k /root/freeipa.keytab -D '{{ keytab_retrieval_dn }}' -w '{{ keytab_retrieval_password }}'" # noqa: yaml[line-length]
   register: gfpk_result

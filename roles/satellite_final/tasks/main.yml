@@ -3,7 +3,7 @@
 # Run the final tasks for the satellite configuration
 # - build the PXE linux defaults
 
-- name: "Build PXE Linux Defaults"
+- name: "Build PXE Linux Defaults" # noqa var-naming[no-role-prefix]
   ansible.builtin.uri:
     url: "{{ satellite_url }}/api/provisioning_templates/build_pxe_default"
     method: POST

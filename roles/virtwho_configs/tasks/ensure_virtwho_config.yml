@@ -3,7 +3,7 @@
 # using the foreman_virtwho_config api
 # this is not strictly idempotent as it reruns the configuration script each time
 
-- name: "Get the organization_id for: {{ virtwho_config.foreman_virt_who_configure_config.organization_name }}"
+- name: "Get the organization_id for: {{ virtwho_config.foreman_virt_who_configure_config.organization_name }}" # noqa var-naming[no-role-prefix]
   redhat.satellite.organization_info:
     username: "{{ satellite_username | default(omit) }}"
     password: "{{ satellite_password | default(omit) }}"
@@ -14,22 +14,22 @@
   register: org_info
   no_log: true
 
-- name: "Update the foreman virtwho configure element with the organization id"
+- name: "Update the foreman virtwho configure element with the organization id" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     updated_foreman_virt_who_configure_config: "{{ virtwho_config.foreman_virt_who_configure_config | combine({'organization_id': org_info.organization.id}) }}"
   no_log: true
 
-- name: "Update the configuration"
+- name: "Update the configuration" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     updated_virtwho_config: "{{ virtwho_config | combine({'foreman_virt_who_configure_config': updated_foreman_virt_who_configure_config}) }}"
   no_log: true
 
-- name: "Ensure json"
+- name: "Ensure json" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     json_data: "{{ updated_virtwho_config | to_json }}"
   no_log: true
 
-- name: "Does the virtwho configuration exist"
+- name: "Does the virtwho configuration exist" # noqa var-naming[no-role-prefix]
   ansible.builtin.uri:
     url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs"
     method: "GET"
@@ -42,23 +42,23 @@
   register: result
   no_log: true
 
-- name: "Create list"
+- name: "Create list" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     virtwho_config_config_names: "{{ result.json.results | selectattr('name') | map(attribute='name') | list }}"
   no_log: true
 
-- name: "Ensure negation"
+- name: "Ensure negation" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     config_exists: false
 
-- name: "Determin if config already exists"
+- name: "Determin if config already exists" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     config_exists: true
   when: virtwho_config.foreman_virt_who_configure_config.name in virtwho_config_config_names
   no_log: true
 
 # only one config of a given name
-- name: "There can be only one"
+- name: "There can be only one" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     config_id: "{{ result.json.results | selectattr('name', 'equalto', virtwho_config.foreman_virt_who_configure_config.name) | map(attribute='id') | first }}"
   when: config_exists
@@ -67,7 +67,7 @@
 - name: "Create the new configuration in Satellite"
   when: not config_exists
   block:
-    - name: "Create the new configuration in Satellite for {{ virtwho_config.foreman_virt_who_configure_config.name }}"
+    - name: "Create the new configuration in Satellite for {{ virtwho_config.foreman_virt_who_configure_config.name }}" # noqa var-naming[no-role-prefix]
       ansible.builtin.uri:
         url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs"
         method: "POST"
@@ -80,14 +80,14 @@
       register: result
       no_log: true
 
-    - name: "Set the config_id"
+    - name: "Set the config_id" # noqa var-naming[no-role-prefix]
       ansible.builtin.set_fact:
         config_id: "{{ result.json.id }}"
 
 - name: "Update the existing configuration in Satellite for existing config_id"
   when: config_exists
   block:
-    - name: "Update the existing configuration in Satellite for {{ virtwho_config.foreman_virt_who_configure_config.name }}"
+    - name: "Update the existing configuration in Satellite for {{ virtwho_config.foreman_virt_who_configure_config.name }}" # noqa var-naming[no-role-prefix]
       ansible.builtin.uri:
         url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs/{{ config_id }}/"
         method: "PUT"
@@ -100,12 +100,12 @@
       register: result
       no_log: true
 
-    - name: "Set the config_id"
+    - name: "Set the config_id" # noqa var-naming[no-role-prefix]
       ansible.builtin.set_fact:
         config_id: "{{ result.json.id }}"
       no_log: true
 
-- name: "Retrieve the deployment config"
+- name: "Retrieve the deployment config" # noqa var-naming[no-role-prefix]
   ansible.builtin.uri:
     url: "https://{{ ansible_fqdn }}/foreman_virt_who_configure/api/v2/configs/{{ config_id }}/deploy_script/"
     method: "GET"
@@ -115,7 +115,7 @@
   register: result
   no_log: true
 
-- name: "Deploy on Satellite" # noqa: command-instead-of-shell no-changed-when
+- name: "Deploy on Satellite" # noqa: command-instead-of-shell no-changed-when # noqa var-naming[no-role-prefix]
   ansible.builtin.shell: "{{ result.json.virt_who_config_script }}"
   register: result
   no_log: true

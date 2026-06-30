@@ -1,6 +1,6 @@
 ---
 
-- name: "Set _satpre_satellite_installed to false"
+- name: "Set _satpre_satellite_installed to false" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _satpre_satellite_installed: false
   tags:
@@ -11,7 +11,7 @@
 - name: "Has satellite-installer been run"
   block:
 
-    - name: "Get the state of the foreman service"
+    - name: "Get the state of the foreman service" # noqa var-naming[no-role-prefix]
       ansible.builtin.command: "sudo systemctl list-unit-files foreman.service"
       register: foreman_status
       changed_when: true
@@ -26,7 +26,7 @@
         - tags_satellite_pre
         - tags_satellite_before_sync
 
-    - name: "Set _satpre_satellite_installed to true"
+    - name: "Set _satpre_satellite_installed to true" # noqa var-naming[no-role-prefix]
       ansible.builtin.set_fact:
         _satpre_satellite_installed: true
       tags:
@@ -34,7 +34,7 @@
         - tags_satellite_before_sync
 
   rescue:
-    - name: "Set _satpre_satellite_installed to false"
+    - name: "Set _satpre_satellite_installed to false" # noqa var-naming[no-role-prefix]
       ansible.builtin.set_fact:
         _satpre_satellite_installed: false
       tags:

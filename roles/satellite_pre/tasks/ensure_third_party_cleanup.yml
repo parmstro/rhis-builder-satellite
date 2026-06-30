@@ -4,7 +4,7 @@
 
 # Satellite is an appliance-like deployment. It should only have the designated repos.
 # disable all third party repos
-- name: "Find all repos"
+- name: "Find all repos" # noqa var-naming[no-role-prefix]
   ansible.builtin.find:
     paths: '/etc/yum.repos.d'
     file_type: "file"
@@ -31,7 +31,7 @@
 
 # Satellite is an appliance-like deployment. It must be registered to the CDN with CDN repos.
 # uninstall any RHUI client
-- name: "Find any RHUI client packages"
+- name: "Find any RHUI client packages" # noqa var-naming[no-role-prefix]
   ansible.builtin.yum:
     list: "*rhui*"
   register: pkg_list

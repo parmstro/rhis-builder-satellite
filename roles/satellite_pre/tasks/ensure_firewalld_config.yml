@@ -31,7 +31,7 @@
     - tags_satellite_pre_firewall
     - tags_satellite_before_sync
 
-- name: "Set the primary interface for Satellite communication"
+- name: "Set the primary interface for Satellite communication" # noqa var-naming[no-role-prefix]
   when: override_iface is defined and (sat_override_iface | length) > 0
   ansible.builtin.set_fact:
     sat_firewalld_interface: "{{ override_iface }}"

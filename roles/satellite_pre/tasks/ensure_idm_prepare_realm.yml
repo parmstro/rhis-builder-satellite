@@ -8,7 +8,7 @@
 # If the user does not exist, call prepare realm - this pulls the keytab
 # Copy the keytab to the appropriate locations.
 
-- name: "Assume the foreman proxy realm user does not exist"
+- name: "Assume the foreman proxy realm user does not exist" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     realm_user_exists: false
   tags:
@@ -28,7 +28,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Determine if the foreman-proxy realm user exists - normally realm-capsule" # noqa: command-instead-of-shell risky-shell-pipe
+- name: "Determine if the foreman-proxy realm user exists - normally realm-capsule" # noqa: command-instead-of-shell risky-shell-pipe # noqa var-naming[no-role-prefix]
   ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; echo '{{ ipa_admin_password }}' | ipa user-find {{ foreman_proxy_realm_principal }}"
   register: fpr_user_find
   changed_when: fpr_user_find.rc == 0
@@ -38,7 +38,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Evaluate search"
+- name: "Evaluate search" # noqa var-naming[no-role-prefix]
   when: ('1 user matched') in fpr_user_find.stdout
   ansible.builtin.set_fact:
     realm_user_exists: true
@@ -59,7 +59,7 @@
   when: not realm_user_exists
   block:
 
-    - name: "Setup satellite realm user"  # noqa: command-instead-of-shell risky-shell-pipe
+    - name: "Setup satellite realm user"  # noqa: command-instead-of-shell risky-shell-pipe # noqa var-naming[no-role-prefix]
       ansible.builtin.shell: "echo '{{ ipa_admin_password }}' | kinit {{ ipa_admin_principal }}; echo '{{ ipa_admin_password }}' | /usr/sbin/foreman-prepare-realm {{ ipa_admin_principal }} {{ foreman_proxy_realm_principal }}"
       register: fpr_prepare_realm
       changed_when: fpr_prepare_realm.rc == 0
@@ -68,7 +68,7 @@
         - tags_satellite_pre_idm_integration
         - tags_satellite_before_sync
 
-    - name: "Determine keytab download file"
+    - name: "Determine keytab download file" # noqa var-naming[no-role-prefix]
       ansible.builtin.set_fact:
         freeipa_keytab_file: "{{ fpr_prepare_realm.stdout_lines[-1].split()[-1] }}"
 
@@ -116,7 +116,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Test the new keytab" # noqa: no-changed-when risky-shell-pipe
+- name: "Test the new keytab" # noqa: no-changed-when risky-shell-pipe # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "kinit -kt /etc/foreman-proxy/freeipa.keytab {{ foreman_proxy_realm_principal }}"
   register: result
   tags:

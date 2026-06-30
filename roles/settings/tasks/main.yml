@@ -1,7 +1,7 @@
 ---
 # Configure the list of settings.
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "general"
   tags:
@@ -19,7 +19,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_general
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "rhcloud"
   tags:
@@ -37,7 +37,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_rhcloud
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "authentication"
   tags:
@@ -55,7 +55,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_authentication
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "email"
   tags:
@@ -73,7 +73,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_email
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "notifications"
   tags:
@@ -91,7 +91,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_notification
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "provisioning"
   tags:
@@ -109,7 +109,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_provisioning
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "facts"
   tags:
@@ -127,7 +127,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_facts
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "config_management"
   tags:
@@ -145,7 +145,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_config_management
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "tasks"
   tags:
@@ -163,7 +163,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_tasks
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "remote_execution"
   tags:
@@ -181,7 +181,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_remote_execution
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "ansible"
   tags:
@@ -199,7 +199,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_ansible
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "content"
   tags:
@@ -217,7 +217,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_content
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "boot_disk"
   tags:
@@ -235,7 +235,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_boot_disk
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "discovery"
   tags:
@@ -253,7 +253,7 @@
     - tags_satellite_settings
     - tags_satellite_settings_discovery
 
-- name: "Set the current section fact"
+- name: "Set the current section fact" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     _section_fact: "template_sync"
   tags:

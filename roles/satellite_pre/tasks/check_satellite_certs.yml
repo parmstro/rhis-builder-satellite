@@ -1,7 +1,7 @@
 ---
 
 # Verify the certs check out
-- name: "Checking the certificates for Satellite"
+- name: "Checking the certificates for Satellite" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "katello-certs-check -c {{ sat_ssl_crt_path }} -k {{ sat_ssl_key_path }} -b {{ sat_ssl_ca_crt_path }}"
   register: kcc_result
   changed_when: kcc_result == 0

@@ -13,7 +13,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Ensure the release is not set" # noqa: no-changed-when
+- name: "Ensure the release is not set" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "subscription-manager release --unset"
   register: sub_man_release_unset
   changed_when: sub_man_release_unset.rc == 0
@@ -22,7 +22,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Clean the yum metadata" # noqa: no-changed-when
+- name: "Clean the yum metadata" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "dnf clean all"
   register: dnf_clean_all
   changed_when: dnf_clean_all.rc == 0

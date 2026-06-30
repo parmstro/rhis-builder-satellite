@@ -31,7 +31,7 @@
     - tags_satellite_pre_chrony
     - tags_satellite_before_sync
 
-- name: "Ensure the time is synchronized"
+- name: "Ensure the time is synchronized" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "chronyc makestep" # noqa: no-changed-when
   register: makestep_result
   changed_when: makestep_result.rc == 0

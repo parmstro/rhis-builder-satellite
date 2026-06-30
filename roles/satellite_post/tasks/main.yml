@@ -4,7 +4,7 @@
 - name: "Disconnected Satellite post"
   when: satellite_disconnected
   block:
-    - name: "Ensure disconnected Satellite has subscription connection set to false"
+    - name: "Ensure disconnected Satellite has subscription connection set to false" # noqa var-naming[no-role-prefix]
       redhat.satellite.setting:
         username: "{{ satellite_username | default(omit) }}"
         password: "{{ satellite_password | default(omit) }}"
@@ -17,7 +17,7 @@
         - tags_satellite_post
         - tags_satellite_before_sync
 
-    - name: "Ensure organization cdn configuration is set"
+    - name: "Ensure organization cdn configuration is set"  # noqa var-naming[no-role-prefix]
       when: satellite_cdn_configuration_type == 'export_sync'
       ansible.builtin.command:
         cmd: "hammer organization configure-cdn --name='{{ satellite_organization }}' --type={{ satellite_cdn_configuration_type }}"

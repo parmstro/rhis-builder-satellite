@@ -13,7 +13,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Enable the CA trust" # noqa: no-changed-when risky-shell-pipe
+- name: "Enable the CA trust" # noqa: no-changed-when risky-shell-pipe # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "update-ca-trust enable"
   register: update_ca_trust_enable_result
   changed_when: update_ca_trust_enable_result.rc == 0
@@ -22,7 +22,7 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Update the CA trust" # noqa: no-changed-when risky-shell-pipe
+- name: "Update the CA trust" # noqa: no-changed-when risky-shell-pipe # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "update-ca-trust"
   register: update_ca_trust_result
   changed_when: update_ca_trust_result.rc == 0

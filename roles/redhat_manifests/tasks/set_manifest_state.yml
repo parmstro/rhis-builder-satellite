@@ -1,6 +1,6 @@
 ---
 # Set the basic manifest state - present or absent
-- name: "Set the manifest state"
+- name: "Set the manifest state" # noqa var-naming[no-role-prefix]
   redhat.satellite.redhat_manifest:
     portal: "{{ redhat_manifest.portal_url }}"
     username: "{{ redhat_manifest.cdn_username }}"

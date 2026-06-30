@@ -40,7 +40,6 @@
     - tags_satellite_before_sync
 
 - name: "Ensure satellite binaries are installed"
-  when: not satellite_disconnected
   ansible.builtin.import_tasks: ensure_sat_binaries.yml
   tags:
     - tags_satellite_pre

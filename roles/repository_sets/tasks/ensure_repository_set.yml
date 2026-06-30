@@ -29,4 +29,3 @@
     repositories: "{{ repository_set.repository_list | default(omit) }}"
     all_repositories: "{{ repository_set.repository_list is not defined }}"
     state: "{{ repository_set.state | default(omit) }}"
-  

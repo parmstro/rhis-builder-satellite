@@ -3,7 +3,7 @@
 # Set the basic system level tuning for satellite
 
 # Reasoning: satellite core information is stored in postgres database which performs poorly under TPH, same with redis
-- name: "Configure transparent huge pages to [never]"
+- name: "Configure transparent huge pages to [never]" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: 'grubby --args="transparent_hugepage=never" --update-kernel ALL'
   register: grubby_result
   changed_when: grubby_result.rc == 0
@@ -29,7 +29,7 @@
     - tags_satellite_pre
     - tags_satellite_before_sync
 
-- name: "Gather TPH status from kernel"
+- name: "Gather TPH status from kernel" # noqa var-naming[no-role-prefix]
   ansible.builtin.command:
     cmd: "cat /sys/kernel/mm/transparent_hugepage/enabled"
   register: tph_result
@@ -67,7 +67,7 @@
     - tags_satellite_pre
     - tags_satellite_before_sync
 
-- name: "Enable the profile"
+- name: "Enable the profile" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "tuned-adm profile satellite"
   register: tuned_adm_result
   changed_when: tuned_adm_result.rc == 0

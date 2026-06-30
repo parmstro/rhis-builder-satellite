@@ -7,13 +7,13 @@
 #    the content view has been set to force_publish
 # It expects to be called in a loop with a loop variable cv
 
-- name: "Ensure content meets publication requirements"
+- name: "Ensure content meets publication requirements" # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:
     publish_content: false                       # default to false - only publish when necessary
     hours_since_publication: 8766                # assume the last publication was long ago.. one year - 365.25 days
     exceeded_publication_threshold_hours: false  # assume we haven't exceeded the threshold
 
-- name: "Get content view info: {{ content_view.name }}"
+- name: "Get content view info: {{ content_view.name }}" # noqa var-naming[no-role-prefix]
   redhat.satellite.content_view_info:
     username: "{{ satellite_username | default(omit) }}"
     password: "{{ satellite_password | default(omit) }}"
@@ -26,7 +26,7 @@
   changed_when: false
 
 # Satellite returns the time for these values in UTC
-- name: "Determine hours since last publication time"
+- name: "Determine hours since last publication time" # noqa var-naming[no-role-prefix]
   when: cv_info.content_view.last_published
   ansible.builtin.set_fact:
     hours_since_publication: "{{ (now(utc=true) - (cv_info.content_view.last_published[:-4] | to_datetime)).seconds / 3600 | float }}"
@@ -35,21 +35,21 @@
   ansible.builtin.debug:
     var: hours_since_publication
 
-- name: "Determine if we have exceeded publication threshold hours"
+- name: "Determine if we have exceeded publication threshold hours" # noqa var-naming[no-role-prefix]
   when:
     - content_view.publication_threshold_hours is defined
     - (hours_since_publication|float) > (content_view.publication_threshold_hours|float)
   ansible.builtin.set_fact:
     exceeded_publication_threshold_hours: true
 
-- name: "If we have exceeded the threshold and skip_publish_all is false, Publish"
+- name: "If we have exceeded the threshold and skip_publish_all is false, Publish" # noqa var-naming[no-role-prefix]
   when:
     - exceeded_publication_threshold_hours
     - not skip_publish_all
   ansible.builtin.set_fact:
     publish_content: true
 
-- name: "If we been asked to force publish *this* content view, Publish"
+- name: "If we been asked to force publish *this* content view, Publish" # noqa var-naming[no-role-prefix]
   when: (content_view.force_publish is defined and content_view.force_publish)
   ansible.builtin.set_fact:
     publish_content: true
