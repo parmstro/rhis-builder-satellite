@@ -2,9 +2,24 @@
 # Validate the staged bundle structure.
 # Failures: missing manifest or Pulp chunks (import cannot proceed without them).
 # Warnings: missing optional artifacts (ansible_roles, discovery_images, ISOs).
-# The import script is responsible for setting satellite_roles_source_path,
-# satellite_disconnected_discovery_images_src, and satellite_disconnected_root in
-# host_vars using the bundle_delivery_bundle_path fact reported here.
+#
+# bundle_delivery_bundle_path  — set by usb.yml or push.yml; points to satellite/
+#   subdir on satellite (push) or on mounted drive (USB). Contains ansible_roles/
+#   and discovery_images/ for use by main.yml disconnected roles.
+#
+# _bd_manifest_path — set by usb.yml or push.yml; full path to rhis_export_manifest.yml
+#   on the satellite (push: moved to stage_path; USB: on mounted drive).
+
+- name: "Initialize Pulp search result variables"
+  ansible.builtin.set_fact:
+    _bd_chunks_found: false
+    _bd_chunks_stage: {matched: 0, files: []}
+    _bd_chunks_import: {matched: 0, files: []}
+    _bd_metadata_stage: {matched: 0, files: []}
+    _bd_metadata_import: {matched: 0, files: []}
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
 
 - name: "Assert bundle path is known"
   ansible.builtin.assert:
@@ -20,7 +35,7 @@
 
 - name: "Stat bundle manifest"
   ansible.builtin.stat:
-    path: "{{ bundle_delivery_bundle_path }}/rhis_disconnected_manifest.yml"
+    path: "{{ _bd_manifest_path }}"
   register: _bd_manifest_stat
   tags:
     - tags_bundle_delivery
@@ -31,9 +46,9 @@
     that: _bd_manifest_stat.stat.exists
     fail_msg: >
       Bundle manifest not found at:
-        {{ bundle_delivery_bundle_path }}/rhis_disconnected_manifest.yml
-      The bundle may be incomplete or corrupted. Re-run copy_rhis_to_transfer_media.sh
-      to regenerate the bundle on the lowside.
+        {{ _bd_manifest_path }}
+      The bundle may be incomplete or corrupted. Re-run export_deployment.sh
+      to regenerate the bundle on the lowside and re-transfer.
     success_msg: "Bundle manifest found"
   tags:
     - tags_bundle_delivery
@@ -44,19 +59,32 @@
     paths: "{{ bundle_delivery_pulp_stage_path }}"
     patterns: "*.tar.*"
     recurse: true
-  register: _bd_chunks_found
+  register: _bd_chunks_stage
+  failed_when: false
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_validate
 
-- name: "Assert Pulp chunks are present"
+- name: "Find Pulp content chunks under import path (already moved by content_imports)"
+  ansible.builtin.find:
+    paths: "{{ bundle_delivery_pulp_import_path }}"
+    patterns: "*.tar.*"
+    recurse: true
+  register: _bd_chunks_import
+  failed_when: false
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Assert Pulp chunks present in stage or import path"
   ansible.builtin.assert:
-    that: _bd_chunks_found.matched > 0
+    that: (_bd_chunks_stage.matched | default(0)) + (_bd_chunks_import.matched | default(0)) > 0
     fail_msg: >
-      No Pulp export chunks (*.tar.*) found under {{ bundle_delivery_pulp_stage_path }}.
+      No Pulp export chunks (*.tar.*) found under {{ bundle_delivery_pulp_stage_path }}
+      or {{ bundle_delivery_pulp_import_path }}.
       The content import will fail without these files. Verify the bundle was copied
-      completely by copy_rhis_to_transfer_media.sh and that all chunk files transferred.
-    success_msg: "{{ _bd_chunks_found.matched }} Pulp chunk(s) present"
+      completely by transfer_to_drive.sh and that all chunk files transferred.
+    success_msg: "Pulp chunks present (stage: {{ _bd_chunks_stage.matched | default(0) }}, import: {{ _bd_chunks_import.matched | default(0) }})"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_validate
@@ -66,16 +94,29 @@
     paths: "{{ bundle_delivery_pulp_stage_path }}"
     patterns: "metadata.json"
     recurse: true
-  register: _bd_metadata_found
+  register: _bd_metadata_stage
+  failed_when: false
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_validate
 
-- name: "Assert metadata.json is present"
+- name: "Find metadata.json under import path (already moved by content_imports)"
+  ansible.builtin.find:
+    paths: "{{ bundle_delivery_pulp_import_path }}"
+    patterns: "metadata.json"
+    recurse: true
+  register: _bd_metadata_import
+  failed_when: false
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_validate
+
+- name: "Assert metadata.json present in stage or import path"
   ansible.builtin.assert:
-    that: _bd_metadata_found.matched > 0
+    that: (_bd_metadata_stage.matched | default(0)) + (_bd_metadata_import.matched | default(0)) > 0
     fail_msg: >
-      metadata.json not found under {{ bundle_delivery_pulp_stage_path }}.
+      metadata.json not found under {{ bundle_delivery_pulp_stage_path }}
+      or {{ bundle_delivery_pulp_import_path }}.
       Satellite requires this file to process the import. The export bundle is incomplete.
     success_msg: "metadata.json found"
   tags:
@@ -121,7 +162,7 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_validate
 
-# ── Write outputs to provisioner for bash wrapper consumption ─────────────────
+# ── Write output for build_sat_disconnected_import.sh ─────────────────────────
 
 - name: "Write bundle path to provisioner"
   ansible.builtin.copy:
@@ -134,27 +175,18 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_validate
 
-- name: "Fetch _content_imports.yml from bundle to provisioner"
-  ansible.builtin.fetch:
-    src: "{{ bundle_delivery_bundle_path }}/_content_imports.yml"
-    dest: "/tmp/rhis_content_imports_fetch.yml"
-    flat: true
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_validate
-
 - name: "Report bundle delivery complete"
   ansible.builtin.debug:
     msg:
-      - "══════════════════════════════════════════════════════════════"
+      - "══════════════════════════════════════════════════════════════════"
       - " BUNDLE DELIVERY COMPLETE"
-      - "══════════════════════════════════════════════════════════════"
-      - " Bundle artifacts:  {{ bundle_delivery_bundle_path }}"
-      - " Pulp chunks staged: {{ bundle_delivery_pulp_stage_path }}"
-      - " Pulp chunks found:  {{ _bd_chunks_found.matched }}"
-      - " Chunks move to:     {{ bundle_delivery_pulp_import_path }} (post-installer, via content_imports)"
-      - "──────────────────────────────────────────────────────────────"
-      - " Set these in host_vars/{{ inventory_hostname }}/ before main.yml:"
+      - "══════════════════════════════════════════════════════════════════"
+      - " Satellite artifacts: {{ bundle_delivery_bundle_path }}"
+      - " Pulp chunks staged:  {{ bundle_delivery_pulp_stage_path }}"
+      - " Pulp chunks found:   stage={{ _bd_chunks_stage.matched | default(0) }}, import={{ _bd_chunks_import.matched | default(0) }}"
+      - " Chunks move to:      {{ bundle_delivery_pulp_import_path }} (post-installer, via content_imports)"
+      - "──────────────────────────────────────────────────────────────────"
+      - " These extra-vars are set for main.yml by build_sat_disconnected_import.sh:"
       - ""
       - "   satellite_disconnected: true"
       - "   satellite_disconnected_iso_prestaged: true"
@@ -162,15 +194,8 @@
       - "   satellite_import_content: true"
       - "   satellite_roles_source_path: {{ bundle_delivery_bundle_path }}/ansible_roles"
       - "   satellite_disconnected_discovery_images_src: {{ bundle_delivery_bundle_path }}/discovery_images"
-      - ""
-      - "   content_imports:"
-      - "     - name: Library"
-      - "       type: library"
-      - "       import_path: {{ bundle_delivery_pulp_import_path }}/<org>/<timestamp>/<id>"
-      - "       (copy _content_imports.yml from bundle with /exports/ → /imports/ prefix remap)"
       - "   satellite_bundle_stage_path: {{ bundle_delivery_pulp_stage_path }}"
-      - "       (content_imports role moves chunks to /var/lib/pulp/imports/ post-installer)"
-      - "══════════════════════════════════════════════════════════════"
+      - "══════════════════════════════════════════════════════════════════"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_validate

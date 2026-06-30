@@ -24,19 +24,19 @@
 #                  the provisioner over the highside network.
 #
 # After this playbook completes, the satellite has:
-#   - Pulp content chunks at /var/lib/pulp/imports/  (from USB drive or pushed by Ansible)
-#   - Bundle artifacts at bundle_delivery_stage_path/rhis_transfer_<timestamp>/
-#     (ISOs, ansible_roles, discovery_images, bootstrap_init, manifests)
+#   - Pulp content chunks at bundle_delivery_pulp_stage_path/<pulp_org>/ (pre-installer staging)
+#   - satellite/ artifacts at bundle_delivery_stage_path/satellite/ (push methods)
+#     or at bundle_delivery_usb_mount_path/satellite/ (USB — accessed directly from drive)
 #
-# The import script writes these paths into the satellite's host_vars before running
-# this playbook and main.yml:
-#   satellite_disconnected_root:                bundle_delivery_stage_path/rhis_transfer_<ts>
-#   satellite_roles_source_path:                bundle_delivery_stage_path/rhis_transfer_<ts>/ansible_roles
-#   satellite_disconnected_discovery_images_src: bundle_delivery_stage_path/rhis_transfer_<ts>/discovery_images
-#   satellite_disconnected_iso_prestaged:       true   (ISOs already on satellite after this play)
-#   satellite_import_content:                   true   (enable content_imports role in main.yml)
-#   content_imports.yml:                        _content_imports.yml from bundle with
-#                                               /exports/ → /imports/ prefix remap applied
+# build_sat_disconnected_import.sh reads bundle_delivery_bundle_path from
+# /tmp/rhis_bundle_path.txt (written by validate.yml) and sets these extra-vars for main.yml:
+#   satellite_disconnected_root:                bundle_delivery_bundle_path
+#   satellite_roles_source_path:                bundle_delivery_bundle_path/ansible_roles
+#   satellite_disconnected_discovery_images_src: bundle_delivery_bundle_path/discovery_images
+#   satellite_disconnected_iso_prestaged:       true
+#   satellite_import_content:                   true
+#   satellite_bundle_stage_path:                bundle_delivery_pulp_stage_path
+#   content_imports.yml is already in the inventory archive (C6 — pre-remapped at export time)
 
 - name: "Stage RHIS transfer bundle on highside satellite"
   hosts: sat_primary

@@ -1,33 +1,40 @@
 ---
 # export_disconnected.yml
 #
-# Orchestrates the lowside disconnected satellite export bundle assembly.
-# Called by build_sat_disconnected_export.sh from inside the rhis-provisioner container.
+# Runs the Pulp library export and pulls satellite-side artifacts into the
+# provisioner staging directory for the lowside disconnected export bundle.
+# Called by export_deployment.sh from inside the rhis-provisioner container.
 #
-# The Pulp library export chunks remain exactly where Satellite placed them:
-#   /var/lib/pulp/exports/<destination_server>/<org>/Library/<version>/
+# Pulp export chunks remain where Satellite places them:
+#   /var/lib/pulp/exports/<org>/<version>/<hostname>/<timestamp>/
 #
-# All additional bundle artifacts are staged in rhis_export_root on the satellite,
-# in a separate directory with no SELinux context concerns:
-#   <rhis_export_root>/<destination_server>_<timestamp>/
+# Satellite-sourced artifacts (ansible_roles, discovery_images) are pulled
+# from the satellite directly to the provisioner staging directory mounted
+# at /rhis/vars/export_staging/satellite/.
 #
-# The copy_rhis_to_transfer_media.sh script (Stage 2) assembles both locations
-# onto transfer media in a single operator action.
+# All other staging (containers, inventory archive, bootstrap, ISOs) is handled
+# by export_deployment.sh in bash after this playbook completes.
+#
+# REQUIRED MOUNTS (enforced by export_deployment.sh):
+#   /rhis/vars/highside_host_vars  — highside deployment host_vars/ directory
+#                                    Required for writing content_imports.yml (C6).
+#                                    deployments/<highside_domain>/host_vars/ on host.
+#   /rhis/vars/export_staging      — provisioner staging directory for this export run.
+#                                    Created by export_deployment.sh before Stage 1.
+#
+# REQUIRED EXTRA VARS:
+#   active_downstream_deployment   — FQDN of the target highside domain (e.g. highside.example.ca)
 
-- name: "Assemble disconnected satellite export bundle"
+- name: "Satellite Pulp export and artifact collection"
   hosts: sat_primary
   become: true
   gather_facts: true
 
   vars:
-    rhis_export_root: "/home/ansiblerunner/rhis_export"
-    rhis_provisioner_image: "quay.io/parmstro/rhis-provisioner-9-2.5:latest"
-    _bundle_timestamp: "{{ ansible_date_time.date }}_{{ ansible_date_time.hour }}{{ ansible_date_time.minute }}"
-    _manifests_src: "files/manifests"    # override with --extra-vars when running via export_deployment.sh
     _ansible_roles_src: "/etc/ansible/roles"
     _ansible_playbooks_src: "/etc/ansible/playbooks"
     _discovery_image_dir: "/var/lib/tftpboot/boot"
-    _bootstrap_init_src: "/home/ansiblerunner/rhis/rhis-builder-bootstrap-init"
+    _export_staging: "/rhis/vars/export_staging"
 
   tasks:
 
@@ -43,15 +50,17 @@
         dir: "{{ vars_dir }}"
       tags: always
 
-    # ── Pre: Mount transfer drive ───────────────────────────────────────────
+    # ── Pre: Reset Pulp export marker for fresh run ────────────────────────
+    # Tagged tags_content_exports so this is skipped during --skip-tags resume,
+    # preserving the marker for downstream reference.
 
-    - name: "Pre — Prepare export drive"
-      ansible.builtin.import_role:
-        name: content_export_prepare_drv
-      vars:
-        content_export_prepare_drv_state: "present"
+    - name: "Pre — Remove stale Pulp export marker"
+      ansible.builtin.file:
+        path: "/rhis/vars/logs/.pulp_export_complete"
+        state: absent
+      delegate_to: localhost
+      connection: local
       tags:
-        - tags_export_drive
         - tags_content_exports
 
     # ── Step 1: Content export ──────────────────────────────────────────────
@@ -63,278 +72,115 @@
         - tags_content_config
         - tags_content_exports
 
-    # Resolve the Pulp export path — destination_server is optional
-    - name: "Resolve bundle destination name"
+    # ── Checkpoint: Write Pulp export completion marker ────────────────────
+    # Records export timestamp and Pulp API path so export_deployment.sh can
+    # detect a prior successful export and skip re-running it on resume.
+    # Tagged tags_content_exports — skipped during --skip-tags resume runs.
+
+    - name: "Checkpoint — Write Pulp export completion marker"
+      ansible.builtin.copy:
+        content: |
+          export_timestamp: "{{ ansible_date_time.iso8601 }}"
+          pulp_export_path: "{{ _export_path | default('') }}"
+        dest: "/rhis/vars/logs/.pulp_export_complete"
+        mode: "0644"
+      delegate_to: localhost
+      connection: local
+      tags:
+        - tags_content_exports
+
+    - name: "Resolve Pulp export root"
       ansible.builtin.set_fact:
-        _destination_server: "{{ content_exports[0].destination_server | default(content_exports[0].name) }}"
-        _bundle_dir: "{{ rhis_export_root }}/{{ content_exports[0].destination_server | default(content_exports[0].name) }}_{{ _bundle_timestamp }}"
         _pulp_export_root: "/var/lib/pulp/exports/{{ content_exports[0].destination_server | default('') }}"
 
-    - name: "Show bundle staging directory"
+    - name: "Show Pulp export root"
       ansible.builtin.debug:
-        msg:
-          - "Bundle directory: {{ _bundle_dir }}"
-          - "Pulp export root: {{ _pulp_export_root }}"
+        msg: "Pulp export root: {{ _pulp_export_root }}"
 
-    # ── Step 2: Create bundle staging directories ───────────────────────────
+    # ── Step 2: Pull Ansible roles from satellite to provisioner staging ───
 
-    - name: "Step 2 — Create bundle staging directories"
-      ansible.builtin.file:
-        path: "{{ item }}"
-        state: directory
-        mode: "0755"
-        owner: "ansiblerunner"
-        group: "ansiblerunner"
-      loop:
-        - "{{ rhis_export_root }}"
-        - "{{ _bundle_dir }}"
-        - "{{ _bundle_dir }}/ansible_roles"
-        - "{{ _bundle_dir }}/bootstrap_init"
-        - "{{ _bundle_dir }}/discovery_images"
-        - "{{ _bundle_dir }}/manifests"
-        - "{{ _bundle_dir }}/inventory"
-        - "{{ _bundle_dir }}/container"
+    - name: "Step 2 — Check for Ansible roles on satellite"
+      ansible.builtin.stat:
+        path: "{{ _ansible_roles_src }}"
+      register: _roles_stat
 
-    # ── Step 3: Sync compliance-as-code Ansible roles ──────────────────────
-
-    - name: "Step 3 — Sync Ansible roles to bundle"
+    - name: "Step 2 — Pull Ansible roles to staging"
+      when: _roles_stat.stat.exists
       ansible.posix.synchronize:
         src: "{{ _ansible_roles_src }}/"
-        dest: "{{ _bundle_dir }}/ansible_roles/"
+        dest: "{{ _export_staging }}/satellite/ansible_roles/"
+        mode: pull
         recursive: true
         delete: false
-        mode: push
 
-    - name: "Step 3 — Check for Ansible playbooks directory"
+    - name: "Step 2 — Check for Ansible playbooks on satellite"
       ansible.builtin.stat:
         path: "{{ _ansible_playbooks_src }}"
       register: _playbooks_stat
 
-    - name: "Step 3 — Sync Ansible playbooks to bundle"
+    - name: "Step 2 — Pull Ansible playbooks to staging"
       when: _playbooks_stat.stat.exists
       ansible.posix.synchronize:
         src: "{{ _ansible_playbooks_src }}/"
-        dest: "{{ _bundle_dir }}/ansible_roles/playbooks/"
+        dest: "{{ _export_staging }}/satellite/ansible_roles/playbooks/"
+        mode: pull
         recursive: true
         delete: false
-        mode: push
 
-    # ── Step 3b: Copy rhis-builder-bootstrap-init ─────────────────────────
-    # Provides the highside operator with tooling to generate kickstart ISOs
-    # for unattended RHEL installs on bare metal or VMware (upload ISO to vCenter).
-    # Required on the highside before IdM and Satellite nodes can be provisioned.
-
-    - name: "Step 3b — Check for rhis-builder-bootstrap-init"
-      ansible.builtin.stat:
-        path: "{{ _bootstrap_init_src }}"
-      register: _bootstrap_init_stat
-      delegate_to: localhost
-      connection: local
-
-    - name: "Step 3b — Sync rhis-builder-bootstrap-init to bundle"
-      when: _bootstrap_init_stat.stat.exists
-      ansible.posix.synchronize:
-        src: "{{ _bootstrap_init_src }}/"
-        dest: "{{ _bundle_dir }}/bootstrap_init/"
-        recursive: true
-        delete: false
-        mode: push
-        rsync_opts:
-          - "--exclude=.git"
-
-    - name: "Step 3b — Warn if rhis-builder-bootstrap-init not found"
-      when: not _bootstrap_init_stat.stat.exists
+    - name: "Step 2 — Warn if no Ansible roles found"
+      when: not _roles_stat.stat.exists
       ansible.builtin.debug:
         msg: >
-          WARNING: rhis-builder-bootstrap-init not found at {{ _bootstrap_init_src }}.
-          The highside operator will not have kickstart ISO tooling in the bundle.
-          Clone the repo to {{ _bootstrap_init_src }} before running the export.
+          WARNING: {{ _ansible_roles_src }} not found on satellite.
+          Ansible roles will not be in the export staging.
 
-    # ── Step 4: Copy Foreman discovery images ──────────────────────────────
+    # ── Step 3: Pull Foreman discovery images from satellite to staging ────
 
-    - name: "Step 4 — Find Foreman discovery images"
+    - name: "Step 3 — Find Foreman discovery images on satellite"
       ansible.builtin.find:
         paths: "{{ _discovery_image_dir }}"
-        patterns: "foreman*"
+        patterns: "fdi-image-*.tar"
         file_type: file
       register: _discovery_images
 
-    - name: "Step 4 — Copy discovery images to bundle"
-      ansible.builtin.copy:
+    - name: "Step 3 — Pull discovery images to staging"
+      ansible.builtin.fetch:
         src: "{{ item.path }}"
-        dest: "{{ _bundle_dir }}/discovery_images/"
-        remote_src: true
-        mode: "0644"
+        dest: "{{ _export_staging }}/satellite/discovery_images/"
+        flat: true
+        validate_checksum: false
       loop: "{{ _discovery_images.files }}"
       loop_control:
         label: "{{ item.path | basename }}"
 
-    - name: "Step 4 — Warn if no discovery images found"
+    - name: "Step 3 — Warn if no discovery images found"
       when: _discovery_images.files | length == 0
       ansible.builtin.debug:
-        msg: "WARNING: No Foreman discovery images found in {{ _discovery_image_dir }}."
-
-    # ── Step 5: Copy highside subscription manifests ────────────────────────
-
-    - name: "Step 5 — Find highside manifests"
-      ansible.builtin.find:
-        paths: "{{ _manifests_src }}"
-        patterns: "*.zip"
-      register: _manifests
-      delegate_to: localhost
-      connection: local
-
-    - name: "Step 5 — Copy highside manifests to bundle"
-      ansible.builtin.copy:
-        src: "{{ item.path }}"
-        dest: "{{ _bundle_dir }}/manifests/{{ item.path | basename }}"
-        mode: "0644"
-      loop: "{{ _manifests.files }}"
-      loop_control:
-        label: "{{ item.path | basename }}"
-
-    - name: "Step 5 — Warn if no manifests found"
-      when: _manifests.files | length == 0
-      ansible.builtin.debug:
         msg: >
-          WARNING: No manifest ZIP files found in {{ _manifests_src }}.
-          Copy highside subscription manifests to files/manifests/ before transfer.
+          WARNING: No Foreman discovery images found in {{ _discovery_image_dir }}.
+          Foreman discovery will need images from the Satellite DVD on the highside.
 
-    # ── Step 6: Archive the inventory ──────────────────────────────────────
-    # Two-step: archive locally on the controller, then copy to satellite.
-    # The archive module runs on the controller (provisioner container) so dest
-    # must be a local path. A subsequent copy pushes it to the satellite bundle.
+    # ── Step 4: Record lowside versions for manifest ───────────────────────────
+    # Written to a sidecar in provisioner staging; export_deployment.sh reads it
+    # when assembling rhis_export_manifest.yml so the highside can validate
+    # version compatibility before running pulpcore-worker.
 
-    - name: "Step 6 — Create inventory archive on controller"
-      community.general.archive:
-        path: "{{ inventory_dir | default('/rhis/vars') }}"
-        dest: "/tmp/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
-        format: gz
-        mode: "0644"
-      delegate_to: localhost
-      connection: local
-
-    - name: "Step 6 — Copy inventory archive to satellite bundle"
-      ansible.builtin.copy:
-        src: "/tmp/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
-        dest: "{{ _bundle_dir }}/inventory/rhis_inventory_{{ _bundle_timestamp }}.tar.gz"
-        mode: "0644"
-
-    # ── Step 7: Copy container image into the satellite bundle ─────────────
-    # The image tar is saved by export_deployment.sh on the provisioner host
-    # BEFORE launching the container (Option A — avoids the chicken-and-egg
-    # problem of calling podman from inside the provisioner container).
-    # export_deployment.sh passes provisioner_image_tar as an extra-var and
-    # mounts the tar into the container at that path.
-
-    - name: "Step 7 — Copy container image to satellite bundle"
-      when: provisioner_image_tar is defined and provisioner_image_tar | length > 0
-      ansible.builtin.copy:
-        src: "{{ provisioner_image_tar }}"
-        dest: "{{ _bundle_dir }}/container/rhis-provisioner_{{ _bundle_timestamp }}.tar"
-        mode: "0644"
-
-    - name: "Step 7 — Warn if container image tar not provided"
-      when: provisioner_image_tar is not defined or provisioner_image_tar | length == 0
-      ansible.builtin.debug:
-        msg:
-          - "WARNING: provisioner_image_tar not set — container image not included in bundle."
-          - "Use export_deployment.sh to run the export, or save manually before transferring:"
-          - "  podman save {{ rhis_provisioner_image }} -o <bundle>/container/rhis-provisioner.tar"
-
-    # ── Step 8: (Removed) ──────────────────────────────────────────────────
-    #
-    # Git SHA collection per role was removed. Rationale:
-    #
-    # The operator is responsible for ensuring /etc/ansible/roles/ contains
-    # what they tested. Roles may have uncommitted local modifications that
-    # git rev-parse HEAD would not reflect, producing a SHA that does not
-    # accurately describe the exported content.
-    #
-    # The authoritative record of what was exported is:
-    #   1. The role files themselves, copied faithfully by Step 3 (synchronize)
-    #   2. The per-file SHA256 checksums in the manifest (Step 9), which cover
-    #      every file in the bundle including all role files
-    #
-    # Per-file checksums at the bundle level provide complete integrity
-    # verification without any dependency on git history or commit state.
-
-    # ── Step 9: Compute checksums and write manifest ────────────────────────
-
-    - name: "Step 9 — Find all bundle files for checksumming"
-      ansible.builtin.find:
-        paths: "{{ _bundle_dir }}"
-        recurse: true
-        file_type: file
-      register: _bundle_files
-
-    - name: "Step 9 — Compute SHA256 checksums"
-      ansible.builtin.stat:
-        path: "{{ item.path }}"
-        checksum_algorithm: sha256
-        get_checksum: true
-      loop: "{{ _bundle_files.files }}"
-      loop_control:
-        label: "{{ item.path | replace(_bundle_dir + '/', '') }}"
-      register: _checksums
-
-    - name: "Step 9 — Write rhis_disconnected_manifest.yml"
-      ansible.builtin.template:
-        src: "rhis_disconnected_manifest.yml.j2"
-        dest: "{{ _bundle_dir }}/rhis_disconnected_manifest.yml"
-        mode: "0644"
-        owner: "ansiblerunner"
-        group: "ansiblerunner"
-      vars:
-        _manifest_timestamp: "{{ ansible_date_time.iso8601 }}"
-        _satellite_fqdn: "{{ ansible_fqdn }}"
-        _satellite_version: "{{ ansible_local.foreman.server.version | default('unknown') }}"
-        _manifest_list: "{{ _manifests.files | map(attribute='path') | map('basename') | list }}"
-        _checksum_results: "{{ _checksums.results }}"
-        _bundle_path: "{{ _bundle_dir }}"
-        _pulp_path: "{{ _pulp_export_root }}"
-
-    # ── Step 10: Write operator checklist ──────────────────────────────────
-
-    - name: "Step 10 — Write pre-transfer checklist"
-      ansible.builtin.template:
-        src: "rhis_export_checklist.md.j2"
-        dest: "{{ _bundle_dir }}/RHIS_Export_Checklist_{{ _bundle_timestamp }}.md"
-        mode: "0644"
-        owner: "ansiblerunner"
-        group: "ansiblerunner"
-      vars:
-        _manifest_list: "{{ _manifests.files | map(attribute='path') | map('basename') | list }}"
-        _discovery_count: "{{ _discovery_images.files | length }}"
-        _bundle_path: "{{ _bundle_dir }}"
-        _pulp_path: "{{ _pulp_export_root }}"
-        _export_timestamp: "{{ ansible_date_time.iso8601 }}"
-        _satellite_fqdn: "{{ ansible_fqdn }}"
-
-- name: "Unmount transfer drive — runs whether export succeeded or failed"
-  hosts: sat_primary
-  become: true
-  gather_facts: false
-
-  tasks:
-
-    - name: "Load vault variables"
-      when: vault_dir is defined
-      ansible.builtin.include_vars:
-        dir: "{{ vault_dir }}"
-      tags: always
-
-    - name: "Unmount transfer drive"
-      ansible.builtin.import_role:
-        name: content_export_prepare_drv
-      vars:
-        content_export_prepare_drv_state: "absent"
+    - name: "Step 4 — Gather package facts from satellite"
+      ansible.builtin.package_facts:
+        manager: rpm
       tags:
-        - tags_export_drive
         - tags_content_exports
 
-    - name: "Transfer drive cleanup complete"
-      ansible.builtin.debug:
-        msg:
-          - "Transfer drive unmounted or was not mounted — satellite is clean."
-          - "The drive may now be safely removed and transferred to the highside."
+    - name: "Step 4 — Write export version facts to staging"
+      ansible.builtin.copy:
+        content: |
+          satellite_version: "{{ (ansible_facts.packages['satellite'] | default([{'version': 'unknown'}]))[0].version }}"
+          pulpcore_version: "{{ (ansible_facts.packages['python3-pulpcore'] | default([{'version': 'unknown'}]))[0].version }}"
+          pulp_rpm_version: "{{ (ansible_facts.packages['python3-pulp-rpm'] | default([{'version': 'unknown'}]))[0].version }}"
+          pulp_file_version: "{{ (ansible_facts.packages['python3-pulp-file'] | default([{'version': 'unknown'}]))[0].version }}"
+        dest: "{{ _export_staging }}/_version_facts.yml"
+        mode: "0644"
+      delegate_to: localhost
+      connection: local
+      tags:
+        - tags_content_exports

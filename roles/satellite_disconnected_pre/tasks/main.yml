@@ -96,7 +96,7 @@
     - tags_satellite_pre
     - tags_satellite_before_sync
 
-- name: "Refresh the repos"
+- name: "Refresh the repos" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "dnf repolist"
   register: repolist_out
   changed_when: repolist_out.rc == 0
@@ -123,7 +123,7 @@
     - tags_satellite_before_sync
 
 # Copy installation files to disconnected satellite
-- name: "Install satellite binaries from DVD"
+- name: "Install satellite binaries from DVD" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "{{ satellite_install_repo_mount }}/install_packages"
   args:
     chdir: "{{ satellite_install_repo_mount }}"

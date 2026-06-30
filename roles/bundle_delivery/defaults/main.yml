@@ -29,9 +29,9 @@ bundle_delivery_usb_mount_path: "/mnt/rhis_transfer_drv"
 # ── push settings (virtual_disk and rsync) ────────────────────────────────────
 
 # Source path on the provisioner (Ansible controller inside the container).
-#   virtual_disk: mount point of the attached disk image (e.g. /mnt/rhis_transfer)
+#   virtual_disk: path where operator rsync'd all drive content (e.g. /home/ansiblerunner/rhis_transfer)
 #   rsync:        staging dir where operator rsync'd the bundle
-bundle_delivery_source_path: "/mnt/rhis_transfer"
+bundle_delivery_source_path: "/home/ansiblerunner/rhis_transfer"
 
 # Temporary incoming area on the satellite (ansiblerunner-writable, must be on /var).
 # Chunks land here first via SSH push, then root local-rsync moves them to pulp_stage_path.
@@ -52,12 +52,6 @@ bundle_delivery_pulp_stage_path: "/var/satellite_stage/pulp_stage"
 # Final Pulp import path — where chunks must reside when content_imports runs.
 # Referenced in validate output only; the move happens inside the content_imports role.
 bundle_delivery_pulp_import_path: "/var/lib/pulp/imports"
-
-# ── shared settings ───────────────────────────────────────────────────────────
-
-# Bundle directory name (e.g. rhis_transfer_20260601_120000).
-# If empty, auto-discovered from the source (USB: drive mount; push: source path).
-bundle_delivery_bundle_dir: ""
 
 # ── Internal constants ─────────────────────────────────────────────────────────
 

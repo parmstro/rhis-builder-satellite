@@ -6,6 +6,8 @@
 #
 # Source satellite: {{ ansible_fqdn }}
 
+satellite_import_content: true
+
 content_imports:
 {% for item in content_imports %}
   - name: "{{ item.name }}"

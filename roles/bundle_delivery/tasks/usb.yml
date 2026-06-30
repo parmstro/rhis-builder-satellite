@@ -3,8 +3,9 @@
 # Discover the drive by label, validate filesystem, mount at a safe pre-installer path.
 # Pulp chunks are copied from the drive to bundle_delivery_pulp_stage_path so they
 # survive after the drive is removed and are available post-installer for content_imports.
-# The drive stays mounted for artifact access (ISOs, ansible_roles, discovery_images)
-# during the satellite build. pulp user and /var/lib/pulp/imports do not exist yet.
+# The drive stays mounted so satellite/ artifacts (ansible_roles, discovery_images)
+# are accessible directly during the satellite build.
+# pulp user and /var/lib/pulp/imports do not exist until satellite-installer runs.
 
 - name: "Discover transfer drive by label {{ bundle_delivery_drv_label }}"
   ansible.builtin.command:
@@ -130,39 +131,34 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_usb
 
-- name: "Auto-discover bundle directory on drive"
-  when: bundle_delivery_bundle_dir == ""
-  ansible.builtin.shell:
-    cmd: "set -o pipefail && ls -td {{ bundle_delivery_usb_mount_path }}/rhis_transfer_*/ 2>/dev/null | head -1 | tr -d '\n'"
-    executable: /bin/bash
-  register: _bd_auto_bundle
-  changed_when: false
-  failed_when: _bd_auto_bundle.stdout | trim == ""
+# ── Read manifest to identify Pulp org dir ────────────────────────────────────
+
+- name: "Read bundle manifest from drive"
+  ansible.builtin.slurp:
+    src: "{{ bundle_delivery_usb_mount_path }}/rhis_export_manifest.yml"
+  register: _bd_manifest_slurp
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_usb
 
-- name: "Set bundle path fact (auto-discovered)"
-  when: bundle_delivery_bundle_dir == ""
+- name: "Set Pulp org dir from manifest"
   ansible.builtin.set_fact:
-    bundle_delivery_bundle_path: "{{ _bd_auto_bundle.stdout | trim | regex_replace('/$', '') }}"
+    _bd_pulp_export_path: "{{ (_bd_manifest_slurp.content | b64decode | from_yaml).pulp_export_path | default('') }}"
+    _bd_pulp_org_dir: "{{ ((_bd_manifest_slurp.content | b64decode | from_yaml).pulp_export_path | default(''))
+                          | regex_replace('^/var/lib/pulp/exports/([^/]+)/.*$', '\\1') }}"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_usb
 
-- name: "Set bundle path fact (explicit)"
-  when: bundle_delivery_bundle_dir != ""
-  ansible.builtin.set_fact:
-    bundle_delivery_bundle_path: "{{ bundle_delivery_usb_mount_path }}/{{ bundle_delivery_bundle_dir }}"
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_usb
-
-- name: "Assert bundle directory exists on drive"
-  ansible.builtin.stat:
-    path: "{{ bundle_delivery_bundle_path }}"
-  register: _bd_bundle_dir_stat
-  failed_when: not _bd_bundle_dir_stat.stat.exists or not _bd_bundle_dir_stat.stat.isdir
+- name: "Assert Pulp org dir was found in manifest"
+  ansible.builtin.assert:
+    that:
+      - _bd_pulp_org_dir | length > 0
+      - _bd_pulp_org_dir != _bd_pulp_export_path
+    fail_msg: >
+      Pulp org directory could not be determined from rhis_export_manifest.yml on the drive.
+      pulp_export_path in the manifest is empty or malformed.
+      Ensure the drive was prepared with transfer_to_drive.sh on the lowside.
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_usb
@@ -170,20 +166,21 @@
 - name: "Display USB drive and bundle summary"
   ansible.builtin.debug:
     msg:
-      - "Device:  {{ _bd_drv_device }}"
-      - "UUID:    {{ _bd_drv_uuid }}"
-      - "Mount:   {{ bundle_delivery_usb_mount_path }}"
-      - "Bundle:  {{ bundle_delivery_bundle_path }}"
-      - "Chunks → {{ bundle_delivery_pulp_stage_path }}"
+      - "Device:     {{ _bd_drv_device }}"
+      - "UUID:       {{ _bd_drv_uuid }}"
+      - "Mount:      {{ bundle_delivery_usb_mount_path }}"
+      - "Pulp org:   {{ _bd_pulp_org_dir }}"
+      - "Chunks  →   {{ bundle_delivery_pulp_stage_path }}/{{ _bd_pulp_org_dir }}"
+      - "Artifacts → {{ bundle_delivery_usb_mount_path }}/satellite (accessed directly from drive)"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_usb
 
 # ── Copy Pulp chunks from drive to pre-installer safe staging path ─────────────
-# Chunk directories are named after the Pulp org (e.g. Default_Organization/).
-# rhis_transfer_* dirs are artifacts — excluded here, accessed directly on drive.
+# Chunk directory is the Pulp org dir (e.g. Default_Organization/).
 # This copy is required because /var/lib/pulp/imports and the pulp user do not
 # exist until satellite-installer runs. content_imports moves them post-installer.
+# satellite/ artifacts remain on the drive and are accessed directly.
 
 - name: "Ensure Pulp chunk staging path exists"
   ansible.builtin.file:
@@ -196,13 +193,23 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_usb
 
-- name: "Copy Pulp chunks from drive to staging path — Please wait..."  # noqa command-instead-of-module
+- name: "Copy Pulp org dir from drive to staging path — Please wait..."  # noqa command-instead-of-module
   ansible.builtin.command:
     cmd: >
-      rsync -a --exclude=rhis_transfer_*
-      {{ bundle_delivery_usb_mount_path }}/
-      {{ bundle_delivery_pulp_stage_path }}/
+      rsync -a
+      {{ bundle_delivery_usb_mount_path }}/{{ _bd_pulp_org_dir }}/
+      {{ bundle_delivery_pulp_stage_path }}/{{ _bd_pulp_org_dir }}/
   changed_when: true
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_usb
+
+# ── Set output facts for validate.yml and build_sat_disconnected_import.sh ────
+
+- name: "Set bundle path and manifest path facts"
+  ansible.builtin.set_fact:
+    bundle_delivery_bundle_path: "{{ bundle_delivery_usb_mount_path }}/satellite"
+    _bd_manifest_path: "{{ bundle_delivery_usb_mount_path }}/rhis_export_manifest.yml"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_usb

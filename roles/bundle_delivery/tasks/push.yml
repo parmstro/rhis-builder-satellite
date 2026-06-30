@@ -5,21 +5,28 @@
 #   rsync        — operator rsync'd the USB drive contents to bundle_delivery_source_path
 #                  over the highside network; no disk attachment needed.
 #
+# C3 layout at bundle_delivery_source_path:
+#   satellite/        — ansible_roles/, discovery_images/
+#   provisioner/      — containers/, inventory/
+#   bootstrap/        — bootstrap_isos/, infra_isos/, rhis-builder-bootstrap-init/
+#   <pulp_org>/       — Pulp export chunks (virtual_disk only; not present for rsync)
+#   rhis_export_manifest.yml
+#
 # Two-step data movement (required because ansible.posix.synchronize does not honour
 # become — it uses the SSH connection user):
 #
 #   Step 1: SSH push (no root) from provisioner → bundle_delivery_incoming_path on satellite.
 #           incoming_path is created as ansiblerunner-owned so the SSH user can write there.
 #
-#   Step 2: Root local rsync (ansible.builtin.command, become: true) on satellite moves:
-#           - Pulp chunks   → bundle_delivery_pulp_import_path
-#           - Bundle artifacts → bundle_delivery_stage_path / <bundle_dir>
+#   Step 2: Root mv on satellite moves:
+#           - satellite/ subdir → bundle_delivery_stage_path/satellite/
+#           - <pulp_org>/ subdir → bundle_delivery_pulp_stage_path/<pulp_org>/ (virtual_disk only)
 #           incoming_path is removed to recover space.
 #
 # Space requirement on /var of the highside satellite:
-#   1x Pulp export size (incoming_path, temporary)
-#   1x Pulp export size (pulp_import_path, permanent until import completes)
-#   1x bundle artifacts (stage_path, permanent — ISOs, roles, discovery_images)
+#   1x satellite/ artifacts (stage_path/satellite/, permanent — roles, discovery images)
+#   1x Pulp export size (incoming_path, temporary — virtual_disk only; rsync skips Pulp here)
+#   1x Pulp export size (pulp_stage_path, permanent until content_imports runs)
 
 - name: "Assert source path is set"
   ansible.builtin.assert:
@@ -55,52 +62,23 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-- name: "Auto-discover bundle directory on provisioner"
-  when: bundle_delivery_bundle_dir == ""
-  ansible.builtin.shell:
-    cmd: "set -o pipefail && ls -td {{ bundle_delivery_source_path }}/rhis_transfer_*/ 2>/dev/null | head -1 | tr -d '\n'"
-    executable: /bin/bash
-  register: _bd_auto_bundle_ctrl
+# ── Read manifest to identify Pulp org dir ────────────────────────────────────
+
+- name: "Read bundle manifest from source path"
+  ansible.builtin.slurp:
+    src: "{{ bundle_delivery_source_path }}/rhis_export_manifest.yml"
+  register: _bd_manifest_slurp
   delegate_to: localhost
   connection: local
-  changed_when: false
-  failed_when: _bd_auto_bundle_ctrl.stdout | trim == ""
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-- name: "Set controller bundle path (auto-discovered)"
-  when: bundle_delivery_bundle_dir == ""
+- name: "Set Pulp org dir from manifest"
   ansible.builtin.set_fact:
-    _bd_ctrl_bundle_path: "{{ _bd_auto_bundle_ctrl.stdout | trim | regex_replace('/$', '') }}"
-    _bd_bundle_dir_name: "{{ _bd_auto_bundle_ctrl.stdout | trim | regex_replace('/$', '') | basename }}"
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_push
-
-- name: "Set controller bundle path (explicit)"
-  when: bundle_delivery_bundle_dir != ""
-  ansible.builtin.set_fact:
-    _bd_ctrl_bundle_path: "{{ bundle_delivery_source_path }}/{{ bundle_delivery_bundle_dir }}"
-    _bd_bundle_dir_name: "{{ bundle_delivery_bundle_dir }}"
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_push
-
-- name: "Assert controller bundle directory exists"
-  ansible.builtin.stat:
-    path: "{{ _bd_ctrl_bundle_path }}"
-  register: _bd_ctrl_bundle_stat
-  delegate_to: localhost
-  connection: local
-  failed_when: not _bd_ctrl_bundle_stat.stat.exists or not _bd_ctrl_bundle_stat.stat.isdir
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_push
-
-- name: "Set satellite-side bundle path fact"
-  ansible.builtin.set_fact:
-    bundle_delivery_bundle_path: "{{ bundle_delivery_stage_path }}/{{ _bd_bundle_dir_name }}"
+    _bd_pulp_export_path: "{{ (_bd_manifest_slurp.content | b64decode | from_yaml).pulp_export_path | default('') }}"
+    _bd_pulp_org_dir: "{{ ((_bd_manifest_slurp.content | b64decode | from_yaml).pulp_export_path | default(''))
+                          | regex_replace('^/var/lib/pulp/exports/([^/]+)/.*$', '\\1') }}"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
@@ -108,12 +86,12 @@
 - name: "Display push delivery plan"
   ansible.builtin.debug:
     msg:
-      - "Method:       {{ bundle_delivery_method }}"
-      - "Source:       {{ bundle_delivery_source_path }}"
-      - "Bundle dir:   {{ _bd_bundle_dir_name }}"
-      - "Incoming:     {{ bundle_delivery_incoming_path }}"
-      - "Pulp chunks → {{ bundle_delivery_pulp_stage_path }} (staged pre-installer)"
-      - "Artifacts  → {{ bundle_delivery_bundle_path }}"
+      - "Method:      {{ bundle_delivery_method }}"
+      - "Source:      {{ bundle_delivery_source_path }}"
+      - "Pulp org:    {{ _bd_pulp_org_dir }}"
+      - "Incoming:    {{ bundle_delivery_incoming_path }}"
+      - "Pulp stage:  {{ bundle_delivery_pulp_stage_path }}/{{ _bd_pulp_org_dir }}"
+      - "Artifacts:   {{ bundle_delivery_stage_path }}/satellite"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
@@ -131,9 +109,20 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-- name: "Ensure satellite stage path exists"
+- name: "Ensure satellite artifact staging dir exists"
   ansible.builtin.file:
     path: "{{ bundle_delivery_stage_path }}"
+    state: directory
+    owner: root
+    group: root
+    mode: "0755"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+- name: "Ensure Pulp pre-installer staging dir exists"
+  ansible.builtin.file:
+    path: "{{ bundle_delivery_pulp_stage_path }}"
     state: directory
     owner: root
     group: root
@@ -145,64 +134,143 @@
 # ── Step 2: SSH push from provisioner to satellite incoming dir ────────────────
 # ansible.posix.synchronize does not honour become — files arrive owned by the
 # SSH user (ansiblerunner). The incoming_path is ansiblerunner-owned to allow this.
+#
+# Only push what the satellite actually needs:
+#   rsync        — satellite/ and manifest only (Pulp went directly from workstation)
+#   virtual_disk — satellite/, manifest, AND the Pulp org dir (everything came via provisioner)
+# bootstrap/ (ISOs) and provisioner/ (containers) are NOT pushed — they are not
+# needed on the satellite and are very large.
 
-- name: "Push bundle content from provisioner to satellite incoming dir — Please wait..."
+- name: "Set push filter for rsync delivery (satellite artifacts only)"
+  when: bundle_delivery_method == 'rsync'
+  ansible.builtin.set_fact:
+    _bd_push_rsync_opts:
+      - "--include=satellite/"
+      - "--include=satellite/**"
+      - "--include=rhis_export_manifest.yml"
+      - "--exclude=*"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+- name: "Set push filter for virtual_disk delivery (satellite artifacts + Pulp org dir)"
+  when: bundle_delivery_method == 'virtual_disk'
+  ansible.builtin.set_fact:
+    _bd_push_rsync_opts:
+      - "--include={{ _bd_pulp_org_dir }}/"
+      - "--include={{ _bd_pulp_org_dir }}/**"
+      - "--include=satellite/"
+      - "--include=satellite/**"
+      - "--include=rhis_export_manifest.yml"
+      - "--exclude=*"
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+- name: "Push required artifacts from provisioner to satellite incoming dir — Please wait..."
   ansible.posix.synchronize:
     src: "{{ bundle_delivery_source_path }}/"
     dest: "{{ bundle_delivery_incoming_path }}/"
     recursive: true
     delete: false
     mode: push
+    rsync_opts: "{{ _bd_push_rsync_opts }}"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-# ── Step 3: Root local rsync — stage Pulp chunks to pre-installer safe path ───
-# Chunks go to bundle_delivery_pulp_stage_path, NOT /var/lib/pulp/imports.
-# The pulp user and /var/lib/pulp/imports do not exist until satellite-installer runs.
-# The content_imports role moves chunks to /var/lib/pulp/imports/ post-installer.
+# ── Step 3: Root mv on satellite — stage artifacts and Pulp to correct paths ───
+# Pulp org dir moved to pulp_stage_path (virtual_disk only — for rsync it was
+# pushed directly to satellite by import_bundle.yml and is not in incoming).
+# satellite/ subdir moved to bundle_delivery_stage_path/satellite.
 
-- name: "Create Pulp chunk staging path on satellite"
-  ansible.builtin.file:
-    path: "{{ bundle_delivery_pulp_stage_path }}"
-    state: directory
-    owner: root
-    group: root
-    mode: "0755"
+- name: "Check if Pulp org dir is in incoming (virtual_disk delivery)"
+  ansible.builtin.stat:
+    path: "{{ bundle_delivery_incoming_path }}/{{ _bd_pulp_org_dir }}"
+  register: _bd_pulp_in_incoming
+  when: _bd_pulp_org_dir | length > 0
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-- name: "Stage Pulp chunks to pre-installer staging path (root rsync)"  # noqa command-instead-of-module
+- name: "Move Pulp org dir to pre-installer staging path (virtual_disk)"
+  when:
+    - _bd_pulp_org_dir | length > 0
+    - _bd_pulp_in_incoming.stat.exists | default(false)
   ansible.builtin.command:
     cmd: >
-      rsync -a --exclude=rhis_transfer_*
-      {{ bundle_delivery_incoming_path }}/
-      {{ bundle_delivery_pulp_stage_path }}/
+      mv {{ bundle_delivery_incoming_path }}/{{ _bd_pulp_org_dir }}
+         {{ bundle_delivery_pulp_stage_path }}/{{ _bd_pulp_org_dir }}
   changed_when: true
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-# ── Step 4: Root local rsync — move bundle artifacts to stage path ─────────────
+- name: "Check if satellite artifacts already staged"
+  ansible.builtin.stat:
+    path: "{{ bundle_delivery_stage_path }}/satellite"
+  register: _bd_sat_staged
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
 
-- name: "Move bundle artifacts to stage path (root rsync)"  # noqa command-instead-of-module
+- name: "Move satellite artifacts to stage path"
+  when: not _bd_sat_staged.stat.exists
   ansible.builtin.command:
     cmd: >
-      rsync -a
-      {{ bundle_delivery_incoming_path }}/{{ _bd_bundle_dir_name }}/
-      {{ bundle_delivery_bundle_path }}/
+      mv {{ bundle_delivery_incoming_path }}/satellite
+         {{ bundle_delivery_stage_path }}/satellite
   changed_when: true
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-# ── Step 5: Remove incoming staging area to recover space ─────────────────────
+- name: "Check if manifest already staged"
+  ansible.builtin.stat:
+    path: "{{ bundle_delivery_stage_path }}/rhis_export_manifest.yml"
+  register: _bd_manifest_staged
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+- name: "Move manifest to stage path for validate.yml access"
+  when: not _bd_manifest_staged.stat.exists
+  ansible.builtin.command:
+    cmd: >
+      mv {{ bundle_delivery_incoming_path }}/rhis_export_manifest.yml
+         {{ bundle_delivery_stage_path }}/rhis_export_manifest.yml
+  changed_when: true
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+# ── Step 4: Remove incoming staging area to recover space ─────────────────────
+
+- name: "Install ansible roles to /etc/ansible/roles/"
+  ansible.builtin.command:
+    cmd: >
+      rsync -a {{ bundle_delivery_stage_path }}/satellite/ansible_roles/
+            /etc/ansible/roles/
+  become: true
+  changed_when: true
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
 
 - name: "Remove incoming staging directory"
   ansible.builtin.file:
     path: "{{ bundle_delivery_incoming_path }}"
     state: absent
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
+
+# ── Set output facts for validate.yml and build_sat_disconnected_import.sh ────
+
+- name: "Set bundle delivery path fact"
+  ansible.builtin.set_fact:
+    bundle_delivery_bundle_path: "{{ bundle_delivery_stage_path }}/satellite"
+    _bd_manifest_path: "{{ bundle_delivery_stage_path }}/rhis_export_manifest.yml"
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push

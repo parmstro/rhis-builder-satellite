@@ -39,7 +39,7 @@
         - always
 
     - name: "Apply role of satellite_pre to disconnected satellite {{ ansible_fqdn }}"
-      when: satellite_disconnected
+      when: satellite_disconnected and not (satellite_disconnected_http_repos | default(false))
       ansible.builtin.include_role:
         name: satellite_disconnected_pre
       tags:
@@ -210,6 +210,15 @@
         - tags_post_publication
         - tags_provisioning_config
         - tags_provisioning_templates
+
+    - name: "Configure job templates"
+      ansible.builtin.import_role:
+        name: job_templates
+      tags:
+        - tags_post_sync
+        - tags_post_publication
+        - tags_provisioning_config
+        - tags_job_templates
 
     - name: "Synchronized satellite template repositories"
       ansible.builtin.import_role:

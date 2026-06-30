@@ -12,6 +12,7 @@
 # Different export types (library, cv_version, repository) write to different
 # path structures — querying the API by history ID gives the correct path
 # regardless of type.
+
 - name: "Get export path from Satellite API"
   redhat.satellite.resource_info:
     username: "{{ satellite_username | default(omit) }}"
@@ -22,14 +23,14 @@
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
     resource: content_exports
     search: "id = {{ export_result.task.output.export_history_id }}"
-  register: _export_history
+  register: _export_history  # noqa var-naming[no-role-prefix]
   tags:
     - tags_content_config
     - tags_content_exports
 
 - name: "Set export path fact"
   ansible.builtin.set_fact:
-    _export_path: "{{ _export_history.resources[0].path }}"
+    _export_path: "{{ _export_history.resources[0].path }}" # noqa var-naming[no-role-prefix]
   tags:
     - tags_content_config
     - tags_content_exports
@@ -40,7 +41,7 @@
 # over stale pre-loaded items that lack the 'type' key and fail.
 - name: "Reset content_imports to empty list for this export"
   ansible.builtin.set_fact:
-    content_imports: []
+    content_imports: [] # noqa var-naming[no-role-prefix]
   tags:
     - tags_content_config
     - tags_content_exports
@@ -48,62 +49,40 @@
 # Build the dict in a single task with direct assignment — NOT with a loop and combine().
 # Ansible's set_fact + combine() in a loop silently drops keys due to variable
 # scoping behaviour across iterations. Direct assignment is unambiguous and atomic.
+# We are taking the path that Satellite provided and mapping to the corresponding import path and metadata file path for the content_imports.yml structure.
+# The highside operator will have a functioning import path without needing to reconfigure.
 - name: "Create the content_import dictionary item"
   ansible.builtin.set_fact:
-    content_import_dict:
+    content_import_dict: # noqa var-naming[no-role-prefix]
       name: "{{ content_export.name }}"
       type: "{{ content_export.type }}"
-      import_path: "{{ _export_path }}"
-      metadata_file: "{{ _export_path }}/metadata.json"
+      import_path: "{{ _export_path | replace('/var/lib/pulp/exports/', '/var/lib/pulp/imports/') }}"
+      metadata_file: "{{ _export_path | replace('/var/lib/pulp/exports/', '/var/lib/pulp/imports/') }}/metadata.json"
   tags:
     - tags_content_config
     - tags_content_exports
 
 - name: "Append the content_import item to content_imports list"
   ansible.builtin.set_fact:
-    content_imports: "{{ content_imports | default([]) + [content_import_dict] }}"
+    content_imports: "{{ content_imports | default([]) + [content_import_dict] }}" # noqa var-naming[no-role-prefix]
   tags:
     - tags_content_config
     - tags_content_exports
 
 - name: "Update the timestamp value"
   ansible.builtin.set_fact:
-    generation_datetime: "{{ ansible_date_time.iso8601 }}"
+    generation_datetime: "{{ ansible_date_time.iso8601 }}" # noqa var-naming[no-role-prefix]
   tags:
     - tags_content_config
     - tags_content_exports
 
-- name: "Set default destination"
-  ansible.builtin.set_fact:
-    destination: "rhis_import_export_data"
-
-- name: "Determine if destination server value exists"
-  when: destination_server is defined and (destination_server | length) > 0
-  ansible.builtin.set_fact:
-    destination: "{{ destination_server }}"
-
-- name: "Ensure the destination path exists"
-  when: destination is defined and (destination | length) > 0
-  ansible.builtin.file:
-    path: "/var/lib/pulp/exports/{{ destination }}/"
-    state: "directory"
-    mode: "0644"
-    owner: "pulp"
-    group: "pulp"
-    seuser: "system_u"
-    serole: "object_r"
-    setype: "pulpcore_var_lib_t"
-    selevel: "s0"  # system_u:object_r:pulpcore_var_lib_t:s0
-
-- name: "Rewrite the content_imports.yml file"
-  when: destination is defined and (destination | length) > 0
+- name: "Write content_imports.yml to highside deployment host_vars"
   ansible.builtin.template:
     src: "content_imports.j2"
-    dest: "/var/lib/pulp/exports/{{ destination }}/{{ generation_datetime }}_content_imports.yml"
+    dest: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
     mode: "0644"
-    owner: "pulp"
-    group: "pulp"
-    seuser: "system_u"
-    serole: "object_r"
-    setype: "pulpcore_var_lib_t"
-    selevel: "s0"  # system_u:object_r:pulpcore_var_lib_t:s0
+  delegate_to: localhost
+  connection: local
+  tags:
+    - tags_content_config
+    - tags_content_exports
