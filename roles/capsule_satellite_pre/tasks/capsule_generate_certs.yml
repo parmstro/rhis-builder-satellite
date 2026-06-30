@@ -302,7 +302,7 @@
         - tags_capsule_pre
 
     - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals for {{ cert_capsule.fqdn }}"
-      ansible.builtin.shell: "kinit -kt {{ _local_keytab }} {{ ipa_admin_principal }}; ipa-getcert start-tracking -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      ansible.builtin.shell: "kinit -kt {{ _local_keytab }} {{ ipa_admin_principal }}; ipa-getcert start-tracking -c IPA -k {{ capsule_key_path }} -f {{ capsule_crt_path }} -I {{ cert_capsule.fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_start_tracking_result
       changed_when: gc_start_tracking_result.rc ==0
       tags:
