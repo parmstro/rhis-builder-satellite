@@ -193,7 +193,7 @@
       changed_when: gc_gen_crt_result.rc ==0
 
     - name: "Ensure that certmonger starts-tracking the new certificate for autorenewals"  # noqa var-naming[no-role-prefix]
-      ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking c IPA -k {{ host_ssl_key_path }} -f {{ host_ssl_crt_path }} -I {{ crt_service_type }}.{{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
+      ansible.builtin.shell: "kinit -kt {{ host_ssl_certs_dir }}local.keytab {{ ipa_admin_principal }}; ipa-getcert start-tracking -r -k {{ host_ssl_key_path }} -f {{ host_ssl_crt_path }} -I {{ crt_service_type }}.{{ ansible_fqdn }}" # noqa: yaml[line-length] risky-shell-pipe no-changed-when
       register: gc_start_tracking_result
       changed_when: gc_start_tracking_result.rc ==0
 
