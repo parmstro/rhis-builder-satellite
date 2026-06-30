@@ -1,0 +1,42 @@
+---
+# reset_import_library.yml
+#
+# Resets the highside Satellite Library import to a clean state for re-import or testing.
+#
+# Called by build_sat_disconnected_import.sh (or directly) from inside the
+# rhis-provisioner container running on the highside.
+#
+# Three cleanup steps in sequence:
+#   1. Delete all Import-Library content import history records from the Satellite API.
+#   2. Delete the Import-Library content view (all versions, then the CV itself).
+#   3. Remove /var/lib/pulp/imports/<org_label>/Import-Library/ from the filesystem.
+#
+# All steps guard on presence — safe to run when no Library import exists.
+# After this playbook completes, the satellite is in the same state as before
+# any library import was performed.
+
+- name: "Reset Satellite Import-Library to clean state"
+  hosts: sat_primary
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: "Load vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+      tags: always
+
+    - name: "Load host variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
+      tags: always
+
+    - name: "Run reset_import_library role"
+      ansible.builtin.include_role:
+        name: reset_import_library
+      tags:
+        - tags_content_config
+        - tags_reset_import_library

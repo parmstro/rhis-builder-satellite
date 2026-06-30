@@ -1,0 +1,5 @@
+---
+
+# All required variables (satellite_url, satellite_username, satellite_password,
+# satellite_organization, satellite_validate_certs) are expected from inventory.
+# No role-specific defaults are needed.

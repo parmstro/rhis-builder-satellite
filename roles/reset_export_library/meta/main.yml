@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Reset the Export-Library on a lowside Satellite — deletes export history records, Export-Library content view and versions, and purges the filesystem export tree"
+  standalone: false

@@ -1,0 +1,23 @@
+---
+
+- name: "Check if Import-Library import directory exists"
+  ansible.builtin.stat:
+    path: "/var/lib/pulp/imports/{{ _reset_org_label }}/Import-Library"
+  become: true
+  register: _import_lib_dir
+
+- name: "Report filesystem state"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        'Removing /var/lib/pulp/imports/' + _reset_org_label + '/Import-Library'
+        if _import_lib_dir.stat.exists
+        else 'No Import-Library directory found — filesystem already clean'
+      }}
+
+- name: "Remove Import-Library directory tree"
+  when: _import_lib_dir.stat.exists
+  ansible.builtin.file:
+    path: "/var/lib/pulp/imports/{{ _reset_org_label }}/Import-Library"
+    state: absent
+  become: true

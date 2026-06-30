@@ -1,0 +1,42 @@
+---
+# reset_export_library.yml
+#
+# Resets the lowside Satellite Library export to a clean state for re-export or testing.
+#
+# Called by build_sat_disconnected_export.sh (or directly) from inside the
+# rhis-provisioner container.
+#
+# Three cleanup steps in sequence:
+#   1. Delete all Export-Library content export history records from the Satellite API.
+#   2. Delete the Export-Library content view (all versions, then the CV itself).
+#   3. Remove /var/lib/pulp/exports/<org_label>/Export-Library/ from the filesystem.
+#
+# All steps guard on presence — safe to run when no Library export exists.
+# After this playbook completes, the satellite is in the same state as before
+# any library export was performed.
+
+- name: "Reset Satellite Export-Library to clean state"
+  hosts: sat_primary
+  become: true
+  gather_facts: true
+
+  tasks:
+
+    - name: "Load vault variables"
+      when: vault_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vault_dir }}"
+      tags: always
+
+    - name: "Load host variables"
+      when: vars_dir is defined
+      ansible.builtin.include_vars:
+        dir: "{{ vars_dir }}"
+      tags: always
+
+    - name: "Run reset_export_library role"
+      ansible.builtin.include_role:
+        name: reset_export_library
+      tags:
+        - tags_content_config
+        - tags_reset_export_library

@@ -1,0 +1,46 @@
+---
+
+# Reset the Satellite Import-Library.
+# Removes all import history records for the Library import, deletes the
+# Import-Library content view and all its versions, and purges the corresponding
+# /var/lib/pulp/imports/<org_label>/Import-Library/ directory tree.
+# Safe to run when no Library import exists — all steps guard on presence.
+
+- name: "Get organization info to derive filesystem path label"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: organizations
+    search: "name = \"{{ satellite_organization }}\""
+  register: _org_info
+  tags:
+    - tags_content_config
+    - tags_reset_import_library
+
+- name: "Set organization label fact"
+  ansible.builtin.set_fact:
+    _reset_org_label: "{{ _org_info.resources[0].label }}"
+  tags:
+    - tags_content_config
+    - tags_reset_import_library
+
+- name: "Delete Import-Library content import history"
+  ansible.builtin.include_tasks: "delete_import_history.yml"
+  tags:
+    - tags_content_config
+    - tags_reset_import_library
+
+- name: "Delete Import-Library content view and all versions"
+  ansible.builtin.include_tasks: "delete_import_cv.yml"
+  tags:
+    - tags_content_config
+    - tags_reset_import_library
+
+- name: "Clean up Import-Library filesystem content"
+  ansible.builtin.include_tasks: "cleanup_filesystem.yml"
+  tags:
+    - tags_content_config
+    - tags_reset_import_library

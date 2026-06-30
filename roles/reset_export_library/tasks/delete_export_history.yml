@@ -1,0 +1,24 @@
+---
+
+# Export history records live in katello_content_view_version_export_histories and
+# are cascade-deleted when the Export-Library content view is deleted.
+# This task queries and reports the count for operator visibility only.
+
+- name: "Find all Export-Library content views (bare and destination_server-slug variants)"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: content_views
+    search: "name ~ \"Export-Library\""
+  register: _export_cv_check
+
+- name: "Report Export-Library content views found"
+  ansible.builtin.debug:
+    msg: >-
+      Found {{ _export_cv_check.resources | length }} Export-Library CV(s):
+      {{ _export_cv_check.resources | map(attribute='name') | list }}.
+      Export history records will be cascade-deleted with each CV.

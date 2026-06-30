@@ -1,0 +1,29 @@
+---
+
+- name: "Find all Export-Library export directories (bare and destination_server-slug variants)"
+  ansible.builtin.find:
+    paths: "/var/lib/pulp/exports/{{ _reset_org_label }}"
+    patterns: "Export-Library*"
+    file_type: directory
+    recurse: false
+  become: true
+  register: _export_lib_dirs
+
+- name: "Report filesystem state"
+  ansible.builtin.debug:
+    msg: >-
+      {{
+        'Found ' + (_export_lib_dirs.files | length | string) + ' Export-Library director(ies) to remove: '
+        + (_export_lib_dirs.files | map(attribute='path') | list | string)
+        if _export_lib_dirs.files | length > 0
+        else 'No Export-Library directories found — filesystem already clean'
+      }}
+
+- name: "Remove Export-Library directory trees"
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    state: absent
+  loop: "{{ _export_lib_dirs.files }}"
+  loop_control:
+    label: "{{ item.path }}"
+  become: true

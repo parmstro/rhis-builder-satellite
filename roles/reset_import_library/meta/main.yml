@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Reset the Import-Library on a highside Satellite — deletes import history records, Import-Library content view and versions, and purges the filesystem import tree"
+  standalone: false

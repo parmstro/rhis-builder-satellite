@@ -1,0 +1,37 @@
+---
+
+# Import history records are cascade-deleted when the Import-Library content view
+# is deleted. This task queries and reports the count for operator visibility only.
+
+- name: "Check whether Import-Library content view exists"
+  redhat.satellite.resource_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    resource: content_views
+    search: "name = \"Import-Library\""
+  register: _import_cv_check
+
+- name: "Query Import-Library content import history records"
+  when: _import_cv_check.resources | length > 0
+  redhat.satellite.content_import_info:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    content_view: "Import-Library"
+  register: _import_history
+
+- name: "Report import history records (will be cascade-deleted with the CV)"
+  when: _import_cv_check.resources | length > 0
+  ansible.builtin.debug:
+    msg: >-
+      Found {{ _import_history.content_imports | default([]) | length }}
+      Import-Library history record(s) — ids:
+      {{ _import_history.content_imports | default([]) | map(attribute='id') | list }}.
+      These will be removed by cascade when the Import-Library content view is deleted.
