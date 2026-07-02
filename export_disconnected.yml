@@ -50,137 +50,203 @@
         dir: "{{ vars_dir }}"
       tags: always
 
-    # ── Pre: Reset Pulp export marker for fresh run ────────────────────────
-    # Tagged tags_content_exports so this is skipped during --skip-tags resume,
-    # preserving the marker for downstream reference.
+    # ── Pre: Gather enabled sync plans before export ───────────────────────
+    # Gathered outside the block so _enabled_sync_plans is always available
+    # in the always section for re-enable, even on failure.
 
-    - name: "Pre — Remove stale Pulp export marker"
-      ansible.builtin.file:
-        path: "/rhis/vars/logs/.pulp_export_complete"
-        state: absent
-      delegate_to: localhost
-      connection: local
+    - name: "Pre — Gather currently enabled sync plans"
+      redhat.satellite.resource_info:
+        username: "{{ satellite_username | default(omit) }}"
+        password: "{{ satellite_password | default(omit) }}"
+        use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+        server_url: "{{ satellite_url }}"
+        organization: "{{ satellite_organization }}"
+        validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+        resource: sync_plans
+        search: "enabled = true"
+      register: _enabled_sync_plans
       tags:
         - tags_content_exports
 
-    # ── Step 1: Content export ──────────────────────────────────────────────
-
-    - name: "Step 1 — Run content_exports role (Library)"
-      ansible.builtin.import_role:
-        name: content_exports
-      tags:
-        - tags_content_config
-        - tags_content_exports
-
-    # ── Checkpoint: Write Pulp export completion marker ────────────────────
-    # Records export timestamp and Pulp API path so export_deployment.sh can
-    # detect a prior successful export and skip re-running it on resume.
-    # Tagged tags_content_exports — skipped during --skip-tags resume runs.
-
-    - name: "Checkpoint — Write Pulp export completion marker"
-      ansible.builtin.copy:
-        content: |
-          export_timestamp: "{{ ansible_date_time.iso8601 }}"
-          pulp_export_path: "{{ _export_path | default('') }}"
-        dest: "/rhis/vars/logs/.pulp_export_complete"
-        mode: "0644"
-      delegate_to: localhost
-      connection: local
-      tags:
-        - tags_content_exports
-
-    - name: "Resolve Pulp export root"
-      ansible.builtin.set_fact:
-        _pulp_export_root: "/var/lib/pulp/exports/{{ content_exports[0].destination_server | default('') }}"
-
-    - name: "Show Pulp export root"
-      ansible.builtin.debug:
-        msg: "Pulp export root: {{ _pulp_export_root }}"
-
-    # ── Step 2: Pull Ansible roles from satellite to provisioner staging ───
-
-    - name: "Step 2 — Check for Ansible roles on satellite"
-      ansible.builtin.stat:
-        path: "{{ _ansible_roles_src }}"
-      register: _roles_stat
-
-    - name: "Step 2 — Pull Ansible roles to staging"
-      when: _roles_stat.stat.exists
-      ansible.posix.synchronize:
-        src: "{{ _ansible_roles_src }}/"
-        dest: "{{ _export_staging }}/satellite/ansible_roles/"
-        mode: pull
-        recursive: true
-        delete: false
-
-    - name: "Step 2 — Check for Ansible playbooks on satellite"
-      ansible.builtin.stat:
-        path: "{{ _ansible_playbooks_src }}"
-      register: _playbooks_stat
-
-    - name: "Step 2 — Pull Ansible playbooks to staging"
-      when: _playbooks_stat.stat.exists
-      ansible.posix.synchronize:
-        src: "{{ _ansible_playbooks_src }}/"
-        dest: "{{ _export_staging }}/satellite/ansible_roles/playbooks/"
-        mode: pull
-        recursive: true
-        delete: false
-
-    - name: "Step 2 — Warn if no Ansible roles found"
-      when: not _roles_stat.stat.exists
-      ansible.builtin.debug:
-        msg: >
-          WARNING: {{ _ansible_roles_src }} not found on satellite.
-          Ansible roles will not be in the export staging.
-
-    # ── Step 3: Pull Foreman discovery images from satellite to staging ────
-
-    - name: "Step 3 — Find Foreman discovery images on satellite"
-      ansible.builtin.find:
-        paths: "{{ _discovery_image_dir }}"
-        patterns: "fdi-image-*.tar"
-        file_type: file
-      register: _discovery_images
-
-    - name: "Step 3 — Pull discovery images to staging"
-      ansible.builtin.fetch:
-        src: "{{ item.path }}"
-        dest: "{{ _export_staging }}/satellite/discovery_images/"
-        flat: true
-        validate_checksum: false
-      loop: "{{ _discovery_images.files }}"
+    - name: "Pre — Disable sync plans for export"
+      redhat.satellite.sync_plan:
+        username: "{{ satellite_username | default(omit) }}"
+        password: "{{ satellite_password | default(omit) }}"
+        use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+        server_url: "{{ satellite_url }}"
+        organization: "{{ satellite_organization }}"
+        validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+        name: "{{ _sync_plan.name }}"
+        interval: "{{ _sync_plan.interval }}"
+        sync_date: "{{ _sync_plan.sync_date }}"
+        enabled: false
+        state: present
+      loop: "{{ _enabled_sync_plans.resources }}"
       loop_control:
-        label: "{{ item.path | basename }}"
-
-    - name: "Step 3 — Warn if no discovery images found"
-      when: _discovery_images.files | length == 0
-      ansible.builtin.debug:
-        msg: >
-          WARNING: No Foreman discovery images found in {{ _discovery_image_dir }}.
-          Foreman discovery will need images from the Satellite DVD on the highside.
-
-    # ── Step 4: Record lowside versions for manifest ───────────────────────────
-    # Written to a sidecar in provisioner staging; export_deployment.sh reads it
-    # when assembling rhis_export_manifest.yml so the highside can validate
-    # version compatibility before running pulpcore-worker.
-
-    - name: "Step 4 — Gather package facts from satellite"
-      ansible.builtin.package_facts:
-        manager: rpm
+        loop_var: _sync_plan
+        label: "{{ _sync_plan.name }}"
       tags:
         - tags_content_exports
 
-    - name: "Step 4 — Write export version facts to staging"
-      ansible.builtin.copy:
-        content: |
-          satellite_version: "{{ (ansible_facts.packages['satellite'] | default([{'version': 'unknown'}]))[0].version }}"
-          pulpcore_version: "{{ (ansible_facts.packages['python3-pulpcore'] | default([{'version': 'unknown'}]))[0].version }}"
-          pulp_rpm_version: "{{ (ansible_facts.packages['python3-pulp-rpm'] | default([{'version': 'unknown'}]))[0].version }}"
-          pulp_file_version: "{{ (ansible_facts.packages['python3-pulp-file'] | default([{'version': 'unknown'}]))[0].version }}"
-        dest: "{{ _export_staging }}/_version_facts.yml"
-        mode: "0644"
-      delegate_to: localhost
-      connection: local
-      tags:
-        - tags_content_exports
+    - name: "Export — run content export and collect artifacts"
+      block:
+
+        # ── Pre: Reset Pulp export marker for fresh run ──────────────────────
+        # Tagged tags_content_exports so this is skipped during --skip-tags resume,
+        # preserving the marker for downstream reference.
+
+        - name: "Pre — Remove stale Pulp export marker"
+          ansible.builtin.file:
+            path: "/rhis/vars/logs/.pulp_export_complete"
+            state: absent
+          delegate_to: localhost
+          connection: local
+          tags:
+            - tags_content_exports
+
+        # ── Step 1: Content export ────────────────────────────────────────────
+
+        - name: "Step 1 — Run content_exports role (Library)"
+          ansible.builtin.import_role:
+            name: content_exports
+          tags:
+            - tags_content_config
+            - tags_content_exports
+
+        # ── Checkpoint: Write Pulp export completion marker ──────────────────
+        # Records export timestamp and Pulp API path so export_deployment.sh can
+        # detect a prior successful export and skip re-running it on resume.
+        # Tagged tags_content_exports — skipped during --skip-tags resume runs.
+
+        - name: "Checkpoint — Write Pulp export completion marker"
+          ansible.builtin.copy:
+            content: |
+              export_timestamp: "{{ ansible_date_time.iso8601 }}"
+              pulp_export_path: "{{ _export_path | default('') }}"
+            dest: "/rhis/vars/logs/.pulp_export_complete"
+            mode: "0644"
+          delegate_to: localhost
+          connection: local
+          tags:
+            - tags_content_exports
+
+        - name: "Resolve Pulp export root"
+          ansible.builtin.set_fact:
+            _pulp_export_root: "/var/lib/pulp/exports/{{ content_exports[0].destination_server | default('') }}"
+
+        - name: "Show Pulp export root"
+          ansible.builtin.debug:
+            msg: "Pulp export root: {{ _pulp_export_root }}"
+
+        # ── Step 2: Pull Ansible roles from satellite to provisioner staging ─
+
+        - name: "Step 2 — Check for Ansible roles on satellite"
+          ansible.builtin.stat:
+            path: "{{ _ansible_roles_src }}"
+          register: _roles_stat
+
+        - name: "Step 2 — Pull Ansible roles to staging"
+          when: _roles_stat.stat.exists
+          ansible.posix.synchronize:
+            src: "{{ _ansible_roles_src }}/"
+            dest: "{{ _export_staging }}/satellite/ansible_roles/"
+            mode: pull
+            recursive: true
+            delete: false
+
+        - name: "Step 2 — Check for Ansible playbooks on satellite"
+          ansible.builtin.stat:
+            path: "{{ _ansible_playbooks_src }}"
+          register: _playbooks_stat
+
+        - name: "Step 2 — Pull Ansible playbooks to staging"
+          when: _playbooks_stat.stat.exists
+          ansible.posix.synchronize:
+            src: "{{ _ansible_playbooks_src }}/"
+            dest: "{{ _export_staging }}/satellite/ansible_roles/playbooks/"
+            mode: pull
+            recursive: true
+            delete: false
+
+        - name: "Step 2 — Warn if no Ansible roles found"
+          when: not _roles_stat.stat.exists
+          ansible.builtin.debug:
+            msg: >
+              WARNING: {{ _ansible_roles_src }} not found on satellite.
+              Ansible roles will not be in the export staging.
+
+        # ── Step 3: Pull Foreman discovery images from satellite to staging ──
+
+        - name: "Step 3 — Find Foreman discovery images on satellite"
+          ansible.builtin.find:
+            paths: "{{ _discovery_image_dir }}"
+            patterns: "fdi-image-*.tar"
+            file_type: file
+          register: _discovery_images
+
+        - name: "Step 3 — Pull discovery images to staging"
+          ansible.builtin.fetch:
+            src: "{{ item.path }}"
+            dest: "{{ _export_staging }}/satellite/discovery_images/"
+            flat: true
+            validate_checksum: false
+          loop: "{{ _discovery_images.files }}"
+          loop_control:
+            label: "{{ item.path | basename }}"
+
+        - name: "Step 3 — Warn if no discovery images found"
+          when: _discovery_images.files | length == 0
+          ansible.builtin.debug:
+            msg: >
+              WARNING: No Foreman discovery images found in {{ _discovery_image_dir }}.
+              Foreman discovery will need images from the Satellite DVD on the highside.
+
+        # ── Step 4: Record lowside versions for manifest ─────────────────────
+        # Written to a sidecar in provisioner staging; export_deployment.sh reads it
+        # when assembling rhis_export_manifest.yml so the highside can validate
+        # version compatibility before running pulpcore-worker.
+
+        - name: "Step 4 — Gather package facts from satellite"
+          ansible.builtin.package_facts:
+            manager: rpm
+          tags:
+            - tags_content_exports
+
+        - name: "Step 4 — Write export version facts to staging"
+          ansible.builtin.copy:
+            content: |
+              satellite_version: "{{ (ansible_facts.packages['satellite'] | default([{'version': 'unknown'}]))[0].version }}"
+              pulpcore_version: "{{ (ansible_facts.packages['python3-pulpcore'] | default([{'version': 'unknown'}]))[0].version }}"
+              pulp_rpm_version: "{{ (ansible_facts.packages['python3-pulp-rpm'] | default([{'version': 'unknown'}]))[0].version }}"
+              pulp_file_version: "{{ (ansible_facts.packages['python3-pulp-file'] | default([{'version': 'unknown'}]))[0].version }}"
+            dest: "{{ _export_staging }}/_version_facts.yml"
+            mode: "0644"
+          delegate_to: localhost
+          connection: local
+          tags:
+            - tags_content_exports
+
+      always:
+
+        # ── Post: Re-enable sync plans ───────────────────────────────────────
+        # Runs on success and failure. Guarded by _enabled_sync_plans being defined
+        # so a --skip-tags tags_content_exports resume run is a clean no-op here.
+
+        - name: "Post — Re-enable sync plans"
+          when: _enabled_sync_plans is defined
+          redhat.satellite.sync_plan:
+            username: "{{ satellite_username | default(omit) }}"
+            password: "{{ satellite_password | default(omit) }}"
+            use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+            server_url: "{{ satellite_url }}"
+            organization: "{{ satellite_organization }}"
+            validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+            name: "{{ _sync_plan.name }}"
+            interval: "{{ _sync_plan.interval }}"
+            sync_date: "{{ _sync_plan.sync_date }}"
+            enabled: true
+            state: present
+          loop: "{{ _enabled_sync_plans.resources | default([]) }}"
+          loop_control:
+            loop_var: _sync_plan
+            label: "{{ _sync_plan.name }}"
