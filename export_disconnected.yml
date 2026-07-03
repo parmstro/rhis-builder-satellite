@@ -139,34 +139,84 @@
             msg: "Pulp export root: {{ _pulp_export_root }}"
 
         # ── Step 2: Pull Ansible roles from satellite to provisioner staging ─
+        # Uses tar/fetch/unarchive rather than synchronize — synchronize spawns
+        # its own rsync SSH subprocess that does not inherit the Ansible private
+        # key, causing a password prompt in the container context.
 
         - name: "Step 2 — Check for Ansible roles on satellite"
           ansible.builtin.stat:
             path: "{{ _ansible_roles_src }}"
           register: _roles_stat
 
-        - name: "Step 2 — Pull Ansible roles to staging"
+        - name: "Step 2 — Archive Ansible roles on satellite"
+          ansible.builtin.command:
+            cmd: "tar czf /tmp/ansible_roles_export.tar.gz -C {{ _ansible_roles_src }} ."
           when: _roles_stat.stat.exists
-          ansible.posix.synchronize:
-            src: "{{ _ansible_roles_src }}/"
+          changed_when: true
+
+        - name: "Step 2 — Fetch Ansible roles archive to staging"
+          ansible.builtin.fetch:
+            src: /tmp/ansible_roles_export.tar.gz
+            dest: "{{ _export_staging }}/satellite/"
+            flat: true
+          when: _roles_stat.stat.exists
+
+        - name: "Step 2 — Extract Ansible roles to staging"
+          ansible.builtin.unarchive:
+            src: "{{ _export_staging }}/satellite/ansible_roles_export.tar.gz"
             dest: "{{ _export_staging }}/satellite/ansible_roles/"
-            mode: pull
-            recursive: true
-            delete: false
+            remote_src: false
+          delegate_to: localhost
+          connection: local
+          when: _roles_stat.stat.exists
+
+        - name: "Step 2 — Remove Ansible roles archive from satellite"
+          ansible.builtin.file:
+            path: /tmp/ansible_roles_export.tar.gz
+            state: absent
+          when: _roles_stat.stat.exists
 
         - name: "Step 2 — Check for Ansible playbooks on satellite"
           ansible.builtin.stat:
             path: "{{ _ansible_playbooks_src }}"
           register: _playbooks_stat
 
-        - name: "Step 2 — Pull Ansible playbooks to staging"
+        - name: "Step 2 — Archive Ansible playbooks on satellite"
+          ansible.builtin.command:
+            cmd: "tar czf /tmp/ansible_playbooks_export.tar.gz -C {{ _ansible_playbooks_src }} ."
           when: _playbooks_stat.stat.exists
-          ansible.posix.synchronize:
-            src: "{{ _ansible_playbooks_src }}/"
+          changed_when: true
+
+        - name: "Step 2 — Fetch Ansible playbooks archive to staging"
+          ansible.builtin.fetch:
+            src: /tmp/ansible_playbooks_export.tar.gz
+            dest: "{{ _export_staging }}/satellite/"
+            flat: true
+          when: _playbooks_stat.stat.exists
+
+        - name: "Step 2 — Ensure playbooks staging directory exists"
+          ansible.builtin.file:
+            path: "{{ _export_staging }}/satellite/ansible_roles/playbooks/"
+            state: directory
+            mode: "0755"
+          delegate_to: localhost
+          connection: local
+          when: _playbooks_stat.stat.exists
+
+        - name: "Step 2 — Extract Ansible playbooks to staging"
+          ansible.builtin.unarchive:
+            src: "{{ _export_staging }}/satellite/ansible_playbooks_export.tar.gz"
             dest: "{{ _export_staging }}/satellite/ansible_roles/playbooks/"
-            mode: pull
-            recursive: true
-            delete: false
+            remote_src: false
+          delegate_to: localhost
+          connection: local
+          when: _playbooks_stat.stat.exists
+
+        - name: "Step 2 — Remove Ansible playbooks archive from satellite"
+          ansible.builtin.file:
+            path: /tmp/ansible_playbooks_export.tar.gz
+            state: absent
+          when: _playbooks_stat.stat.exists
 
         - name: "Step 2 — Warn if no Ansible roles found"
           when: not _roles_stat.stat.exists
