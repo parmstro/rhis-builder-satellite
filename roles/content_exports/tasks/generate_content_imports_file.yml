@@ -76,6 +76,29 @@
     - tags_content_config
     - tags_content_exports
 
+- name: "Check for existing content_imports.yml before overwrite"
+  ansible.builtin.stat:
+    path: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
+  delegate_to: localhost
+  connection: local
+  register: _content_imports_existing
+  tags:
+    - tags_content_config
+    - tags_content_exports
+
+- name: "Backup existing content_imports.yml before overwrite"
+  ansible.builtin.copy:
+    src: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
+    dest: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml.bak"
+    remote_src: false
+    mode: "0644"
+  delegate_to: localhost
+  connection: local
+  when: _content_imports_existing.stat.exists
+  tags:
+    - tags_content_config
+    - tags_content_exports
+
 - name: "Write content_imports.yml to highside deployment host_vars"
   ansible.builtin.template:
     src: "content_imports.j2"
