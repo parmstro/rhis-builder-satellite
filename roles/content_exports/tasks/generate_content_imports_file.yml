@@ -76,6 +76,18 @@
     - tags_content_config
     - tags_content_exports
 
+# Write content_imports.yml into the Pulp export directory on the satellite first.
+# It travels with the tar chunks on the transfer drive and is recoverable there
+# if the highside host_vars write below fails for any reason.
+- name: "Write content_imports.yml to satellite export directory"
+  ansible.builtin.template:
+    src: "content_imports.j2"
+    dest: "{{ _export_path }}/content_imports.yml"
+    mode: "0644"
+  tags:
+    - tags_content_config
+    - tags_content_exports
+
 - name: "Check for existing content_imports.yml before overwrite"
   ansible.builtin.stat:
     path: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
