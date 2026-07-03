@@ -113,16 +113,57 @@
             - tags_content_config
             - tags_content_exports
 
-        # ── Checkpoint: Write Pulp export completion marker ──────────────────
-        # Records export timestamp and Pulp API path so export_deployment.sh can
-        # detect a prior successful export and skip re-running it on resume.
-        # Tagged tags_content_exports — skipped during --skip-tags resume runs.
+        # ── Checkpoint: Validate export directory and write completion marker ──
+        # Verifies the Pulp export directory (path returned by the Satellite API)
+        # contains at least one tar chunk and a metadata.json file before writing
+        # the resume marker.  The marker is only written on a valid, complete export.
+        # All tasks tagged tags_content_exports — skipped on --skip-tags resume runs.
+
+        - name: "Checkpoint — Assert export path is defined"
+          ansible.builtin.assert:
+            that:
+              - _export_path is defined
+              - _export_path | length > 0
+            fail_msg: >-
+              content_exports role did not set _export_path — export may have failed silently.
+              Do not use --resume; delete the marker and re-run the full export.
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Find tar chunks in export directory"
+          ansible.builtin.find:
+            paths: "{{ _export_path }}"
+            patterns: "*.tar"
+            file_type: file
+          register: _export_tar_files
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Stat metadata.json in export directory"
+          ansible.builtin.stat:
+            path: "{{ _export_path }}/metadata.json"
+          register: _export_metadata_stat
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Assert export directory is complete"
+          ansible.builtin.assert:
+            that:
+              - _export_tar_files.matched > 0
+              - _export_metadata_stat.stat.exists
+            fail_msg: >-
+              Export directory {{ _export_path }} is incomplete:
+              tar chunks found: {{ _export_tar_files.matched }},
+              metadata.json present: {{ _export_metadata_stat.stat.exists }}.
+              Do not use --resume; delete the marker and re-run the full export.
+          tags:
+            - tags_content_exports
 
         - name: "Checkpoint — Write Pulp export completion marker"
           ansible.builtin.copy:
             content: |
               export_timestamp: "{{ ansible_date_time.iso8601 }}"
-              pulp_export_path: "{{ _export_path | default('') }}"
+              pulp_export_path: "{{ _export_path }}"
             dest: "/rhis/vars/logs/.pulp_export_complete"
             mode: "0644"
           delegate_to: localhost
@@ -148,7 +189,7 @@
             path: "{{ _ansible_roles_src }}"
           register: _roles_stat
 
-        - name: "Step 2 — Archive Ansible roles on satellite"
+        - name: "Step 2 — Archive Ansible roles on satellite"  # noqa: command-instead-of-module
           ansible.builtin.command:
             cmd: "tar czf /tmp/ansible_roles_export.tar.gz -C {{ _ansible_roles_src }} ."
           when: _roles_stat.stat.exists
@@ -181,7 +222,7 @@
             path: "{{ _ansible_playbooks_src }}"
           register: _playbooks_stat
 
-        - name: "Step 2 — Archive Ansible playbooks on satellite"
+        - name: "Step 2 — Archive Ansible playbooks on satellite"  # noqa: command-instead-of-module
           ansible.builtin.command:
             cmd: "tar czf /tmp/ansible_playbooks_export.tar.gz -C {{ _ansible_playbooks_src }} ."
           when: _playbooks_stat.stat.exists
