@@ -1,12 +1,9 @@
 ---
 
-# This task will generate a content_imports.yml file containing a timestamp for use with
-# rhis-provisioner container and the downstream disconnected satellite configuration
-# Currently if you are performing multiple imports, you may need to manually merge the dictionaries
-# we are going to append the existing export operations to any existing content_imports dictionary
-# and then re-write the file. So if there is stuff there, it will persist, if there is another file
-# somewhere, you will need to replace it or merge it.
-# by default we will write out the file to host_vars/{{ ansible_fqdn }}/content_imports.yml
+# Generates content_imports.yml and writes it to the Pulp export directory on the satellite.
+# export_deployment.sh fetches it from there via scp and places it in both the
+# highside deployment host_vars and the staging tree.  The playbook has no dependency
+# on the highside host_vars directory being mounted inside the container.
 
 # Retrieve the export path from the Satellite API using the export history ID.
 # Different export types (library, cv_version, repository) write to different
@@ -76,9 +73,8 @@
     - tags_content_config
     - tags_content_exports
 
-# Write content_imports.yml into the Pulp export directory on the satellite first.
-# It travels with the tar chunks on the transfer drive and is recoverable there
-# if the highside host_vars write below fails for any reason.
+# Write content_imports.yml into the Pulp export directory on the satellite.
+# It travels with the tar chunks on the transfer drive.
 - name: "Write content_imports.yml to satellite export directory"
   ansible.builtin.template:
     src: "content_imports.j2"
@@ -88,36 +84,19 @@
     - tags_content_config
     - tags_content_exports
 
-- name: "Check for existing content_imports.yml before overwrite"
-  ansible.builtin.stat:
-    path: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
-  delegate_to: localhost
-  connection: local
-  register: _content_imports_existing
-  tags:
-    - tags_content_config
-    - tags_content_exports
-
-- name: "Backup existing content_imports.yml before overwrite"
-  ansible.builtin.copy:
-    src: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
-    dest: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml.bak"
-    remote_src: false
-    mode: "0644"
-  delegate_to: localhost
-  connection: local
-  when: _content_imports_existing.stat.exists
-  tags:
-    - tags_content_config
-    - tags_content_exports
-
-- name: "Write content_imports.yml to highside deployment host_vars"
+# Also write content_imports.yml directly to provisioner staging so
+# export_deployment.sh can read it without an scp from the satellite.
+# The Pulp export directory is owned by pulp and unreadable by ansiblerunner,
+# so scp as that user fails with "No such file or directory" on the path.
+# Delegate_to localhost runs as root inside the container — no permission issue.
+- name: "Write content_imports.yml to provisioner staging"
   ansible.builtin.template:
     src: "content_imports.j2"
-    dest: "/rhis/vars/highside_host_vars/satellite1.{{ active_downstream_deployment }}/content_imports.yml"
+    dest: "{{ _export_staging }}/satellite/content_imports.yml"
     mode: "0644"
   delegate_to: localhost
   connection: local
   tags:
     - tags_content_config
     - tags_content_exports
+

@@ -209,6 +209,11 @@
               Ansible roles will not be in the export staging.
 
         # ── Step 3: Pull Foreman discovery images from satellite to staging ──
+        # Uses scp via command+delegate_to — one connection per file, direct to staging.
+        # ansible.builtin.fetch falls back to the slurp path under become:true, which
+        # base64-encodes the binary in Python and pegs CPU.  bundle+unarchive fails
+        # because unarchive makes a temp copy inside the container overlay filesystem
+        # which has no room for a 500 MB file.  scp bypasses both problems.
 
         - name: "Step 3 — Find Foreman discovery images on satellite"
           ansible.builtin.find:
@@ -217,15 +222,22 @@
             file_type: file
           register: _discovery_images
 
-        - name: "Step 3 — Pull discovery images to staging"
-          ansible.builtin.fetch:
-            src: "{{ item.path }}"
-            dest: "{{ _export_staging }}/satellite/discovery_images/"
-            flat: true
-            validate_checksum: false
+        - name: "Step 3 — Copy discovery images to staging via scp"
+          ansible.builtin.command:
+            cmd: >-
+              scp -q
+              -o BatchMode=yes
+              -o StrictHostKeyChecking=no
+              -i /root/.ssh/id_ed25519
+              ansiblerunner@{{ inventory_hostname }}:{{ item.path }}
+              {{ _export_staging }}/satellite/discovery_images/{{ item.path | basename }}
+          delegate_to: localhost
+          connection: local
           loop: "{{ _discovery_images.files }}"
           loop_control:
             label: "{{ item.path | basename }}"
+          when: _discovery_images.files | length > 0
+          changed_when: true
 
         - name: "Step 3 — Warn if no discovery images found"
           when: _discovery_images.files | length == 0
