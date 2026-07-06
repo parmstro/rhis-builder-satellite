@@ -206,45 +206,40 @@
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-- name: "Check if satellite artifacts already staged"
-  ansible.builtin.stat:
-    path: "{{ bundle_delivery_stage_path }}/satellite"
-  register: _bd_sat_staged
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_push
-
 - name: "Move satellite artifacts to stage path"
-  when: not _bd_sat_staged.stat.exists
   ansible.builtin.command:
     cmd: >
       mv {{ bundle_delivery_incoming_path }}/satellite
          {{ bundle_delivery_stage_path }}/satellite
+    creates: "{{ bundle_delivery_stage_path }}/satellite"
+  become: true
   changed_when: true
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
-- name: "Check if manifest already staged"
-  ansible.builtin.stat:
-    path: "{{ bundle_delivery_stage_path }}/rhis_export_manifest.yml"
-  register: _bd_manifest_staged
-  tags:
-    - tags_bundle_delivery
-    - tags_bundle_delivery_push
-
 - name: "Move manifest to stage path for validate.yml access"
-  when: not _bd_manifest_staged.stat.exists
   ansible.builtin.command:
     cmd: >
       mv {{ bundle_delivery_incoming_path }}/rhis_export_manifest.yml
          {{ bundle_delivery_stage_path }}/rhis_export_manifest.yml
+    creates: "{{ bundle_delivery_stage_path }}/rhis_export_manifest.yml"
+  become: true
   changed_when: true
   tags:
     - tags_bundle_delivery
     - tags_bundle_delivery_push
 
 # ── Step 4: Remove incoming staging area to recover space ─────────────────────
+
+- name: "Install ansible-core (creates /etc/ansible/roles/ with correct ownership)"
+  ansible.builtin.package:
+    name: ansible-core
+    state: present
+  become: true
+  tags:
+    - tags_bundle_delivery
+    - tags_bundle_delivery_push
 
 - name: "Install ansible roles to /etc/ansible/roles/"
   ansible.builtin.command:
