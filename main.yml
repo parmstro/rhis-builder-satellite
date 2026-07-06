@@ -38,8 +38,8 @@
       tags:
         - always
 
-    - name: "Apply role of satellite_pre to disconnected satellite {{ ansible_fqdn }}"
-      when: satellite_disconnected and not (satellite_disconnected_http_repos | default(false))
+    - name: "Apply role of satellite_disconnected_pre to disconnected satellite {{ ansible_fqdn }}"
+      when: satellite_disconnected
       ansible.builtin.include_role:
         name: satellite_disconnected_pre
       tags:
