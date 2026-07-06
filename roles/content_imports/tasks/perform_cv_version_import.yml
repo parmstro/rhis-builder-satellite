@@ -1,6 +1,6 @@
 ---
 
-# import the Satellite repository for the organization
+# import the Satellite content view version for the organization
 
 - name: "Performing cv_version import using format {{ content_import.name }}" # noqa: name[template]
   redhat.satellite.content_import_version:
@@ -15,9 +15,6 @@
     metadata_file: "{{ content_import.metadata_file | default(omit) }}"
     path: "{{ content_import.import_path }}"
   register: import_cv_version_result # noqa var-naming[no-role-prefix]
-  until: import_cv_version_result.finished
-  retries: "{{ (satellite_async_timeout / satellite_async_delay) | int }}"
-  delay: "{{ satellite_async_delay }}"
   tags:
     - tags_content_config
     - tags_content_imports
