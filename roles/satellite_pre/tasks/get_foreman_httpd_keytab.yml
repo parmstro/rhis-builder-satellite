@@ -34,8 +34,6 @@
     src: "/root/httpd.keytab"
     dest: "/etc/httpd/httpd.keytab"
     remote_src: true
-    owner: apache
-    group: apache
     mode: "0600"
     seuser: "system_u"
     serole: "object_r"

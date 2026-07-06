@@ -2,6 +2,12 @@
 
 # we are patching the system so ya, latest is required
 # patch only when satellite-installer has not been run
+- name: "Set _satpre_satellite_installed to false" # noqa var-naming[no-role-prefix]
+  ansible.builtin.set_fact:
+    _satpre_satellite_installed: false
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_before_sync
 
 - name: "Is satellite installed?"
   ansible.builtin.include_tasks: "is_satellite_installed.yml"

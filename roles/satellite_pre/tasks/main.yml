@@ -25,6 +25,13 @@
     - tags_satellite_pre_repos
     - tags_satellite_before_sync
 
+- name: "Ensure satellite binaries are installed"
+  ansible.builtin.import_tasks: ensure_sat_binaries.yml
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_pre_packages
+    - tags_satellite_before_sync
+    
 - name: "Ensure satellite is using chronyd for time"
   ansible.builtin.import_tasks: "ensure_chronyd.yml"
   tags:
@@ -37,13 +44,6 @@
   tags:
     - tags_satellite_pre
     - tags_satellite_pre_firewall
-    - tags_satellite_before_sync
-
-- name: "Ensure satellite binaries are installed"
-  ansible.builtin.import_tasks: ensure_sat_binaries.yml
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_pre_packages
     - tags_satellite_before_sync
 
 - name: "Start IdM integration block"

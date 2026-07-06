@@ -1,100 +1,13 @@
 ---
 
 # This role prepares a disconnected satellite for installation
-# Configure offline base OS repos
-#
-# Variables:
-#   satellite_disconnected_iso_prestaged (bool, default: false)
-#     Set to true if ISOs are already present at satellite_disconnected_root.
-#     Skips the synchronize (copy) tasks.
-#
-#   satellite_disconnected_iso_mounted (bool, default: false)
-#     Set to true if ISOs are already mounted at their mount paths.
-#     Skips the mount tasks. Useful for re-runs after a failed build.
 
-- name: "Ensure that the OS ISO is not yet mounted"
-  when: not (satellite_disconnected_iso_mounted | default(false))
-  ansible.posix.mount:
-    src: "{{ satellite_disconnected_root }}/{{ satellite_os_iso_source }}"
-    path: "{{ satellite_os_repo_mount }}"
-    state: unmounted
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
+# ── Preflight: IdM DNS resolver check ─────────────────────────────────────────
+# If /etc/NetworkManager/conf.d/zzz-ipa.conf exists, the [global-dns-domain-*]
+# servers= value must match ipa_client_dns_servers.  Absent file is not an error
+# (fresh host before IPA client enrolment); mismatch is a hard failure.
 
-- name: "Ensure that the Satellite ISO is not yet mounted"
-  when: not (satellite_disconnected_iso_mounted | default(false))
-  ansible.posix.mount:
-    src: "{{ satellite_disconnected_root }}/{{ satellite_install_iso_source }}"
-    path: "{{ satellite_install_repo_mount }}"
-    state: unmounted
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-- name: "Create the target directory"
-  ansible.builtin.file:
-    path: "{{ satellite_disconnected_root }}"
-    state: directory
-    mode: "0655"
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-- name: "Synchronize the OS ISO to target - Please wait..."
-  when: not (satellite_disconnected_iso_prestaged | default(false))
-  ansible.posix.synchronize:
-    src: "{{ satellite_os_iso_source }}"
-    dest: "{{ satellite_disconnected_root }}/{{ satellite_os_iso_source }}"
-    mode: "push"
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-- name: "Synchronize the Satellite ISO to target - Please wait..."
-  when: not (satellite_disconnected_iso_prestaged | default(false))
-  ansible.posix.synchronize:
-    src: "{{ satellite_install_iso_source }}"
-    dest: "{{ satellite_disconnected_root }}/{{ satellite_install_iso_source }}"
-    mode: "push"
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-- name: "Mount the OS source"
-  when: not (satellite_disconnected_iso_mounted | default(false))
-  ansible.posix.mount:
-    src: "{{ satellite_disconnected_root }}/{{ satellite_os_iso_source }}"
-    path: "{{ satellite_os_repo_mount }}"
-    fstype: "iso9660"
-    opts: "ro"
-    state: mounted
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-- name: "Mount the Satellite source"
-  when: not (satellite_disconnected_iso_mounted | default(false))
-  ansible.posix.mount:
-    src: "{{ satellite_disconnected_root }}/{{ satellite_install_iso_source }}"
-    path: "{{ satellite_install_repo_mount }}"
-    fstype: "iso9660"
-    opts: "ro"
-    state: mounted
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-- name: "Template the OS repo file"
-  ansible.builtin.template:
-    src: "{{ satellite_os_repo_template_name }}"
-    dest: "{{ satellite_os_repo_template_dest }}"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
+# ── Repo validation ───────────────────────────────────────────────────────────
 
 - name: "Refresh the repos" # noqa var-naming[no-role-prefix]
   ansible.builtin.command: "dnf repolist"
@@ -107,8 +20,10 @@
 - name: "Assertion"
   ansible.builtin.assert:
     that:
-      - "'RHEL-BaseOS' in repolist_out.stdout"
-      - "'RHEL-AppStream' in repolist_out.stdout"
+      - "'rhis-rhel-baseos' in repolist_out.stdout"
+      - "'rhis-rhel-appstream' in repolist_out.stdout"
+      - "'rhis-satellite' in repolist_out.stdout"
+      - "'rhis-satellite-maintenance' in repolist_out.stdout"
   tags:
     - tags_satellite_pre
     - tags_satellite_before_sync
@@ -118,17 +33,6 @@
   ansible.builtin.dnf:
     name: "*"
     state: latest
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-# Copy installation files to disconnected satellite
-- name: "Install satellite binaries from DVD" # noqa var-naming[no-role-prefix]
-  ansible.builtin.command: "{{ satellite_install_repo_mount }}/install_packages"
-  args:
-    chdir: "{{ satellite_install_repo_mount }}"
-  register: satellite_install_packages
-  changed_when: satellite_install_packages.rc == 0
   tags:
     - tags_satellite_pre
     - tags_satellite_before_sync

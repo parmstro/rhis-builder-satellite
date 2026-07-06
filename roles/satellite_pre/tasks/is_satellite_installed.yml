@@ -1,13 +1,5 @@
 ---
 
-- name: "Set _satpre_satellite_installed to false" # noqa var-naming[no-role-prefix]
-  ansible.builtin.set_fact:
-    _satpre_satellite_installed: false
-  tags:
-    - tags_satellite_pre
-    - tags_satellite_before_sync
-
-
 - name: "Has satellite-installer been run"
   block:
 

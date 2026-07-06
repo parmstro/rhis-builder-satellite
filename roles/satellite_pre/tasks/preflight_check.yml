@@ -1,0 +1,62 @@
+---
+
+# check our basic configuration is valid before we start doing anything else
+# the dns server for the satellite host must be the same as the IdM server if we are using IdM
+# If NetworkManager is configured to use the IdM server as a DNS resolver,
+# then the value of servers= in /etc/NetworkManager/conf.d/zzz-ipa.conf must match ipa_client_dns_servers.
+# If the file does not exist, that is not an error (fresh host before IPA client enrolment).
+# If the file exists and the values do not match, that is a hard failure.
+
+- name: "Preflight — check zzz-ipa.conf exists" # noqa var-naming[no-role-prefix]
+  ansible.builtin.stat:
+    path: /etc/NetworkManager/conf.d/zzz-ipa.conf
+  register: _sdp_ipa_nm_conf_stat
+  become: true
+  when: satellite_pre_use_idm | default(false)
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_before_sync
+
+- name: "Preflight — read zzz-ipa.conf" # noqa var-naming[no-role-prefix]
+  ansible.builtin.slurp:
+    src: /etc/NetworkManager/conf.d/zzz-ipa.conf
+  register: _sdp_ipa_nm_conf
+  become: true
+  when:
+    - satellite_pre_use_idm | default(false)
+    - _sdp_ipa_nm_conf_stat.stat.exists | default(false)
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_before_sync
+
+- name: "Preflight — extract servers= from [global-dns-domain-*] section" # noqa var-naming[no-role-prefix]
+  ansible.builtin.set_fact:
+    _sdp_ipa_nm_dns_server: >-
+      {{ (_sdp_ipa_nm_conf.content | b64decode).split('\n')
+         | select('match', '^servers=')
+         | first
+         | regex_replace('^servers=', '')
+         | trim }}
+  when:
+    - satellite_pre_use_idm | default(false)
+    - _sdp_ipa_nm_conf_stat.stat.exists | default(false)
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_before_sync
+
+- name: "Preflight — assert IdM DNS resolver matches ipa_client_dns_servers" # noqa var-naming[no-role-prefix]
+  ansible.builtin.assert:
+    that: _sdp_ipa_nm_dns_server == (ipa_client_dns_servers | string)
+    fail_msg: >-
+      IdM DNS resolver mismatch in /etc/NetworkManager/conf.d/zzz-ipa.conf.
+      Found:    servers={{ _sdp_ipa_nm_dns_server }}
+      Expected: {{ ipa_client_dns_servers }}
+      Verify the satellite enrolled in the correct IdM instance and that
+      ipa_client_dns_servers is set to the highside IdM IP in group_vars.
+  when:
+    - satellite_pre_use_idm | default(false)
+    - _sdp_ipa_nm_conf_stat.stat.exists | default(false)
+  tags:
+    - tags_satellite_pre
+    - tags_satellite_before_sync
+
