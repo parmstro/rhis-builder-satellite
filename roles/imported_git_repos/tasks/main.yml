@@ -1,47 +1,15 @@
 ---
 
-# When satellite_disconnected is true, compliance-as-code Ansible roles arrive
-# via the export bundle rather than being cloned from GitHub.
-# satellite_roles_source_path points to the ansible_roles/ directory in the staged bundle.
-# ansible.posix.synchronize populates /etc/ansible/roles/ on the satellite directly.
-# The git clone/update loop is skipped entirely on disconnected builds — no network access.
-
-- name: "Assert satellite_roles_source_path is set for disconnected build"
-  when: satellite_disconnected | default(false)
-  ansible.builtin.assert:
-    that:
-      - satellite_roles_source_path is defined
-      - satellite_roles_source_path | length > 0
-    fail_msg: >
-      satellite_disconnected is true but satellite_roles_source_path is not set.
-      On a disconnected satellite, compliance roles must arrive via the export bundle.
-      Set satellite_roles_source_path to the path of the extracted ansible_roles/
-      directory from the transfer bundle (e.g. /home/ansiblerunner/rhis_export/<bundle>/ansible_roles).
-      The export playbook places roles at <bundle_dir>/ansible_roles/ on the lowside satellite.
-    success_msg: "satellite_roles_source_path is set — roles will be synced from bundle"
-  tags:
-    - tags_provisioning_config
-    - tags_import_git_repos
-
-- name: "Sync compliance roles from bundle source (disconnected)"
-  when:
-    - satellite_disconnected | default(false)
-    - satellite_roles_source_path is defined
-    - satellite_roles_source_path | length > 0
-  ansible.posix.synchronize:
-    src: "{{ satellite_roles_source_path }}/"
-    dest: "/etc/ansible/roles/"
-    recursive: true
-    delete: false
-    mode: push
-  delegate_to: "{{ inventory_hostname }}"
-  tags:
-    - tags_provisioning_config
-    - tags_import_git_repos
+# On a connected satellite, roles are cloned/updated from the upstream git repos below.
+# On a disconnected satellite, roles arrive via the transfer bundle — bundle_delivery
+# installs them to /etc/ansible/roles/ before main.yml runs. The git clone loop is
+# skipped by default on disconnected builds.
+# Set satellite_imported_git_repos_override: true to enable cloning from a highside
+# git server when one is available (e.g. Gitea running on the provisioner node).
 
 - name: "Configure the git repos to replicate"
   when:
-    - not (satellite_disconnected | default(false))
+    - not (satellite_disconnected | default(false)) or (satellite_imported_git_repos_override | default(false))
     - git_repos is defined
     - git_repos | length > 0
   ansible.builtin.include_tasks: "ensure_clone_git_repos.yml"

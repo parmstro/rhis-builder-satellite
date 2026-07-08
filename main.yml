@@ -221,6 +221,9 @@
         - tags_job_templates
 
     - name: "Synchronized satellite template repositories"
+      when: >
+        not (satellite_disconnected | default(false)) or
+        (satellite_template_sync_override | default(false))
       ansible.builtin.import_role:
         name: templates_sync
       tags:

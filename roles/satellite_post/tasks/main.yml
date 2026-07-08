@@ -142,3 +142,10 @@
   tags:
     - tags_satellite_post
     - tags_satellite_before_sync
+
+- name: "Deploy httpd import timeout tweaks for disconnected content import"
+  when: satellite_disconnected | default(false)
+  ansible.builtin.include_tasks: ensure_disconnected_import_timeout.yml
+  tags:
+    - tags_satellite_post
+    - tags_satellite_before_sync

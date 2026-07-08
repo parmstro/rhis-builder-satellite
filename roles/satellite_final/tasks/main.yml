@@ -22,4 +22,18 @@
   ansible.builtin.debug:
     var: pxe_build_result
 
+- name: "Remove httpd import timeout drop-in (disconnected only)"
+  when: satellite_disconnected | default(false)
+  ansible.builtin.file:
+    path: /etc/httpd/conf.d/05-import_timeout_tweaks.conf
+    state: absent
+  become: true
+
+- name: "Restart Satellite services to restore default httpd timeouts"
+  when: satellite_disconnected | default(false)
+  ansible.builtin.command:
+    cmd: satellite-maintain service restart
+  become: true
+  changed_when: true
+
 ...

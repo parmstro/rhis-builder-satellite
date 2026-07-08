@@ -1,0 +1,32 @@
+---
+
+# Deploy an httpd timeout drop-in for disconnected satellites only.
+# Pulp library imports on an air-gapped satellite can take longer than Apache's
+# default ProxyTimeout, causing a 502 before the import commits.  28800 s (8 h)
+# covers even very large library imports.
+#
+# This file is created AFTER satellite-installer so the installer cannot overwrite it.
+# satellite_final removes the file and restarts Satellite once content import is done.
+
+- name: "Deploy httpd import timeout drop-in for disconnected content import"
+  ansible.builtin.copy:
+    dest: /etc/httpd/conf.d/05-import_timeout_tweaks.conf
+    content: |
+      Timeout 28800
+      ProxyTimeout 28800
+    owner: root
+    group: root
+    mode: "0644"
+  become: true
+  tags:
+    - tags_satellite_post
+    - tags_satellite_before_sync
+
+- name: "Restart Satellite services to apply import timeout tweaks"
+  ansible.builtin.command:
+    cmd: satellite-maintain service restart
+  become: true
+  changed_when: true
+  tags:
+    - tags_satellite_post
+    - tags_satellite_before_sync
