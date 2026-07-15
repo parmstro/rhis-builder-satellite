@@ -1,5 +1,30 @@
 ---
 
+- name: "Compute medium root directory for {{ installation_medium.name }}"
+  when: installation_medium.load_medium | default(false) | bool
+  ansible.builtin.set_fact:
+    installation_media_current_root: >-
+      {{ installation_medium.medium_root
+         | default(installation_medium.name | lower | regex_replace('[^a-z0-9]+', '_') | regex_replace('^_|_$', '')) }}
+
+- name: "Compute medium path for {{ installation_medium.name }}"
+  when: installation_medium.load_medium | default(false) | bool
+  ansible.builtin.set_fact:
+    installation_media_current_path: >-
+      {{ installation_medium.path
+         | default('http://' + ansible_facts['fqdn'] + installation_media_base_url + '/' + installation_media_current_root) }}
+
+- name: "Compute ISO source for {{ installation_medium.name }}"
+  when: installation_medium.load_medium | default(false) | bool
+  ansible.builtin.set_fact:
+    installation_media_iso_source: >-
+      {{ installation_medium.medium_iso_source
+         | default(installation_media_iso_source_path + '/' + (installation_medium.medium_iso | basename)) }}
+
+- name: "Load installation medium content from ISO for {{ installation_medium.name }}"
+  when: installation_medium.load_medium | default(false) | bool
+  ansible.builtin.include_tasks: "load_installation_medium.yml"
+
 - name: "Ensure state of installation medium - {{ installation_medium.name }}"
   redhat.satellite.installation_medium:
     username: "{{ satellite_username | default(omit) }}"
@@ -13,6 +38,8 @@
     operatingsystems: "{{ installation_medium.operatingsystems | default(omit) }}"
     organizations: "{{ installation_medium.organizations | default(omit) }}"
     os_family: "{{ installation_medium.os_family | default(omit) }}"
-    path: "{{ installation_medium.path | default(omit) }}"
-    state: "{{ installation_medium.ca_path | default(omit) }}"
-    updated_name: "{{ installation_medium.updated | default(omit) }}"
+    path: "{{ installation_media_current_path | default(installation_medium.path) | default(omit) }}"
+    state: "{{ installation_medium.state | default(omit) }}"
+    updated_name: "{{ installation_medium.updated_name | default(omit) }}"
+
+...

@@ -1,0 +1,8 @@
+---
+
+installation_media_base_path: "/var/www/html/pub/installmedia"
+installation_media_base_url: "/pub/installmedia"
+installation_media_mount_point: "/mnt/installation_media_iso"
+installation_media_iso_source_path: "{{ playbook_dir }}/files"
+
+...

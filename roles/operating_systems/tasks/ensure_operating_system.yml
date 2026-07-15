@@ -10,6 +10,7 @@
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
     name: "{{ operating_system.name }}"
     description: "{{ operating_system.description | default(omit) }}"
+    architectures: "{{ operating_system.architectures | default('x86_64') }}"
     family: "{{ operating_system.family }}"
     major: "{{ operating_system.major }}"
     minor: "{{ operating_system.minor | default(omit) }}"
@@ -20,6 +21,7 @@
     ptables: "{{ operating_system.ptables | default(omit) }}"
     release_name: "{{ operating_system.release_name | default(omit) }}"
     state: "{{ operating_system.state | default(omit) }}"
+    updated_name: "{{ operating_system.updated_name | default(omit) }}"
 
 - name: "Set the default templates"
   when: operating_system.default_templates is defined and (operating_system.default_templates | length) > 0

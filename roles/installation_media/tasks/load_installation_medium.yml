@@ -1,0 +1,116 @@
+---
+
+- name: "Ensure installation media base directory exists"
+  ansible.builtin.file:
+    path: "{{ installation_media_base_path }}"
+    state: directory
+    mode: "0755"
+    setype: "httpd_sys_content_t"
+  tags:
+    - tags_provisioning_config
+    - tags_installation_media
+
+- name: "Ensure media content directory exists for {{ installation_medium.name }}"
+  ansible.builtin.file:
+    path: "{{ installation_media_base_path }}/{{ installation_media_current_root }}"
+    state: directory
+    mode: "0755"
+    setype: "httpd_sys_content_t"
+  tags:
+    - tags_provisioning_config
+    - tags_installation_media
+
+- name: "Ensure temporary ISO mount point exists"
+  ansible.builtin.file:
+    path: "{{ installation_media_mount_point }}"
+    state: directory
+    mode: "0755"
+  tags:
+    - tags_provisioning_config
+    - tags_installation_media
+
+- name: "Check if ISO exists on Satellite for {{ installation_medium.name }}"
+  ansible.builtin.stat:
+    path: "{{ installation_medium.medium_iso }}"
+  register: installation_media_iso_stat
+  tags:
+    - tags_provisioning_config
+    - tags_installation_media
+
+- name: "Stage ISO to Satellite for {{ installation_medium.name }}"
+  when: not installation_media_iso_stat.stat.exists
+  block:
+
+    - name: "Ensure ISO target directory exists on Satellite for {{ installation_medium.name }}"
+      ansible.builtin.file:
+        path: "{{ installation_medium.medium_iso | dirname }}"
+        state: directory
+        mode: "0755"
+      tags:
+        - tags_provisioning_config
+        - tags_installation_media
+
+    - name: "Download ISO from URL for {{ installation_medium.name }}"
+      when: installation_media_iso_source is match('^https?://')
+      ansible.builtin.get_url:
+        url: "{{ installation_media_iso_source }}"
+        dest: "{{ installation_medium.medium_iso }}"
+        mode: "0644"
+      tags:
+        - tags_provisioning_config
+        - tags_installation_media
+
+    - name: "Copy ISO from provisioner to Satellite for {{ installation_medium.name }}"
+      when: installation_media_iso_source is not match('^https?://')
+      ansible.builtin.copy:
+        src: "{{ installation_media_iso_source }}"
+        dest: "{{ installation_medium.medium_iso }}"
+        mode: "0644"
+      tags:
+        - tags_provisioning_config
+        - tags_installation_media
+
+- name: "Extract ISO content to media directory for {{ installation_medium.name }}"
+  block:
+
+    - name: "Mount installation medium ISO for {{ installation_medium.name }}"
+      ansible.posix.mount:
+        path: "{{ installation_media_mount_point }}"
+        src: "{{ installation_medium.medium_iso }}"
+        fstype: iso9660
+        opts: loop,ro
+        state: mounted
+      tags:
+        - tags_provisioning_config
+        - tags_installation_media
+
+    - name: "Copy ISO content to media directory for {{ installation_medium.name }}"
+      ansible.builtin.command:
+        cmd: >-
+          cp -a {{ installation_media_mount_point }}/.
+          {{ installation_media_base_path }}/{{ installation_media_current_root }}/
+      changed_when: true
+      tags:
+        - tags_provisioning_config
+        - tags_installation_media
+
+  always:
+
+    - name: "Unmount installation medium ISO for {{ installation_medium.name }}"
+      ansible.posix.mount:
+        path: "{{ installation_media_mount_point }}"
+        state: unmounted
+      tags:
+        - tags_provisioning_config
+        - tags_installation_media
+
+- name: "Restore SELinux context on media directory for {{ installation_medium.name }}"
+  ansible.builtin.command:
+    cmd: "restorecon -Rv {{ installation_media_base_path }}/{{ installation_media_current_root }}"
+  register: installation_media_restorecon_result
+  changed_when: "'Reset' in installation_media_restorecon_result.stdout"
+  tags:
+    - tags_provisioning_config
+    - tags_installation_media
+
+...
