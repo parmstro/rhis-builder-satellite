@@ -16,6 +16,11 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
+- name: "Set default rex_kerberos_sudo_rule for backwards compatibility" # noqa var-naming[no-role-prefix]
+  when: rex_kerberos_sudo_rule_name is not defined
+  ansible.builtin.set_fact:
+    rex_kerberos_sudo_rule_name: "satellite_rex_kerberos"
+
 - name: "Clean up old keytabs"
   ansible.builtin.file:
     path: "{{ item }}"
@@ -72,8 +77,16 @@
       redhat.rhel_idm.ipasudorule:
         ipaadmin_principal: "{{ ipa_admin_principal }}"
         ipaadmin_password: "{{ ipa_admin_password }}"
-        action: "member"
         name: "{{ rex_kerberos_sudo_rule_name }}"
+        order: 2
+        description: "Allow the foreman-proxy realm user to run sudo commands for remote execution"
+        hostcategory: "all"
+        cmdcategory: "all"       # use this to enable unrestricted access to all privileged commands  - HANDLE WITH CARE
+        runasusercategory: "all"
+        runasgroupcategory: "all"
+        sudooption:
+          - "!authenticate"
+        state: "present"
         user: "[{{ foreman_proxy_realm_principal }}]"
 
     - name: "Determine keytab download file" # noqa var-naming[no-role-prefix]
