@@ -113,7 +113,8 @@
     sudooption:
       - "!authenticate"
     state: "present"
-    user: "[{{ foreman_proxy_realm_principal }}]"
+    user:
+      - "{{ foreman_proxy_realm_principal }}"
 
 - name: "Ensure the foreman-proxy directory exists"
   ansible.builtin.file:
