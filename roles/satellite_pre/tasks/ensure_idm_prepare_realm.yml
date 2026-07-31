@@ -16,6 +16,12 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
+- name: "Set default rex_kerberos_sudo_rule for backwards compatibility" # noqa var-naming[no-role-prefix]
+  when: rex_kerberos_sudo_rule_name is not defined
+  ansible.builtin.set_fact:
+    rex_kerberos_sudo_rule_name: "satellite_rex_kerberos"
+    rex_kerberos_sudo_rule_order: "102"
+
 - name: "Clean up old keytabs"
   ansible.builtin.file:
     path: "{{ item }}"
@@ -90,6 +96,26 @@
         - tags_satellite_pre
         - tags_satellite_pre_idm_integration
         - tags_satellite_before_sync
+
+- name: "Ensure that the realm user for Satellite has sudo permissions for use with remote execution."
+  when:
+    - rex_kerberos_enabled
+    - realm_user_exists
+  redhat.rhel_idm.ipasudorule:
+    ipaadmin_principal: "{{ ipa_admin_principal }}"
+    ipaadmin_password: "{{ ipa_admin_password }}"
+    name: "{{ rex_kerberos_sudo_rule_name }}"
+    order: "{{ rex_kerberos_sudo_rule_order }}"
+    description: "Allow the foreman-proxy realm user to run sudo commands for remote execution"
+    hostcategory: "all"
+    cmdcategory: "all"       # use this to enable unrestricted access to all privileged commands  - HANDLE WITH CARE
+    runasusercategory: "all"
+    runasgroupcategory: "all"
+    sudooption:
+      - "!authenticate"
+    state: "present"
+    user:
+      - "{{ foreman_proxy_realm_principal }}"
 
 - name: "Ensure the foreman-proxy directory exists"
   ansible.builtin.file:
