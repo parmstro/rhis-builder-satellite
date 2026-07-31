@@ -68,6 +68,14 @@
         - tags_satellite_pre_idm_integration
         - tags_satellite_before_sync
 
+    - name: "Ensure that the realm user for Satellite has sudo permissions for use with remote execution."
+      redhat.rhel_idm.ipasudorule:
+        ipaadmin_principal: "{{ ipa_admin_principal }}"
+        ipaadmin_password: "{{ ipa_admin_password }}"
+        action: "member"
+        name: "{{ rex_kerberos_sudo_rule_name }}"
+        user: "[{{ foreman_proxy_realm_principal }}]"
+
     - name: "Determine keytab download file" # noqa var-naming[no-role-prefix]
       ansible.builtin.set_fact:
         freeipa_keytab_file: "{{ fpr_prepare_realm.stdout_lines[-1].split()[-1] }}"
