@@ -20,6 +20,7 @@
   when: rex_kerberos_sudo_rule_name is not defined
   ansible.builtin.set_fact:
     rex_kerberos_sudo_rule_name: "satellite_rex_kerberos"
+    rex_kerberos_sudo_rule_order: "102"
 
 - name: "Clean up old keytabs"
   ansible.builtin.file:
