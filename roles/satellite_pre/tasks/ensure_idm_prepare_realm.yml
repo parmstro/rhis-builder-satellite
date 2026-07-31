@@ -104,7 +104,7 @@
     ipaadmin_principal: "{{ ipa_admin_principal }}"
     ipaadmin_password: "{{ ipa_admin_password }}"
     name: "{{ rex_kerberos_sudo_rule_name }}"
-    order: 2
+    order: "{{ rex_kerberos_sudo_rule_order }}"
     description: "Allow the foreman-proxy realm user to run sudo commands for remote execution"
     hostcategory: "all"
     cmdcategory: "all"       # use this to enable unrestricted access to all privileged commands  - HANDLE WITH CARE
