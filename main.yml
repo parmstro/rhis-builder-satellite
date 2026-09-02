@@ -232,6 +232,15 @@
         - tags_provisioning_config
         - tags_templates_sync
 
+    - name: "Configure architectures"
+      ansible.builtin.import_role:
+        name: architectures
+      tags:
+        - tags_post_sync
+        - tags_post_publication
+        - tags_provisioning_config
+        - tags_architectures
+
     - name: "Configure operating systems"
       ansible.builtin.import_role:
         name: operating_systems

@@ -1,0 +1,13 @@
+---
+## Configure the architectures
+
+- name: "Configure the architectures"
+  when: architectures is defined and (architectures | length) > 0
+  ansible.builtin.include_tasks: "ensure_architecture.yml"
+  loop: "{{ architectures }}"
+  loop_control:
+    loop_var: architecture
+  no_log: true
+  tags:
+    - tags_content_config
+    - tags_architectures

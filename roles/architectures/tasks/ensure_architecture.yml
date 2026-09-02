@@ -1,0 +1,15 @@
+---
+# state defaults to present
+# satellite no longer supports purpose_addons, the field has been dropped from the database
+
+- name: "Ensure state of activation key - {{ architecture.name }}"
+  redhat.satellite.architecture:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    state: "{{ architecture.state | default(omit) }}"
+    name: "{{ architecture.name }}"
+    operatingsystems: "{{ architecture.operatingsystems | default(omit) }}"
+    updated_name: "{{ architecture.updated_name | default(omit) }}"

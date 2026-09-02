@@ -273,22 +273,166 @@
 
       always:
 
-        # ── Checkpoint: Write completion marker if Pulp export succeeded ──────
-        # In always so it fires even when a later step (content_imports file write,
-        # artifact collection) fails.  Guarded by _export_path so it is a no-op on
-        # --resume runs where the content_exports role was tag-skipped and
-        # _export_path was never set.  Uses warn+conditional rather than assert so
-        # the always section does not itself fail and suppress the sync plan re-enable.
+        # ── Checkpoint: Recovery and completion marker ───────────────────────
+        # In always so it fires even when the content_exports module fails
+        # (e.g. 502 from Apache while polling a Pulp task that actually completed).
+        # When _export_path is not set (module failure), we query the Foreman
+        # task to verify the export actually completed (result != error) before
+        # attempting disk-based recovery.
+
+        # Gate: query the Foreman task result before attempting recovery.
+        # A 'warning' result means the export completed with non-fatal issues
+        # (e.g. container API 502). An 'error' result means genuine failure.
+        - name: "Checkpoint — Query Foreman task result for most recent export"
+          ansible.builtin.uri:
+            url: >-
+              {{ satellite_url }}/foreman_tasks/api/tasks?search={{
+              'label = Actions::Pulp3::Orchestration::ContentViewVersion::ExportLibrary and state = stopped'
+              | urlencode }}&order={{ 'started_at DESC' | urlencode }}&per_page=1
+            method: GET
+            url_username: "{{ satellite_username | default(omit) }}"
+            url_password: "{{ satellite_password | default(omit) }}"
+            force_basic_auth: true
+            validate_certs: "{{ satellite_validate_certs | default(false) }}"
+          register: _recovery_task_info
+          failed_when: false
+          when: _export_path is not defined or _export_path | default('') | length == 0
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Set recovery eligibility from task result"
+          ansible.builtin.set_fact:
+            _recovery_task_result: "{{ _recovery_task_info.json.results[0].result | default('unknown') }}"
+            _recovery_eligible: >-
+              {{ _recovery_task_info.json.results | default([]) | length > 0
+                 and _recovery_task_info.json.results[0].result in ['warning', 'success'] }}
+          when:
+            - _export_path is not defined or _export_path | default('') | length == 0
+            - _recovery_task_info is defined
+            - _recovery_task_info.status | default(0) == 200
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Log recovery decision"
+          ansible.builtin.debug:
+            msg: >-
+              Foreman export task result: {{ _recovery_task_result | default('unknown') }}.
+              Recovery eligible: {{ _recovery_eligible | default(false) }}.
+          when:
+            - _recovery_task_info is defined
+            - _recovery_task_info.status | default(0) == 200
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Block recovery on genuine export failure"
+          ansible.builtin.debug:
+            msg: >-
+              Export task result is '{{ _recovery_task_result | default('unknown') }}' —
+              this is a genuine failure, not a transient API error.
+              Checkpoint recovery skipped. Investigate the failure and re-run.
+          when:
+            - _export_path is not defined or _export_path | default('') | length == 0
+            - not (_recovery_eligible | default(false) | bool)
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Discover export path from disk (recovery)"
+          ansible.builtin.shell:
+            cmd: >-
+              set -o pipefail;
+              find /var/lib/pulp/exports/ -name '*-toc.json' -printf '%T@ %h\n' 2>/dev/null
+              | sort -rn | head -1 | awk '{print $2}'
+            executable: /bin/bash
+          register: _discovered_path
+          changed_when: false
+          failed_when: false
+          when:
+            - _export_path is not defined or _export_path | default('') | length == 0
+            - _recovery_eligible | default(false) | bool
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Set _export_path from disk discovery"
+          ansible.builtin.set_fact:
+            _export_path: "{{ _discovered_path.stdout | trim }}"
+          when:
+            - _export_path is not defined or _export_path | default('') | length == 0
+            - _discovered_path.stdout | default('') | trim | length > 0
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Log recovered export path"
+          ansible.builtin.debug:
+            msg: "Recovery: discovered export path from disk: {{ _export_path }}"
+          when:
+            - _discovered_path is defined
+            - _discovered_path.stdout | default('') | trim | length > 0
+          tags:
+            - tags_content_exports
 
         - name: "Checkpoint — Find tar chunks in export directory"
           ansible.builtin.find:
             paths: "{{ _export_path }}"
-            patterns: "*.tar"
+            patterns: "*.tar.*"
             file_type: file
           register: _export_tar_files
           when:
             - _export_path is defined
             - _export_path | length > 0
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Find toc.json in export directory"
+          ansible.builtin.find:
+            paths: "{{ _export_path }}"
+            patterns: "*-toc.json"
+            file_type: file
+          register: _export_toc_files
+          when:
+            - _export_path is defined
+            - _export_path | length > 0
+          tags:
+            - tags_content_exports
+
+        # Verify that every file listed in the toc.json manifest exists on
+        # disk and no extra tar chunks are present.  This is the same check
+        # the import side performs before ingesting the bundle.
+        - name: "Checkpoint — Verify toc.json manifest matches disk contents"
+          ansible.builtin.shell:
+            cmd: >-
+              set -o pipefail;
+              toc_files=$(python3 -c "import json,sys; d=json.load(open(sys.argv[1]));
+              print('\n'.join(sorted(d.get('files',{}).keys())))" "{{ _export_toc_files.files[0].path }}");
+              disk_files=$(ls -1 "{{ _export_path }}/" | grep '\.tar\.' | sort);
+              if [ "$toc_files" = "$disk_files" ]; then
+                count=$(echo "$toc_files" | wc -l);
+                echo "VERIFIED: $count files match";
+                exit 0;
+              else
+                echo "MISMATCH";
+                echo "toc: $(echo "$toc_files" | wc -l) files";
+                echo "disk: $(echo "$disk_files" | wc -l) files";
+                diff <(echo "$toc_files") <(echo "$disk_files") || true;
+                exit 1;
+              fi
+            executable: /bin/bash
+          register: _toc_verification
+          changed_when: false
+          failed_when: false
+          when:
+            - _export_path is defined
+            - _export_path | length > 0
+            - _export_toc_files.matched | default(0) > 0
+            - _export_tar_files.matched | default(0) > 0
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Log toc.json verification result"
+          ansible.builtin.debug:
+            msg: "{{ _toc_verification.stdout | default('verification skipped') }}"
+          when:
+            - _toc_verification is defined
+            - _toc_verification is not skipped
           tags:
             - tags_content_exports
 
@@ -299,6 +443,153 @@
           when:
             - _export_path is defined
             - _export_path | length > 0
+          tags:
+            - tags_content_exports
+
+        # Recovery: if toc.json exists (Pulp completed) but metadata.json is
+        # missing (hammer generate-metadata never ran), query the export history
+        # and generate it now.
+        - name: "Checkpoint — Query export history for recovery"
+          redhat.satellite.resource_info:
+            username: "{{ satellite_username | default(omit) }}"
+            password: "{{ satellite_password | default(omit) }}"
+            use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+            server_url: "{{ satellite_url }}"
+            organization: "{{ satellite_organization }}"
+            validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+            resource: content_exports
+          register: _recovery_export_history_raw
+          failed_when: false
+          when:
+            - _export_path is defined
+            - _export_path | length > 0
+            - _export_toc_files.matched | default(0) > 0
+            - not (_export_metadata_stat.stat.exists | default(false))
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Match export history to discovered path"
+          ansible.builtin.set_fact:
+            _recovery_export_match: >-
+              {{ _recovery_export_history_raw.resources
+                 | selectattr('path', 'eq', _export_path)
+                 | list }}
+          when:
+            - _recovery_export_history_raw is defined
+            - _recovery_export_history_raw.resources | default([]) | length > 0
+            - not (_export_metadata_stat.stat.exists | default(false))
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Generate metadata.json (recovery)"
+          ansible.builtin.command:
+            cmd: "hammer content-export generate-metadata --id {{ _recovery_export_match[0].id }}"
+          when:
+            - _recovery_export_match is defined
+            - _recovery_export_match | default([]) | length > 0
+            - not (_export_metadata_stat.stat.exists | default(false))
+          changed_when: true
+          failed_when: false
+          register: _recovery_metadata_result
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Re-stat metadata.json after recovery"
+          ansible.builtin.stat:
+            path: "{{ _export_path }}/metadata.json"
+          register: _export_metadata_stat
+          when:
+            - _recovery_metadata_result is defined
+            - _recovery_metadata_result.rc | default(1) == 0
+          tags:
+            - tags_content_exports
+
+        # ── Recovery: generate content_imports.yml ──────────────────────────
+        # When the export module timed out but Pulp completed, the normal
+        # generate_content_imports_file.yml (called after the module in
+        # perform_library_export.yml) was skipped. Without this recovery,
+        # Stage 3 of export_deployment.yml falls back to the static
+        # placeholder in highside host_vars — wrong path.
+
+        - name: "Checkpoint — Stat content_imports.yml in staging"
+          ansible.builtin.stat:
+            path: "{{ _export_staging }}/satellite/content_imports.yml"
+          register: _recovery_ci_stat
+          delegate_to: localhost
+          connection: local
+          when:
+            - _export_path is defined
+            - _export_path | length > 0
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Build content_imports.yml (recovery)"
+          vars:
+            _import_path: "{{ _export_path | replace('/var/lib/pulp/exports/', '/var/lib/pulp/imports/') }}"
+          ansible.builtin.set_fact:
+            _recovery_ci_content: |
+              ---
+              # content_imports.yml
+              # Auto-generated by export_disconnected.yml recovery on {{ ansible_date_time.iso8601 }}
+              # Source satellite: {{ ansible_fqdn }}
+
+              satellite_import_content: true
+
+              content_imports:
+              {% for ce in content_exports %}
+                - name: "{{ ce.name }}"
+                  type: "{{ ce.type }}"
+                  import_path: "{{ _import_path }}"
+                  metadata_file: "{{ _import_path }}/metadata.json"
+              {% endfor %}
+          when:
+            - _export_path is defined
+            - _export_path | length > 0
+            - not (_recovery_ci_stat.stat.exists | default(false))
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Ensure satellite staging directory exists"
+          ansible.builtin.file:
+            path: "{{ _export_staging }}/satellite"
+            state: directory
+            mode: "0755"
+          delegate_to: localhost
+          connection: local
+          when:
+            - _recovery_ci_content is defined
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Write content_imports.yml to staging (recovery)"
+          ansible.builtin.copy:
+            content: "{{ _recovery_ci_content }}"
+            dest: "{{ _export_staging }}/satellite/content_imports.yml"
+            mode: "0644"
+          delegate_to: localhost
+          connection: local
+          when:
+            - _recovery_ci_content is defined
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Write content_imports.yml to satellite export path (recovery)"
+          ansible.builtin.copy:
+            content: "{{ _recovery_ci_content }}"
+            dest: "{{ _export_path }}/content_imports.yml"
+            mode: "0644"
+          when:
+            - _recovery_ci_content is defined
+          tags:
+            - tags_content_exports
+
+        - name: "Checkpoint — Log content_imports.yml recovery"
+          ansible.builtin.debug:
+            msg: >-
+              Recovery: generated content_imports.yml from recovered export path.
+              Import path: {{ _export_path | replace('/var/lib/pulp/exports/', '/var/lib/pulp/imports/') }}
+          when:
+            - _recovery_ci_content is defined
           tags:
             - tags_content_exports
 
@@ -314,8 +605,9 @@
           when:
             - _export_path is defined
             - _export_path | length > 0
-            - _export_tar_files.matched > 0
-            - _export_metadata_stat.stat.exists
+            - _export_tar_files.matched | default(0) > 0
+            - _export_toc_files.matched | default(0) > 0
+            - _toc_verification.rc | default(1) == 0
           tags:
             - tags_content_exports
 
@@ -324,13 +616,16 @@
             msg: >-
               WARNING: Export directory {{ _export_path | default('(not set)') }} is incomplete
               (tar chunks: {{ _export_tar_files.matched | default(0) }},
+              toc.json: {{ _export_toc_files.matched | default(0) }},
+              toc verified: {{ _toc_verification.rc | default(1) == 0 }},
               metadata.json: {{ _export_metadata_stat.stat.exists | default(false) }}).
               Completion marker not written — next run will perform a full export.
           when:
             - _export_path is defined
             - _export_path | length > 0
             - (_export_tar_files.matched | default(0)) == 0 or
-              not (_export_metadata_stat.stat.exists | default(false))
+              (_export_toc_files.matched | default(0)) == 0 or
+              (_toc_verification.rc | default(1)) != 0
           tags:
             - tags_content_exports
 
