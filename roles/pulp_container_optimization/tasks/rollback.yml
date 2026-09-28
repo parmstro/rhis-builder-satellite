@@ -1,0 +1,61 @@
+---
+# Rollback entry point - called when pulp_container_optimization_action == 'rollback'
+
+- name: "Discover pulp_container installation path"
+  ansible.builtin.include_tasks: discover_paths.yml
+
+- name: "Check if optimization is currently deployed"
+  become_user: "{{ pulp_container_optimization_db_user }}"
+  community.postgresql.postgresql_query:
+    db: "{{ pulp_container_optimization_db_name }}"
+    query: |
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name='container_containerremote'
+      AND column_name='auto_discover_cosign'
+  register: _pco_is_deployed
+
+- name: "Skip rollback if not deployed"
+  when: _pco_is_deployed.rowcount == 0
+  ansible.builtin.debug:
+    msg: "Optimization is not currently deployed (auto_discover_cosign column not found). Skipping rollback."
+
+- name: "Perform rollback"
+  when: _pco_is_deployed.rowcount > 0
+  block:
+
+    - name: "Confirm rollback"
+      when: not (pulp_container_optimization_auto_confirm | default(true))
+      ansible.builtin.pause:
+        prompt: |
+
+          ========================================
+          ROLLBACK CONFIRMATION
+          ========================================
+          This will remove the pulp_container optimization:
+          1. Restore Python files from backup
+          2. Rollback database migration
+          3. Restart Pulp services
+          4. Remove the auto_discover_cosign feature
+
+          Press Ctrl+C and then 'A' to abort.
+          Press Enter to continue with rollback.
+          ========================================
+
+    - name: "Execute rollback"
+      ansible.builtin.include_tasks: rollback_tasks.yml
+      vars:
+        _pco_rollback_reason: "Rollback requested via role action"
+
+    - name: "Rollback complete"
+      ansible.builtin.debug:
+        msg: "Pulp container optimization has been rolled back successfully."
+
+  rescue:
+
+    - name: "Rollback failed"
+      ansible.builtin.fail:
+        msg: >-
+          Rollback failed on {{ ansible_hostname }}.
+          System may be inconsistent. Manual intervention required.
+          Check backup at {{ pulp_container_optimization_backup_dir }}/latest

@@ -1,0 +1,38 @@
+---
+# Discover the pulp_container installation path on the target system
+
+- name: "Search for pulp_container installation"
+  ansible.builtin.shell: |
+    if [ -d /usr/lib/python3.12/site-packages/pulp_container ]; then
+      echo "/usr/lib/python3.12/site-packages/pulp_container"
+    elif [ -d /usr/lib/python3.11/site-packages/pulp_container ]; then
+      echo "/usr/lib/python3.11/site-packages/pulp_container"
+    else
+      find /usr -name "pulp_container" -type d 2>/dev/null | grep site-packages | head -1
+    fi
+  register: _pco_search
+  changed_when: false
+
+- name: "Fail if pulp_container not found"
+  ansible.builtin.fail:
+    msg: "pulp_container installation not found in /usr/lib/python3*/site-packages. Is Satellite installed?"
+  when: _pco_search.stdout == ""
+
+- name: "Set pulp_container paths"
+  ansible.builtin.set_fact:
+    _pco_python_path: "{{ _pco_search.stdout }}"
+    _pco_app_path: "{{ _pco_search.stdout }}/app"
+
+- name: "Verify app directory exists"
+  ansible.builtin.stat:
+    path: "{{ _pco_app_path }}"
+  register: _pco_app_check
+
+- name: "Fail if app directory not found"
+  ansible.builtin.fail:
+    msg: "pulp_container/app directory not found at {{ _pco_app_path }}"
+  when: not _pco_app_check.stat.exists
+
+- name: "Display discovered path"
+  ansible.builtin.debug:
+    msg: "Found pulp_container at {{ _pco_python_path }}"

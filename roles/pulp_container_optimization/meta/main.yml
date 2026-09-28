@@ -1,0 +1,6 @@
+---
+
+galaxy_info:
+  author: "Paul Armstrong (github:@parmstro)"
+  description: "Deploy or rollback the pulp_container tag list bypass optimization for container sync performance."
+  standalone: false
