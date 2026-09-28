@@ -67,6 +67,14 @@
         - tags_satellite_post
         - tags_satellite_before_sync
 
+    - name: "Apply pulp_container sync optimization to {{ ansible_fqdn }}"
+      ansible.builtin.include_role:
+        name: pulp_container_optimization
+      tags:
+        - tags_satellite_post
+        - tags_satellite_before_sync
+        - tags_pulp_optimization
+
     - name: "Ensure hammer configuration"
       ansible.builtin.import_tasks: "tasks/configure_hammer.yml"
       tags:

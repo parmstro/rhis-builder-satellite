@@ -1,0 +1,325 @@
+---
+# Install the pulp_container tag list bypass optimization
+# Patches the installed pulp_container package in-place with backup
+
+- name: "Optimization install"
+  block:
+
+    # ==================================================================
+    # PRE-FLIGHT CHECKS
+    # ==================================================================
+
+    - name: "Discover pulp_container installation path"
+      ansible.builtin.include_tasks: discover_paths.yml
+
+    - name: "Verify PostgreSQL is running"
+      ansible.builtin.systemd:
+        name: postgresql
+        state: started
+      check_mode: true
+
+    - name: "Verify database accessibility"
+      become_user: "{{ pulp_container_optimization_db_user }}"
+      community.postgresql.postgresql_query:
+        db: "{{ pulp_container_optimization_db_name }}"
+        query: "SELECT 1"
+      register: _pco_db_check
+
+    - name: "Check if optimization is already deployed"
+      become_user: "{{ pulp_container_optimization_db_user }}"
+      community.postgresql.postgresql_query:
+        db: "{{ pulp_container_optimization_db_name }}"
+        query: |
+          SELECT column_name
+          FROM information_schema.columns
+          WHERE table_name='container_containerremote'
+          AND column_name='auto_discover_cosign'
+      register: _pco_already_deployed
+
+    - name: "Skip deployment if already applied"
+      when: _pco_already_deployed.rowcount > 0
+      ansible.builtin.debug:
+        msg: "Optimization already deployed (auto_discover_cosign column exists). Skipping."
+
+    - name: "Deploy optimization"
+      when: _pco_already_deployed.rowcount == 0
+      block:
+
+        # ==================================================================
+        # BACKUP
+        # ==================================================================
+
+        - name: "Set backup timestamp"
+          ansible.builtin.set_fact:
+            _pco_backup_timestamp: "{{ ansible_date_time.iso8601_basic_short }}"
+
+        - name: "Create backup directory"
+          ansible.builtin.file:
+            path: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}"
+            state: directory
+            mode: '0777'
+
+        - name: "Create backup manifest"
+          ansible.builtin.copy:
+            content: |
+              Backup created: {{ ansible_date_time.iso8601 }}
+              Host: {{ ansible_hostname }}
+              Backup directory: {{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}
+              Reason: pulp_container optimization deployment
+            dest: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}/BACKUP_MANIFEST.txt"
+            mode: '0644'
+
+        - name: "Backup Python files"
+          ansible.builtin.copy:
+            src: "{{ item.src }}"
+            dest: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}/{{ item.name }}"
+            remote_src: true
+            mode: preserve
+          loop:
+            - { src: "{{ _pco_app_path }}/models.py", name: "models.py" }
+            - { src: "{{ _pco_app_path }}/tasks/sync_stages.py", name: "sync_stages.py" }
+            - { src: "{{ _pco_app_path }}/tasks/synchronize.py", name: "synchronize.py" }
+
+        - name: "Backup migrations directory"
+          ansible.posix.synchronize:
+            src: "{{ _pco_app_path }}/migrations/"
+            dest: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}/migrations/"
+            archive: true
+          delegate_to: "{{ inventory_hostname }}"
+
+        - name: "Backup database migration state"
+          become_user: "{{ pulp_container_optimization_db_user }}"
+          community.postgresql.postgresql_query:
+            db: "{{ pulp_container_optimization_db_name }}"
+            query: |
+              SELECT app, name, applied
+              FROM django_migrations
+              WHERE app = '{{ pulp_container_optimization_migration_app }}'
+              ORDER BY applied DESC
+          register: _pco_migration_state
+
+        - name: "Save migration state to file"
+          ansible.builtin.copy:
+            content: "{{ _pco_migration_state.query_result | to_nice_json }}"
+            dest: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}/migration_state.json"
+            mode: '0644'
+
+        - name: "Backup container_containerremote table"
+          become_user: "{{ pulp_container_optimization_db_user }}"
+          community.postgresql.postgresql_db:
+            name: "{{ pulp_container_optimization_db_name }}"
+            state: dump
+            target: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}/container_containerremote.sql"
+            target_opts: "--table=container_containerremote --clean --if-exists"
+
+        - name: "Create latest backup symlink"
+          ansible.builtin.file:
+            src: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}"
+            dest: "{{ pulp_container_optimization_backup_dir }}/latest"
+            state: link
+            force: true
+
+        # ==================================================================
+        # DRAIN RUNNING TASKS
+        # ==================================================================
+
+        - name: "Check for running pulp tasks"
+          become_user: pulp
+          ansible.builtin.shell: |
+            pulpcore-manager shell -c "
+            from pulpcore.app.models import Task
+            count = Task.objects.filter(state__in=['running', 'waiting', 'canceling']).count()
+            print(count)
+            "
+          environment:
+            PULP_SETTINGS: /etc/pulp/settings.py
+            DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+          register: _pco_task_count
+          changed_when: false
+
+        - name: "Wait for running tasks to drain"
+          become_user: pulp
+          ansible.builtin.shell: |
+            pulpcore-manager shell -c "
+            from pulpcore.app.models import Task
+            count = Task.objects.filter(state__in=['running', 'waiting', 'canceling']).count()
+            print(count)
+            "
+          environment:
+            PULP_SETTINGS: /etc/pulp/settings.py
+            DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+          register: _pco_drain_check
+          until: _pco_drain_check.stdout | trim | int == 0
+          retries: "{{ pulp_container_optimization_drain_retries }}"
+          delay: "{{ pulp_container_optimization_drain_delay }}"
+          changed_when: false
+          when: _pco_task_count.stdout | trim | int > 0
+
+        # ==================================================================
+        # STOP SERVICES
+        # ==================================================================
+
+        - name: "Stop pulp services"
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: stopped
+          loop: "{{ pulp_container_optimization_services }}"
+
+        - name: "Wait for services to stop"
+          ansible.builtin.wait_for:
+            timeout: 30
+
+        - name: "Verify services are stopped"
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+          register: _pco_service_stopped
+          failed_when: _pco_service_stopped.status.ActiveState == "active"
+          loop: "{{ pulp_container_optimization_services }}"
+
+        # ==================================================================
+        # DEPLOY FILES
+        # ==================================================================
+
+        - name: "Deploy optimized models.py"
+          ansible.builtin.copy:
+            src: "pulp_container_optimization/app/models.py"
+            dest: "{{ _pco_app_path }}/models.py"
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: "Deploy optimized sync_stages.py"
+          ansible.builtin.copy:
+            src: "pulp_container_optimization/app/tasks/sync_stages.py"
+            dest: "{{ _pco_app_path }}/tasks/sync_stages.py"
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: "Deploy optimized synchronize.py"
+          ansible.builtin.copy:
+            src: "pulp_container_optimization/app/tasks/synchronize.py"
+            dest: "{{ _pco_app_path }}/tasks/synchronize.py"
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: "Deploy migration file"
+          ansible.builtin.copy:
+            src: "pulp_container_optimization/app/migrations/{{ pulp_container_optimization_migration_file }}"
+            dest: "{{ _pco_app_path }}/migrations/{{ pulp_container_optimization_migration_file }}"
+            owner: root
+            group: root
+            mode: '0644'
+
+        - name: "Compile deployed Python files"
+          ansible.builtin.shell: |
+            python3 -m py_compile {{ _pco_app_path }}/models.py
+            python3 -m py_compile {{ _pco_app_path }}/tasks/sync_stages.py
+            python3 -m py_compile {{ _pco_app_path }}/tasks/synchronize.py
+          register: _pco_compile
+          changed_when: false
+          failed_when: _pco_compile.rc != 0
+
+        # ==================================================================
+        # RUN MIGRATION
+        # ==================================================================
+
+        - name: "Run Django migration"
+          become_user: pulp
+          ansible.builtin.shell: |
+            pulpcore-manager migrate {{ pulp_container_optimization_migration_app }}
+          environment:
+            PULP_SETTINGS: /etc/pulp/settings.py
+            DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+          register: _pco_migration_result
+
+        - name: "Verify migration applied"
+          become_user: "{{ pulp_container_optimization_db_user }}"
+          community.postgresql.postgresql_query:
+            db: "{{ pulp_container_optimization_db_name }}"
+            query: |
+              SELECT name FROM django_migrations
+              WHERE app = '{{ pulp_container_optimization_migration_app }}'
+              AND name = '{{ pulp_container_optimization_migration_file | replace('.py', '') }}'
+          register: _pco_migration_verify
+          failed_when: _pco_migration_verify.rowcount == 0
+
+        - name: "Verify auto_discover_cosign column exists"
+          become_user: "{{ pulp_container_optimization_db_user }}"
+          community.postgresql.postgresql_query:
+            db: "{{ pulp_container_optimization_db_name }}"
+            query: |
+              SELECT column_name, data_type, column_default
+              FROM information_schema.columns
+              WHERE table_name='container_containerremote'
+              AND column_name='auto_discover_cosign'
+          register: _pco_column_check
+          failed_when: _pco_column_check.rowcount == 0
+
+        # ==================================================================
+        # RESTART SERVICES
+        # ==================================================================
+
+        - name: "Start pulp services"
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: started
+          loop: "{{ pulp_container_optimization_services }}"
+
+        - name: "Wait for services to start"
+          ansible.builtin.wait_for:
+            timeout: 30
+
+        - name: "Verify services are running"
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+          register: _pco_service_running
+          failed_when: _pco_service_running.status.ActiveState != "active"
+          loop: "{{ pulp_container_optimization_services }}"
+
+        # ==================================================================
+        # POST-DEPLOYMENT VERIFICATION
+        # ==================================================================
+
+        - name: "Wait for Pulp API to respond"
+          ansible.builtin.uri:
+            url: "https://{{ ansible_fqdn }}/pulp/api/v3/status/"
+            validate_certs: false
+            status_code: 200
+          register: _pco_api_check
+          until: _pco_api_check.status == 200
+          retries: 12
+          delay: 5
+
+        - name: "Create deployment success marker"
+          ansible.builtin.copy:
+            content: |
+              Deployment successful
+              Completed: {{ ansible_date_time.iso8601 }}
+              Backup location: {{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}
+              Migration applied: {{ pulp_container_optimization_migration_file }}
+            dest: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}/DEPLOYMENT_SUCCESS.txt"
+            mode: '0644'
+
+        - name: "Deployment complete"
+          ansible.builtin.debug:
+            msg: >-
+              Pulp container optimization deployed successfully.
+              Backup at {{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp }}.
+
+  rescue:
+
+    - name: "Deployment failed - initiating automatic rollback"
+      ansible.builtin.debug:
+        msg: "Deployment failed. Starting automatic rollback..."
+
+    - name: "Include rollback tasks"
+      ansible.builtin.include_tasks: rollback_tasks.yml
+      vars:
+        _pco_rollback_reason: "Automatic rollback due to deployment failure"
+        _pco_rollback_backup_path: "{{ pulp_container_optimization_backup_dir }}/{{ _pco_backup_timestamp | default(pulp_container_optimization_backup_dir + '/latest') }}"
+
+    - name: "Fail after rollback"
+      ansible.builtin.fail:
+        msg: "Deployment failed and has been rolled back. Check logs on {{ ansible_hostname }}."

@@ -1,0 +1,38 @@
+---
+# Defaults for pulp_container_optimization role
+# Override these in rhis-builder-inventory host/group vars
+
+# Master toggle - set to true to deploy the optimization
+pulp_container_bypass_optimization: false
+
+# Action to perform: 'install' or 'rollback'
+pulp_container_optimization_action: install
+
+# Backup configuration
+pulp_container_optimization_backup_dir: /var/lib/pulp-backups
+pulp_container_optimization_backup_retention_days: 30
+
+# Migration details
+pulp_container_optimization_migration_file: "0046_containerremote_auto_discover_cosign.py"
+pulp_container_optimization_migration_app: "container"
+pulp_container_optimization_migration_rollback_target: "0045_alter_manifest_compressed_image_size"
+
+# Database
+pulp_container_optimization_db_name: pulpcore
+pulp_container_optimization_db_user: postgres
+
+# Pulp services to manage during deploy/rollback
+pulp_container_optimization_services:
+  - pulpcore-api
+  - pulpcore-content
+  - pulpcore-worker@1
+  - pulpcore-worker@2
+  - pulpcore-worker@3
+  - pulpcore-worker@4
+
+# Wait for running tasks to drain before deploying (seconds between checks, max retries)
+pulp_container_optimization_drain_delay: 30
+pulp_container_optimization_drain_retries: 60
+
+# Skip confirmation prompts (for automated runs)
+pulp_container_optimization_auto_confirm: true

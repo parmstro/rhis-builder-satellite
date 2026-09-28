@@ -1,0 +1,20 @@
+---
+
+- name: "Deploy pulp_container bypass optimization"
+  when:
+    - pulp_container_bypass_optimization
+    - pulp_container_optimization_action == 'install'
+  ansible.builtin.include_tasks: install.yml
+  tags:
+    - tags_satellite_post
+    - tags_satellite_before_sync
+    - tags_pulp_optimization
+
+- name: "Rollback pulp_container bypass optimization"
+  when:
+    - pulp_container_optimization_action == 'rollback'
+  ansible.builtin.include_tasks: rollback.yml
+  tags:
+    - tags_satellite_post
+    - tags_pulp_optimization
+    - tags_pulp_optimization_rollback

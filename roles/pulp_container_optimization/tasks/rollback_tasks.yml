@@ -1,0 +1,136 @@
+---
+# Core rollback tasks - used by both the rollback action and the install rescue block
+
+- name: "Discover pulp_container path for rollback"
+  ansible.builtin.include_tasks: discover_paths.yml
+  when: _pco_app_path is not defined
+
+- name: "Resolve backup path"
+  ansible.builtin.set_fact:
+    _pco_resolved_backup: "{{ _pco_rollback_backup_path | default(pulp_container_optimization_backup_dir + '/latest') }}"
+
+- name: "Check backup exists"
+  ansible.builtin.stat:
+    path: "{{ _pco_resolved_backup }}/BACKUP_MANIFEST.txt"
+  register: _pco_backup_check
+
+- name: "Resolve symlink if needed"
+  when: _pco_backup_check.stat is defined and _pco_backup_check.stat.exists is defined and not _pco_backup_check.stat.exists
+  block:
+    - name: "Check if backup path is a symlink"
+      ansible.builtin.stat:
+        path: "{{ _pco_resolved_backup }}"
+      register: _pco_backup_stat
+
+    - name: "Resolve symlink"
+      ansible.builtin.set_fact:
+        _pco_resolved_backup: "{{ _pco_backup_stat.stat.lnk_source }}"
+      when: _pco_backup_stat.stat.islnk | default(false)
+
+- name: "Fail if no backup found"
+  ansible.builtin.fail:
+    msg: >-
+      No backup found at {{ _pco_resolved_backup }}.
+      Available backups in {{ pulp_container_optimization_backup_dir }}/.
+  when: not (_pco_backup_check.stat.exists | default(false))
+
+- name: "Stop pulp services for rollback"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+  loop: "{{ pulp_container_optimization_services }}"
+  ignore_errors: true
+
+- name: "Restore Python files from backup"
+  ansible.builtin.copy:
+    src: "{{ _pco_resolved_backup }}/{{ item.name }}"
+    dest: "{{ item.dest }}"
+    remote_src: true
+    mode: preserve
+  loop:
+    - { name: "models.py", dest: "{{ _pco_app_path }}/models.py" }
+    - { name: "sync_stages.py", dest: "{{ _pco_app_path }}/tasks/sync_stages.py" }
+    - { name: "synchronize.py", dest: "{{ _pco_app_path }}/tasks/synchronize.py" }
+
+- name: "Restore migrations directory from backup"
+  ansible.posix.synchronize:
+    src: "{{ _pco_resolved_backup }}/migrations/"
+    dest: "{{ _pco_app_path }}/migrations/"
+    archive: true
+    delete: true
+  delegate_to: "{{ inventory_hostname }}"
+
+- name: "Remove optimization migration file"
+  ansible.builtin.file:
+    path: "{{ _pco_app_path }}/migrations/{{ pulp_container_optimization_migration_file }}"
+    state: absent
+
+- name: "Rollback database migration"
+  become_user: pulp
+  ansible.builtin.shell: |
+    pulpcore-manager migrate {{ pulp_container_optimization_migration_app }} {{ pulp_container_optimization_migration_rollback_target }}
+  environment:
+    PULP_SETTINGS: /etc/pulp/settings.py
+    DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+  register: _pco_migration_rollback
+  failed_when: false
+
+- name: "Restore database table if migration rollback failed"
+  become_user: "{{ pulp_container_optimization_db_user }}"
+  community.postgresql.postgresql_db:
+    name: "{{ pulp_container_optimization_db_name }}"
+    state: restore
+    target: "{{ _pco_resolved_backup }}/container_containerremote.sql"
+  when: _pco_migration_rollback is failed
+
+- name: "Verify auto_discover_cosign column removed"
+  become_user: "{{ pulp_container_optimization_db_user }}"
+  community.postgresql.postgresql_query:
+    db: "{{ pulp_container_optimization_db_name }}"
+    query: |
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name='container_containerremote'
+      AND column_name='auto_discover_cosign'
+  register: _pco_column_verify
+
+- name: "Confirm column removed"
+  ansible.builtin.debug:
+    msg: "auto_discover_cosign column removed: {{ _pco_column_verify.rowcount == 0 }}"
+
+- name: "Restart pulp services after rollback"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+  loop: "{{ pulp_container_optimization_services }}"
+
+- name: "Wait for services to stabilize"
+  ansible.builtin.wait_for:
+    timeout: 30
+
+- name: "Verify services are running"
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+  register: _pco_service_verify
+  failed_when: _pco_service_verify.status.ActiveState != "active"
+  loop: "{{ pulp_container_optimization_services }}"
+
+- name: "Wait for Pulp API to respond"
+  ansible.builtin.uri:
+    url: "https://{{ ansible_fqdn }}/pulp/api/v3/status/"
+    validate_certs: false
+    status_code: 200
+  register: _pco_api_verify
+  until: _pco_api_verify.status == 200
+  retries: 12
+  delay: 5
+
+- name: "Create rollback success marker"
+  ansible.builtin.copy:
+    content: |
+      Rollback successful
+      Completed: {{ ansible_date_time.iso8601 }}
+      Reason: {{ _pco_rollback_reason | default('Manual rollback requested') }}
+      Restored from: {{ _pco_resolved_backup }}
+    dest: "{{ _pco_resolved_backup }}/ROLLBACK_SUCCESS.txt"
+    mode: '0644'
