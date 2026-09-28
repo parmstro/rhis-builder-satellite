@@ -182,7 +182,7 @@
 
         - name: "Deploy optimized models.py"
           ansible.builtin.copy:
-            src: "pulp_container/app/models.py"
+            src: "pulp_container_optimization/app/models.py"
             dest: "{{ _pco_app_path }}/models.py"
             owner: root
             group: root
@@ -190,7 +190,7 @@
 
         - name: "Deploy optimized sync_stages.py"
           ansible.builtin.copy:
-            src: "pulp_container/app/tasks/sync_stages.py"
+            src: "pulp_container_optimization/app/tasks/sync_stages.py"
             dest: "{{ _pco_app_path }}/tasks/sync_stages.py"
             owner: root
             group: root
@@ -198,7 +198,7 @@
 
         - name: "Deploy optimized synchronize.py"
           ansible.builtin.copy:
-            src: "pulp_container/app/tasks/synchronize.py"
+            src: "pulp_container_optimization/app/tasks/synchronize.py"
             dest: "{{ _pco_app_path }}/tasks/synchronize.py"
             owner: root
             group: root
@@ -206,7 +206,7 @@
 
         - name: "Deploy migration file"
           ansible.builtin.copy:
-            src: "pulp_container/app/migrations/{{ pulp_container_optimization_migration_file }}"
+            src: "pulp_container_optimization/app/migrations/{{ pulp_container_optimization_migration_file }}"
             dest: "{{ _pco_app_path }}/migrations/{{ pulp_container_optimization_migration_file }}"
             owner: root
             group: root
