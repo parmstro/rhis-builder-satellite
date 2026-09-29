@@ -21,14 +21,14 @@
     - name: "Verify database accessibility"
       become_user: "{{ pulp_container_optimization_db_user }}"
       community.postgresql.postgresql_query:
-        db: "{{ pulp_container_optimization_db_name }}"
+        login_db: "{{ pulp_container_optimization_db_name }}"
         query: "SELECT 1"
       register: _pco_db_check
 
     - name: "Check if optimization is already deployed"
       become_user: "{{ pulp_container_optimization_db_user }}"
       community.postgresql.postgresql_query:
-        db: "{{ pulp_container_optimization_db_name }}"
+        login_db: "{{ pulp_container_optimization_db_name }}"
         query: |
           SELECT column_name
           FROM information_schema.columns
@@ -90,7 +90,7 @@
         - name: "Backup database migration state"
           become_user: "{{ pulp_container_optimization_db_user }}"
           community.postgresql.postgresql_query:
-            db: "{{ pulp_container_optimization_db_name }}"
+            login_db: "{{ pulp_container_optimization_db_name }}"
             query: |
               SELECT app, name, applied
               FROM django_migrations
@@ -237,7 +237,7 @@
         - name: "Verify migration applied"
           become_user: "{{ pulp_container_optimization_db_user }}"
           community.postgresql.postgresql_query:
-            db: "{{ pulp_container_optimization_db_name }}"
+            login_db: "{{ pulp_container_optimization_db_name }}"
             query: |
               SELECT name FROM django_migrations
               WHERE app = '{{ pulp_container_optimization_migration_app }}'
@@ -248,7 +248,7 @@
         - name: "Verify auto_discover_cosign column exists"
           become_user: "{{ pulp_container_optimization_db_user }}"
           community.postgresql.postgresql_query:
-            db: "{{ pulp_container_optimization_db_name }}"
+            login_db: "{{ pulp_container_optimization_db_name }}"
             query: |
               SELECT column_name, data_type, column_default
               FROM information_schema.columns

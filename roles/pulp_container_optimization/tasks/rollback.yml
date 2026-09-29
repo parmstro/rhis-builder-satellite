@@ -7,7 +7,7 @@
 - name: "Check if optimization is currently deployed"
   become_user: "{{ pulp_container_optimization_db_user }}"
   community.postgresql.postgresql_query:
-    db: "{{ pulp_container_optimization_db_name }}"
+    login_db: "{{ pulp_container_optimization_db_name }}"
     query: |
       SELECT column_name
       FROM information_schema.columns
