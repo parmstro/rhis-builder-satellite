@@ -17,6 +17,9 @@ pulp_container_optimization_migration_file: "0046_containerremote_auto_discover_
 pulp_container_optimization_migration_app: "container"
 pulp_container_optimization_migration_rollback_target: "0045_alter_manifest_compressed_image_size"
 
+# Python interpreter (Satellite ships psycopg2 under python3.12)
+pulp_container_optimization_python_interpreter: /usr/bin/python3.12
+
 # Database
 pulp_container_optimization_db_name: pulpcore
 pulp_container_optimization_db_user: postgres

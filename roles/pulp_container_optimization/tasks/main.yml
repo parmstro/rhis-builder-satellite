@@ -5,6 +5,8 @@
     - pulp_container_bypass_optimization
     - pulp_container_optimization_action == 'install'
   ansible.builtin.include_tasks: install.yml
+  vars:
+    ansible_python_interpreter: "{{ pulp_container_optimization_python_interpreter }}"
   tags:
     - tags_satellite_post
     - tags_satellite_before_sync
@@ -14,6 +16,8 @@
   when:
     - pulp_container_optimization_action == 'rollback'
   ansible.builtin.include_tasks: rollback.yml
+  vars:
+    ansible_python_interpreter: "{{ pulp_container_optimization_python_interpreter }}"
   tags:
     - tags_satellite_post
     - tags_pulp_optimization
