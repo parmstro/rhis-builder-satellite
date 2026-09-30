@@ -1,0 +1,53 @@
+# ansible-lint configuration for rhis-builder-satellite
+---
+# RHIS standard ansible-lint configuration
+# Used as the baseline for all rhis-builder projects.
+# Copy to .ansible-lint in each repo and add repo-specific exceptions below the marker.
+# https://ansible-lint.readthedocs.io/
+
+profile: production
+
+exclude_paths:
+  - .git/
+  - .github/
+  - .vscode/
+  - .devcontainer/
+  - .claude/
+  - tests/
+  - .cache/
+
+skip_list:
+  - experimental       # Skip experimental rules until they're stable
+  - role-name          # RHIS uses component-prefixed role names (satellite_, idm_, etc.) — intentional
+
+warn_list:
+  - no-changed-when              # Warn but don't fail — some commands are fire-and-forget by design
+  - command-instead-of-module    # Some commands are necessary or intentional
+  - risky-file-permissions       # Context-dependent — review case by case
+  - var-naming[no-role-prefix]   # RHIS uses component-scoped prefixes (satellite_, idm_, kvm_)
+                                 # not role-scoped prefixes. Clean up incrementally during
+                                 # feature verification. See schema/TODO.md variable scoping note.
+
+enable_list:
+  - yaml
+  - fqcn
+  - fqcn-builtins
+
+kinds:
+  - playbook: "**/playbooks/*.yml"
+  - playbook: "**/playbooks/*.yaml"
+  - tasks: "**/tasks/*.yml"
+  - tasks: "**/tasks/*.yaml"
+  - handlers: "**/handlers/*.yml"
+  - vars: "**/vars/*.yml"
+  - vars: "**/defaults/*.yml"
+  - vars: "**/group_vars/**/*.yml"
+  - vars: "**/host_vars/**/*.yml"
+  - meta: "**/meta/main.yml"
+  - meta: "**/meta/argument_specs.yml"
+  - yaml: "*.yaml"
+  - yaml: "*.yml"
+
+offline: false
+verbosity: 1
+# Repo-specific exceptions: none
