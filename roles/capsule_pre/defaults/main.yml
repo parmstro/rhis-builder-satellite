@@ -15,7 +15,7 @@
 #   - "redis"
 # capsule_pre_assert_selinux: "true"
 # capsule_pre_time_servers:
-#   - "time.example.ca"
-#   - "time2.example.ca"
-#   - "time3.example.ca"
+#   - "192.168.252.7"
+#   - "192.168.252.8"
+#   - "192.168.252.9"
 # capsule_pre_firewalld_service: "RH-Satellite-6-capsule"
