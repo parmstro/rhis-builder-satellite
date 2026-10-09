@@ -283,14 +283,13 @@
         # ==================================================================
 
         - name: "Wait for Pulp API to respond"
-          ansible.builtin.uri:
-            url: "https://{{ ansible_fqdn }}/pulp/api/v3/status/"
-            validate_certs: false
-            status_code: 200
+          ansible.builtin.command:
+            cmd: "curl -s -o /dev/null -w '%{http_code}' -k https://{{ ansible_fqdn }}/pulp/api/v3/status/"
           register: _pco_api_check
-          until: _pco_api_check.status == 200
+          until: _pco_api_check.stdout == "200"
           retries: 12
           delay: 5
+          changed_when: false
 
         - name: "Create deployment success marker"
           ansible.builtin.copy:

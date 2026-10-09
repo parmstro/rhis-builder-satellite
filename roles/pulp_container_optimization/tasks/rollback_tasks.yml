@@ -41,6 +41,24 @@
   loop: "{{ pulp_container_optimization_services }}"
   ignore_errors: true
 
+- name: "Rollback database migration"
+  become_user: pulp
+  ansible.builtin.shell: |
+    pulpcore-manager migrate {{ pulp_container_optimization_migration_app }} {{ pulp_container_optimization_migration_rollback_target }}
+  environment:
+    PULP_SETTINGS: /etc/pulp/settings.py
+    DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+  register: _pco_migration_rollback
+  failed_when: false
+
+- name: "Restore database table if migration rollback failed"
+  become_user: "{{ pulp_container_optimization_db_user }}"
+  community.postgresql.postgresql_db:
+    name: "{{ pulp_container_optimization_db_name }}"
+    state: restore
+    target: "{{ _pco_resolved_backup }}/container_containerremote.sql"
+  when: _pco_migration_rollback.rc | default(1) != 0
+
 - name: "Restore Python files from backup"
   ansible.builtin.copy:
     src: "{{ _pco_resolved_backup }}/{{ item.name }}"
@@ -64,24 +82,6 @@
   ansible.builtin.file:
     path: "{{ _pco_app_path }}/migrations/{{ pulp_container_optimization_migration_file }}"
     state: absent
-
-- name: "Rollback database migration"
-  become_user: pulp
-  ansible.builtin.shell: |
-    pulpcore-manager migrate {{ pulp_container_optimization_migration_app }} {{ pulp_container_optimization_migration_rollback_target }}
-  environment:
-    PULP_SETTINGS: /etc/pulp/settings.py
-    DJANGO_SETTINGS_MODULE: pulpcore.app.settings
-  register: _pco_migration_rollback
-  failed_when: false
-
-- name: "Restore database table if migration rollback failed"
-  become_user: "{{ pulp_container_optimization_db_user }}"
-  community.postgresql.postgresql_db:
-    name: "{{ pulp_container_optimization_db_name }}"
-    state: restore
-    target: "{{ _pco_resolved_backup }}/container_containerremote.sql"
-  when: _pco_migration_rollback is failed
 
 - name: "Verify auto_discover_cosign column removed"
   become_user: "{{ pulp_container_optimization_db_user }}"
@@ -116,14 +116,13 @@
   loop: "{{ pulp_container_optimization_services }}"
 
 - name: "Wait for Pulp API to respond"
-  ansible.builtin.uri:
-    url: "https://{{ ansible_fqdn }}/pulp/api/v3/status/"
-    validate_certs: false
-    status_code: 200
+  ansible.builtin.command:
+    cmd: "curl -s -o /dev/null -w '%{http_code}' -k https://{{ ansible_fqdn }}/pulp/api/v3/status/"
   register: _pco_api_verify
-  until: _pco_api_verify.status == 200
+  until: _pco_api_verify.stdout == "200"
   retries: 12
   delay: 5
+  changed_when: false
 
 - name: "Create rollback success marker"
   ansible.builtin.copy:
