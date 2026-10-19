@@ -29,3 +29,4 @@
     package_name: "{{ content_view_filter_rule.package_name | default(omit) }}"  # name alias
     package_group: "{{ content_view_filter_rule.package_group | default(omit) }}"  # name alias
     arch: "{{ content_view_filter_rule.arch | default(omit) }}" # architecture alias
+    fail_on_missing: "{{ content_view_filter_rule.fail_on_missing | default(omit) }}"
