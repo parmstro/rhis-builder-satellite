@@ -1,4 +1,6 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json
+
 # This play creates an individual composite content view from specified content_views
 
 - name: "Configure the composite content view - {{ composite_content_view.name }}"
@@ -10,7 +12,7 @@
     organization: "{{ satellite_organization }}"
     validate_certs: "{{ satellite_validate_certs | default(omit) }}"
     name: "{{ composite_content_view.name }}"
-    description: "{{ composite_content_view.desc }}"
+    description: "{{ composite_content_view.desc | default(omit) }}"
     composite: true
     components: "{{ composite_content_view.components }}"
     auto_publish: "{{ composite_content_view.auto_publish | default(omit) }}"

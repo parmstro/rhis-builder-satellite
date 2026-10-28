@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json
 
 # Configure the content views and composite content views
 - name: "Ensure configuration of content views"

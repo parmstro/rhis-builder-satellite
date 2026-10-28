@@ -1,4 +1,6 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/ansible/schemas/main/f/ansible-tasks.json
+
 # This play adds the filter rules to a content view filter
 # There are a lot of ways to create rules. Please consult the latest documentation
 

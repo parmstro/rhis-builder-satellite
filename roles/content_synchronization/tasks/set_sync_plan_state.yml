@@ -1,0 +1,68 @@
+---
+
+# This task will enable or disble all sync plans for the
+# target satellite, organization and location, based on the value of
+#
+# existing_sync_plan_enabled_state
+#
+# use this to globally disable (false) sync plans prior to content activity
+# and to re-enable them after the content activity
+#
+# e.g. starting an unscheduled synchronization activity
+# What we need to do.
+# Find all the sync plans for the target satellite, organization and location
+# determine if the sync plan is enabled
+# if it is enabled, add that sync plan to a list of sync plans to disable
+# disable all the sync plans in the list
+# keep the list of sync plans that we disabled 
+# so that we can re-enable them after the content activity is complete
+
+- name: "Determing if we are reverting the sync plan state"
+  when: sync_plans_to_change is defined and sync_plans_to_change | length > 0
+  ansible.builtin.set_fact:
+    reverting: "true"
+
+# if reverting is false or does not exist it means 
+# we need to query the satellite for the sync plans and determine which ones to disable  
+- name: "Query Satellite for resources if we are setting a new sync plan state"
+  when: not (reverting | bool | default(false))
+  block:
+    - name: "Query Satellite for resources"
+      redhat.satellite.resource_info:
+        username: "{{ satellite_username | default(omit) }}"
+        password: "{{ satellite_password | default(omit) }}"
+        use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+        server_url: "{{ satellite_url }}"
+        organization: "{{ satellite_organization }}"
+        validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+        resource: "sync_plans"
+      register: sync_plans_info
+
+    - name: "Create the list of sync plans to toggle state on"  
+      ansible.builtin.set_fact:
+        sync_plans_to_change: "{{ sync_plans_info.resources | selectattr('enabled', 'equalto', desired_sync_plan_enabled_state ) | list }}"
+  
+# If we are here we have a list of sync plans to set the state on
+- name: "Set the sync plan state"
+  redhat.satellite.sync_plan:
+    username: "{{ satellite_username | default(omit) }}"
+    password: "{{ satellite_password | default(omit) }}"
+    use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
+    server_url: "{{ satellite_url }}"
+    organization: "{{ satellite_organization }}"
+    validate_certs: "{{ satellite_validate_certs | default(omit) }}"
+    name: "{{ sync_plan.name }}"
+    interval: "{{ sync_plan.interval }}"
+    sync_date: "{{ sync_plan.sync_date }}"
+    enabled: "{{ sync_plan.enabled if (reverting | bool | default(false)) else not sync_plan.enabled }}"
+  loop: "{{ sync_plans_to_change }}"
+  loop_control:
+    loop_var: sync_plan
+
+- name: "Determing if we reverted, clean up"
+  when: reverting | bool | default(false)
+  ansible.builtin.set_fact:
+    reverting: "false"
+    sync_plans_to_change: []
+
+...

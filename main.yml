@@ -150,7 +150,9 @@
     # This task should occur synchronously - we want all the repos populated before we start creating content views
     - name: "Ensure repository synchronization... go grab a meal, this will take a while"
       when: not satellite_disconnected
-      ansible.builtin.import_tasks: "tasks/start_synchronization.yml"
+      # ansible.builtin.import_tasks: "tasks/start_synchronization.yml"
+      ansible.builtin.import_role:
+        name: content_synchronization
       tags:
         - tags_content_config
         - tags_sync
