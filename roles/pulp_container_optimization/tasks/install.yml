@@ -25,7 +25,7 @@
         query: "SELECT 1"
       register: _pco_db_check
 
-    - name: "Check if optimization is already deployed"
+    - name: "Check if database migration is applied"
       become_user: "{{ pulp_container_optimization_db_user }}"
       community.postgresql.postgresql_query:
         login_db: "{{ pulp_container_optimization_db_name }}"
@@ -34,15 +34,50 @@
           FROM information_schema.columns
           WHERE table_name='container_containerremote'
           AND column_name='auto_discover_cosign'
-      register: _pco_already_deployed
+      register: _pco_db_deployed
 
-    - name: "Skip deployment if already applied"
-      when: _pco_already_deployed.rowcount > 0
+    - name: "Check if source files are patched"
+      ansible.builtin.shell: |
+        rpm_name=$(rpm -qf {{ _pco_app_path }}/models.py 2>/dev/null)
+        if [ -z "$rpm_name" ]; then
+          echo "unknown"
+          exit 0
+        fi
+        modified=$(rpm -V "$rpm_name" 2>/dev/null | grep -cE '(models\.py|sync_stages\.py|synchronize\.py)')
+        echo "$modified"
+      register: _pco_source_patched
+      changed_when: false
+
+    - name: "Set deployment state facts"
+      ansible.builtin.set_fact:
+        _pco_db_has_column: "{{ _pco_db_deployed.rowcount > 0 }}"
+        _pco_files_modified: "{{ _pco_source_patched.stdout | trim not in ['0', 'unknown'] }}"
+        _pco_rpm_check_available: "{{ _pco_source_patched.stdout | trim != 'unknown' }}"
+
+    - name: "Skip deployment if fully applied"
+      when: _pco_db_has_column and _pco_files_modified
       ansible.builtin.debug:
-        msg: "Optimization already deployed (auto_discover_cosign column exists). Skipping."
+        msg: "Optimization fully deployed (database column exists, source files patched). Skipping."
+
+    - name: "Warn if database and source are out of sync"
+      when: _pco_db_has_column and not _pco_files_modified and _pco_rpm_check_available
+      ansible.builtin.pause:
+        seconds: 0
+        prompt: |
+
+          ═══════════════════════════════════════════════════════════════
+            WARNING: Optimization state mismatch detected
+
+            Database:     auto_discover_cosign column EXISTS
+            Source files: match RPM originals (NOT patched)
+
+            A Satellite update likely replaced the patched Python files.
+            The optimization will be re-deployed (source files only,
+            migration already applied).
+          ═══════════════════════════════════════════════════════════════
 
     - name: "Deploy optimization"
-      when: _pco_already_deployed.rowcount == 0
+      when: not (_pco_db_has_column and _pco_files_modified)
       block:
 
         # ==================================================================
@@ -222,7 +257,7 @@
           failed_when: _pco_compile.rc != 0
 
         # ==================================================================
-        # RUN MIGRATION
+        # RUN MIGRATION (skip if column already exists from prior deploy)
         # ==================================================================
 
         - name: "Run Django migration"
@@ -233,6 +268,7 @@
             PULP_SETTINGS: /etc/pulp/settings.py
             DJANGO_SETTINGS_MODULE: pulpcore.app.settings
           register: _pco_migration_result
+          when: not _pco_db_has_column
 
         - name: "Verify migration applied"
           become_user: "{{ pulp_container_optimization_db_user }}"
@@ -244,6 +280,7 @@
               AND name = '{{ pulp_container_optimization_migration_file | replace('.py', '') }}'
           register: _pco_migration_verify
           failed_when: _pco_migration_verify.rowcount == 0
+          when: not _pco_db_has_column
 
         - name: "Verify auto_discover_cosign column exists"
           become_user: "{{ pulp_container_optimization_db_user }}"
