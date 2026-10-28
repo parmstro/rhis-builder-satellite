@@ -81,9 +81,9 @@
     - tags_satellite_settings_notification
 
 - name: "Configure the notification settings"
-  when: settings_notification is defined and (settings_notification | length) > 0
+  when: settings_notifications is defined and (settings_notifications | length) > 0
   ansible.builtin.include_tasks: "ensure_setting.yml"
-  loop: "{{ settings_notification }}"
+  loop: "{{ settings_notifications }}"
   loop_control:
     loop_var: setting
   no_log: false

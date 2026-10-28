@@ -5,11 +5,11 @@
   block:
 
     - name: "The host to delete is baremetal - wiping the disks"
-      when: compute_resource == 'baremetal'
+      when: host.compute_resource == 'baremetal'
       redhat.satellite.job_invocation:
         username: "{{ satellite_username }}"
         password: "{{ satellite_password }}"
-        server_url: "{{ satellite_server_url }}"
+        server_url: "{{ satellite_url }}"
         job_template: "Provisioning Action - Re-init baremetal Linux Host"
         inputs:
           "action: wipe"
@@ -20,7 +20,7 @@
       redhat.satellite.host:
         username: "{{ satellite_username }}"
         password: "{{ satellite_password }}"
-        server_url: "{{ satellite_server_url }}"
+        server_url: "{{ satellite_url }}"
         organization: "{{ host.organization }}"
         location: "{{ host.location }}"
         name: "{{ host.delete_host }}"

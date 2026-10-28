@@ -42,7 +42,7 @@
         use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
         server_url: "{{ satellite_url }}"
         validate_certs: "{{ satellite_validate_certs | default(omit) }}"
-        ca_path: "{{ content_import.ca_path | default(omit) }}"
+        ca_path: "{{ content_upload.ca_path | default(omit) }}"
         organization: "{{ content_upload.organization | default(satellite_organization) }}"
         product: "{{ content_upload.product }}"
         repository: "{{ content_upload.repository | default(omit) }}" # either this or ostree repository are required

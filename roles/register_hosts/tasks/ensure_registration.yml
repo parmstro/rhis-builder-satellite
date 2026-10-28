@@ -22,14 +22,14 @@
     remote_execution_interface: "{{ satellite_existing_host.remote_execution_interface | default(omit) }}"
     repo_gpg_key_url: "{{ satellite_existing_host.repo_gpg_key_url | default(omit) }}"
     setup_insights: "{{ satellite_existing_host.setup_insights | default(omit) }}"
-    setup_remote_execution: "{{ satellite_existing_host.setup_remote_execition | default(omit) }}"
+    setup_remote_execution: "{{ satellite_existing_host.setup_remote_execution | default(omit) }}"
     setup_remote_execution_pull: "{{ satellite_existing_host.setup_remote_execution_pull | default(omit) }}"
-    smart_proxy: "{{ satellite_existing_host. | default(omit) }}"
-    update_packages: "{{ satellite_existing_host. | default(omit) }}"
+    smart_proxy: "{{ satellite_existing_host.smart_proxy | default(omit) }}"
+    update_packages: "{{ satellite_existing_host.update_packages | default(omit) }}"
   register: registration_command
 
 - name: "Perform registration" # noqa command-instead-of-shell
   ansible.builtin.shell:       # This has pipes
-    cmd: "{{ command.registration_command }}"
+    cmd: "{{ registration_command.registration_command }}"
   register: registration_result
   changed_when: registration_result.rc == 0

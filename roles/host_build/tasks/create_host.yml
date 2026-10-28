@@ -18,7 +18,7 @@
       vars:
         gfl_sat_username: "{{ satellite_username }}"
         gfl_sat_password: "{{ satellite_password }}"
-        gfl_sat_server_url: "{{ satellite_server_url }}"
+        gfl_sat_server_url: "{{ satellite_url }}"
         gfl_sat_validate_certs: "{{ satellite_validate_certs | default(omit) }}"
         gfl_sat_organization: "{{ host.organization | default(omit) }}"
         gfl_sat_params: "{{ host.params | default(omit) }}"
@@ -79,7 +79,7 @@
     username: "{{ satellite_username | default(omit) }}"
     password: "{{ satellite_password | default(omit) }}"
     use_gssapi: "{{ satellite_use_gssapi | default(omit) }}"
-    server_url: "{{ satellite_server_url }}"
+    server_url: "{{ satellite_url }}"
     organization: "{{ host.organization }}"
     location: "{{ host.location }}"
     name: "{{ host.fqdn }}"
@@ -105,7 +105,7 @@
   when: host.compute_resource == "baremetal"
   connection: local
   ansible.builtin.uri:
-    url: "{{ satellite_server_url }}/api/v2/discovered_hosts/{{ target_name }}/reboot"
+    url: "{{ satellite_url }}/api/v2/discovered_hosts/{{ target_name }}/reboot"
     method: PUT
     user: "{{ satellite_username }}"
     password: "{{ satellite_password }}"
@@ -127,7 +127,7 @@
   when: host.compute_resource == "baremetal"
   connection: local
   ansible.builtin.uri:
-    url: "{{ satellite_server_url }}/api/v2/discovered_hosts/{{ target_name }}"
+    url: "{{ satellite_url }}/api/v2/discovered_hosts/{{ target_name }}"
     method: DELETE
     user: "{{ satellite_username }}"
     password: "{{ satellite_password }}"

@@ -14,12 +14,12 @@
     description: "{{ satellite_user.description | default(omit) }}"
     admin: "{{ satellite_user.admin | default(omit) }}"
     user_password: "{{ satellite_user.user_password | default(omit) }}"
-    default_location: "{{ satellite_user.location_on_login | default(omit) }}"
-    default_organization: "{{ satellite_user.organization_on_login | default(omit) }}"
+    default_location: "{{ satellite_user.default_location | default(omit) }}"
+    default_organization: "{{ satellite_user.default_organization | default(omit) }}"
     auth_source: "{{ satellite_user.auth_source | default(omit) }}"
-    timezone: "{{ satellite_user.time_zone | default(omit) }}"
+    timezone: "{{ satellite_user.timezone | default(omit) }}"
     locale: "{{ satellite_user.locale | default('ca') }}"
     roles: "{{ satellite_user.roles | default(omit) }}" # pass a list object
-    locations: "{{ satellite_user.location_list | default(omit) }}" # pass a list object
-    organizations: "{{ satellite_user.organization_list | default(omit) }}" # pass a list object
+    locations: "{{ satellite_user.locations | default(omit) }}" # pass a list object
+    organizations: "{{ satellite_user.organizations | default(omit) }}" # pass a list object
     state: "{{ satellite_user.state | default(omit) }}"

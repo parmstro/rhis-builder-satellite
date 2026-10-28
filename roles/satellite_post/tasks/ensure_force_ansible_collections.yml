@@ -6,7 +6,7 @@
 # installed to /usr/share/ansible/roles
 
 - name: "Force global location install of ansible collections"
-  when: force_global_ansible_collections is defined and (force_global_ansible_collection | length) > 0
+  when: force_global_ansible_collections is defined and (force_global_ansible_collections | length) > 0
   ansible.builtin.command: "ansible-galaxy collection install -p /usr/share/ansible/collections --force {{ global_collection }}"
   loop: "{{ force_global_ansible_collections }}"
   loop_control:

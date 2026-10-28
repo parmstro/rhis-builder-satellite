@@ -33,7 +33,7 @@
     gpg_key: "{{ custom_product_repository.gpg_key | default(omit) }}"
     http_proxy: "{{ custom_product_repository.http_proxy | default(omit) }}"
     http_proxy_policy: "{{ custom_product_repository.http_proxy_policy | default(omit) }}"
-    ignorable_content: "{{ ignorable_content | default(omit) }}"
+    ignorable_content: "{{ custom_product_repository.ignorable_content | default(omit) }}"
     include_tags: "{{ custom_product_repository.include_tags | default(omit) }}"
     label: "{{ custom_product_repository.label | default(omit) }}"
     mirror_on_sync: "{{ custom_product_repository.mirror_on_sync | default(omit) }}"

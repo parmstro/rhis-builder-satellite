@@ -32,7 +32,7 @@
     gpg_key: "{{ satellite_repository.gpg_key | default(omit) }}"
     http_proxy: "{{ satellite_repository.http_proxy | default(omit) }}"
     http_proxy_policy: "{{ satellite_repository.http_proxy_policy | default(omit) }}"
-    ignorable_content: "{{ ignorable_content | default(omit) }}"
+    ignorable_content: "{{ satellite_repository.ignorable_content | default(omit) }}"
     include_tags: "{{ satellite_repository.include_tags | default(omit) }}"
     label: "{{ satellite_repository.label | default(omit) }}"
     mirror_on_sync: "{{ satellite_repository.mirror_on_sync | default(omit) }}"

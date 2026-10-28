@@ -12,4 +12,4 @@
     operatingsystem: "{{ operating_system.description }}"
     template_kind: "{{ default_template.template_kind }}"
     provisioning_template: "{{ default_template.name }}"
-    state: "{{ default_tempate.state | default(omit) }}"
+    state: "{{ default_template.state | default(omit) }}"
