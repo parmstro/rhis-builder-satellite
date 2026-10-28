@@ -1,0 +1,335 @@
+---
+# Clean up duplicate RPM content objects created by Red Hat CDN syncs.
+#
+# Red Hat CDN periodically pushes duplicate Pulp content objects into
+# kickstart repositories (same NEVRA + location_href, different content_ptr_ids).
+# Pulp's repository version validation rejects these during content view publish.
+#
+# This playbook dynamically discovers ALL duplicates by NEVRA, then cleans up
+# both Pulp (Content/ContentArtifact/Package/RepositoryContent) and Katello
+# (Katello::Rpm/Katello::RepositoryRpm) in a single run.
+#
+# Usage:
+#   ansible-playbook cleanup_cdn_duplicates.yml
+#   ansible-playbook cleanup_cdn_duplicates.yml -e cdn_dedup_dry_run=true
+#
+# The dry_run mode discovers and reports duplicates without deleting anything.
+
+- name: Clean up CDN duplicate RPM content in Satellite
+  hosts: sat_primary
+  become: true
+  gather_facts: true
+
+  vars:
+    cdn_dedup_log_dir: /var/log/rhis
+    cdn_dedup_dry_run: false
+    cdn_dedup_pulp_user: pulp
+    cdn_dedup_db_name: pulpcore
+    cdn_dedup_fetch_dir: /var/log/rhis/cdn_dedup
+
+  tasks:
+
+    - name: Set cleanup timestamp
+      ansible.builtin.set_fact:
+        _cdn_dedup_timestamp: "{{ now(utc=true).strftime('%Y%m%d-%H%M%S') }}"
+
+    - name: Create log directory
+      ansible.builtin.file:
+        path: "{{ cdn_dedup_log_dir }}"
+        state: directory
+        owner: "{{ cdn_dedup_pulp_user }}"
+        group: "{{ cdn_dedup_pulp_user }}"
+        mode: '0755'
+
+    - name: Set log file path
+      ansible.builtin.set_fact:
+        _cdn_dedup_log: "{{ cdn_dedup_log_dir }}/cdn_dedup_{{ _cdn_dedup_timestamp }}.log"
+
+    # ==================================================================
+    # PHASE 1: Discover duplicates and clean Pulp
+    # ==================================================================
+
+    - name: Discover and clean Pulp duplicate content
+      become_user: "{{ cdn_dedup_pulp_user }}"
+      ansible.builtin.shell: |
+        pulpcore-manager shell <<'PYEOF'
+        import json
+        import sys
+        from datetime import datetime
+        from django.db.models import Count
+        from django.db.utils import IntegrityError
+        from pulpcore.app.models import Content, ContentArtifact, RepositoryContent
+        from pulp_rpm.app.models import Package
+
+        DRY_RUN = {{ cdn_dedup_dry_run | bool | lower | capitalize }}
+        LOG_FILE = "{{ _cdn_dedup_log }}"
+
+        log = open(LOG_FILE, 'w')
+        log.write("=" * 70 + "\n")
+        log.write("CDN Duplicate RPM Content Cleanup\n")
+        log.write("=" * 70 + "\n")
+        log.write(f"Timestamp: {datetime.now().isoformat()}\n")
+        log.write(f"Dry run:   {DRY_RUN}\n\n")
+
+        # ── Discover all duplicate NEVRA groups ──────────────────────
+        dupes = Package.objects.values(
+            'name', 'epoch', 'version', 'release', 'arch'
+        ).annotate(
+            cnt=Count('content_ptr_id')
+        ).filter(cnt__gt=1).order_by('name', 'version', 'release', 'arch')
+
+        log.write(f"Found {len(dupes)} NEVRA groups with duplicates\n\n")
+
+        pairs = []
+        nevra_groups = []
+        total_removed = 0
+        errors = []
+
+        for d in dupes:
+            nevra = f"{d['name']}-{d['epoch']}:{d['version']}-{d['release']}.{d['arch']}"
+
+            qs = list(Content.objects.filter(
+                pulp_type='rpm.package',
+                rpm_package__name=d['name'],
+                rpm_package__epoch=d['epoch'],
+                rpm_package__version=d['version'],
+                rpm_package__release=d['release'],
+                rpm_package__arch=d['arch']
+            ).order_by('pulp_created'))
+
+            if len(qs) < 2:
+                continue
+
+            nevra_groups.append({'nevra': nevra, 'count': len(qs)})
+            log.write(f"── {nevra} ({len(qs)} content objects) ──\n")
+            c_good = qs[0]
+            log.write(f"  keep:   {c_good.pulp_id} (created {c_good.pulp_created})\n")
+
+            for c_dup in qs[1:]:
+                log.write(f"  remove: {c_dup.pulp_id} (created {c_dup.pulp_created})\n")
+
+                if not DRY_RUN:
+                    try:
+                        # Reassign RepositoryContent references
+                        rc_count = 0
+                        rc_deleted = 0
+                        for rc in RepositoryContent.objects.filter(content_id=c_dup.pulp_id):
+                            rc.content_id = c_good.pulp_id
+                            try:
+                                rc.save()
+                                rc_count += 1
+                            except IntegrityError:
+                                rc.delete()
+                                rc_deleted += 1
+
+                        # Delete associated records
+                        ca_count = ContentArtifact.objects.filter(content_id=c_dup.pulp_id).delete()[0]
+                        pkg_count = Package.objects.filter(content_ptr_id=c_dup.pulp_id).delete()[0]
+                        c_dup.delete()
+
+                        log.write(f"    -> Pulp cleaned (rc_reassigned={rc_count}, rc_deleted={rc_deleted}, "
+                                  f"artifacts={ca_count}, packages={pkg_count})\n")
+                    except Exception as e:
+                        err_msg = f"    -> ERROR cleaning {c_dup.pulp_id}: {str(e)}"
+                        log.write(err_msg + "\n")
+                        errors.append(err_msg)
+                        continue
+
+                pairs.append({
+                    'good_id': str(c_good.pulp_id),
+                    'dup_id': str(c_dup.pulp_id),
+                    'nevra': nevra
+                })
+                total_removed += 1
+
+            log.write("\n")
+
+        # ── Write summary ────────────────────────────────────────────
+        log.write("=" * 70 + "\n")
+        log.write(f"Pulp cleanup {'(DRY RUN) ' if DRY_RUN else ''}complete\n")
+        log.write(f"  Duplicate groups found: {len(dupes)}\n")
+        log.write(f"  Content objects {'to remove' if DRY_RUN else 'removed'}: {total_removed}\n")
+        if errors:
+            log.write(f"  Errors: {len(errors)}\n")
+        log.write("=" * 70 + "\n\n")
+        log.close()
+
+        # ── Output results to stdout for Ansible ─────────────────────
+        results = {
+            'duplicate_groups': len(dupes),
+            'total_removed': total_removed,
+            'dry_run': DRY_RUN,
+            'errors': len(errors),
+            'nevra_groups': nevra_groups,
+            'pairs': pairs
+        }
+        print(json.dumps(results))
+        PYEOF
+      environment:
+        PULP_SETTINGS: /etc/pulp/settings.py
+        DJANGO_SETTINGS_MODULE: pulpcore.app.settings
+      register: _cdn_dedup_pulp_result
+      changed_when: not cdn_dedup_dry_run
+
+    - name: Parse Pulp cleanup results
+      ansible.builtin.set_fact:
+        _cdn_dedup_results: "{{ _cdn_dedup_pulp_result.stdout | from_json }}"
+
+    - name: Display discovery results
+      ansible.builtin.pause:
+        seconds: 0
+        prompt: |
+
+          ═══════════════════════════════════════════════════════════════
+            CDN Duplicate Content — Pulp Phase {{ '(DRY RUN)' if cdn_dedup_dry_run else '' }}
+          ═══════════════════════════════════════════════════════════════
+
+            Duplicate NEVRA groups found:  {{ _cdn_dedup_results.duplicate_groups }}
+            Content objects {{ 'to remove' if cdn_dedup_dry_run else 'removed' }}:  {{ _cdn_dedup_results.total_removed }}
+            Errors:                        {{ _cdn_dedup_results.errors }}
+
+          {% for g in _cdn_dedup_results.nevra_groups %}
+            {{ "%-60s" | format(g.nevra) }} ({{ g.count }} objects)
+          {% endfor %}
+
+          ═══════════════════════════════════════════════════════════════
+
+    - name: End play if dry run
+      ansible.builtin.meta: end_play
+      when: cdn_dedup_dry_run | bool
+
+    - name: Skip Katello cleanup if no duplicates found
+      ansible.builtin.debug:
+        msg: "No duplicates found. Nothing to clean in Katello."
+      when: _cdn_dedup_results.total_removed == 0
+
+    # ==================================================================
+    # PHASE 2: Clean Katello references
+    # ==================================================================
+
+    - name: Clean Katello duplicate RPM references
+      when: _cdn_dedup_results.total_removed > 0
+      ansible.builtin.shell: |
+        foreman-rake console <<'RBEOF'
+        require 'json'
+
+        LOG_FILE = "{{ _cdn_dedup_log }}"
+
+        pairs = JSON.parse('{{ _cdn_dedup_results.pairs | to_json }}')
+
+        log = File.open(LOG_FILE, 'a')
+        log.puts "=" * 70
+        log.puts "Katello duplicate RPM cleanup"
+        log.puts "=" * 70
+        log.puts "Timestamp: #{Time.now.iso8601}"
+        log.puts "Pairs to process: #{pairs.length}"
+        log.puts
+
+        cleaned = 0
+        skipped = 0
+        errors = 0
+
+        pairs.each do |pair|
+          good_id = pair['good_id']
+          dup_id = pair['dup_id']
+          nevra = pair['nevra']
+
+          good_url = "/pulp/api/v3/content/rpm/packages/#{good_id}/"
+          dup_url = "/pulp/api/v3/content/rpm/packages/#{dup_id}/"
+
+          rpm_orig = Katello::Rpm.find_by(:pulp_id => good_url)
+          rpm_dup = Katello::Rpm.find_by(:pulp_id => dup_url)
+
+          if rpm_orig.nil? || rpm_dup.nil?
+            log.puts "  SKIP #{nevra} — #{rpm_orig.nil? ? 'orig' : 'dup'} not found in Katello"
+            skipped += 1
+            next
+          end
+
+          begin
+            # Remove duplicate repo memberships where the original already exists
+            Katello::RepositoryRpm.where(:rpm_id => rpm_dup.id).each do |record|
+              existing = Katello::RepositoryRpm.find_by(
+                :rpm_id => rpm_orig.id,
+                :repository_id => record.repository_id
+              )
+              record.destroy if existing.present?
+            end
+
+            # Reassign remaining repo memberships from dup to original
+            Katello::RepositoryRpm.where(:rpm_id => rpm_dup.id).update_all(:rpm_id => rpm_orig.id)
+
+            # Delete the duplicate Katello RPM record
+            rpm_dup.destroy!
+
+            log.puts "  OK   #{nevra} — keep #{good_id}, removed #{dup_id}"
+            cleaned += 1
+          rescue => e
+            log.puts "  ERR  #{nevra} — #{e.message}"
+            errors += 1
+          end
+        end
+
+        log.puts
+        log.puts "=" * 70
+        log.puts "Katello cleanup complete"
+        log.puts "  Cleaned: #{cleaned}"
+        log.puts "  Skipped: #{skipped} (not in Katello)"
+        log.puts "  Errors:  #{errors}"
+        log.puts "=" * 70
+
+        log.close
+
+        puts "KATELLO_RESULT:#{cleaned}:#{skipped}:#{errors}"
+        RBEOF
+      register: _cdn_dedup_katello_result
+      changed_when: true
+      failed_when: >-
+        _cdn_dedup_katello_result.rc != 0 or
+        'KATELLO_RESULT:' not in (_cdn_dedup_katello_result.stdout | default(''))
+
+    - name: Parse Katello results
+      when: _cdn_dedup_results.total_removed > 0
+      ansible.builtin.set_fact:
+        _cdn_dedup_katello: "{{ _cdn_dedup_katello_result.stdout_lines | select('match', 'KATELLO_RESULT:') | first }}"
+
+    # ==================================================================
+    # SUMMARY
+    # ==================================================================
+
+    - name: Display final summary
+      ansible.builtin.pause:
+        seconds: 0
+        prompt: |
+
+          ═══════════════════════════════════════════════════════════════
+            CDN Duplicate Content Cleanup — Complete
+          ═══════════════════════════════════════════════════════════════
+
+            Pulp:
+              Duplicate NEVRA groups:    {{ _cdn_dedup_results.duplicate_groups }}
+              Content objects removed:   {{ _cdn_dedup_results.total_removed }}
+              Errors:                    {{ _cdn_dedup_results.errors }}
+
+            Katello:
+              RPM records cleaned:       {{ _cdn_dedup_katello.split(':')[1] | default('0') }}
+              Skipped (not in Katello):  {{ _cdn_dedup_katello.split(':')[2] | default('0') }}
+              Errors:                    {{ _cdn_dedup_katello.split(':')[3] | default('0') }}
+
+            Log (remote): {{ _cdn_dedup_log }}
+            Log (local):  {{ cdn_dedup_fetch_dir }}/
+          ═══════════════════════════════════════════════════════════════
+
+    - name: Create local log directory
+      ansible.builtin.file:
+        path: "{{ cdn_dedup_fetch_dir }}"
+        state: directory
+        mode: '0755'
+      delegate_to: localhost
+      become: false
+
+    - name: Fetch log from satellite
+      ansible.builtin.fetch:
+        src: "{{ _cdn_dedup_log }}"
+        dest: "{{ cdn_dedup_fetch_dir }}/"
+        flat: true
