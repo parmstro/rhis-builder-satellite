@@ -13,14 +13,15 @@
     - tags_satellite_pre_idm_integration
     - tags_satellite_before_sync
 
-- name: "Set up IdM reverse lookup zone to allow foreman proxy to update DNS"
+- name: "Set up IdM reverse lookup zones to allow foreman proxy to update DNS"
   redhat.rhel_idm.ipadnszone:
     ipaadmin_principal: "{{ ipa_admin_principal }}"
     ipaadmin_password: "{{ ipa_admin_password }}"
-    name: "{{ ipa_dns_reverse_zone }}"
-    update_policy: "{{ foreman_proxy_bind_update_policy_reverse }}"
+    name: "{{ item }}"
+    update_policy: "grant {{ ipa_server_realm }} krb5-subdomain {{ item }} PTR;{{ foreman_proxy_dns_update_policy_reverse }}"
     allow_sync_ptr: true
     dynamic_update: true
+  loop: "{{ ipa_dns_reverse_zones }}"
   tags:
     - tags_satellite_pre
     - tags_satellite_pre_idm_integration
